@@ -1,0 +1,49 @@
+Reference, Quantity, Value, Footprint, Datasheet, Part Number
+BT1,1,18650_Battery_Cell_1043,,https://www.digikey.com/product-detail/en/keystone-electronics/1043/36-1043-ND/2745669
+C1 C13 C14 C15 C16 C18 C20 C21 C22 C23 C24 C37 C38,13,C_0.1uF,Capacitors_SMD:C_0603,https://www.digikey.com/product-detail/en/kemet/C0603C104K5RACTU/399-5089-1-ND/1465623,C0603C104K5RACTU
+C10 C11 C12 C19 C27 C28,6,C_1uF,Capacitors_SMD:C_0603,https://www.digikey.com/product-detail/en/yageo/CC0603ZRY5V7BB105/311-1372-1-ND/2103156,CC0603ZRY5V7BB105
+C25 C26,2,C_33uF,Capacitors_SMD:C_0805,https://www.digikey.com/product-detail/en/yageo/CC0603ZRY5V7BB105/311-1372-1-ND/2103156,C2012X5R1A336M125AC
+C3 C4,2,1uF,Capacitors_SMD:C_0603_HandSoldering,http://www.yageo.com/documents/recent/UPY-GPHC_Y5V_6.3V-to-50V_6.pdf,CC0603ZRY5V7BB105
+C29 C30,2,C_100pF,Capacitors_SMD:C_0603,https://www.digikey.com/product-detail/en/avx-corporation/06035A101FAT2A/478-6202-1-ND/2391401,06035A101FAT2A
+C31 C32,2,C_10uF,Capacitors_SMD:C_0603,https://www.digikey.com/product-detail/en/murata-electronics-north-america/GRM188R61A106ME69D/490-10475-1-ND/5026393,GRM188R61A106ME69D
+C35,1,C_150pF,Capacitors_SMD:C_0603,https://www.digikey.com/product-detail/en/murata-electronics-north-america/GRM1885C1H151JA01D/490-1431-1-ND/587669,GRM1885C1H151JA01D
+C33 C34 C36,3,C_330pF,Capacitors_SMD:C_0603,https://www.digikey.com/product-detail/en/kemet/C0603C331F5GACTU/399-7898-1-ND/3471621,C0603C331F5GACTU
+C5 C6 C7,3,4.7uF,Capacitors_SMD:C_0603_HandSoldering,http://media.digikey.com/pdf/Data%20Sheets/Samsung%20PDFs/CL_Series_MLCC_ds.pdf,CL10B475KQ8NQNC
+C2 C8 C9 C17,4,C_100uF,Capacitors_SMD:C_1206,https://www.digikey.com/product-detail/en/kemet/C0603C104K5RACTU/399-5089-1-ND/1465623,C3216X5R1A107M160AC
+D1,1,LED,LEDs:LED_D3.0mm,http://www.mouser.com/ds/2/149/QED123-890063.pdf,QED123
+D2,1,LED,LEDs:LED_0603,http://www.osram-os.com/Graphics/XPic9/00128792_0.pdf,475-2512-2-ND
+D3,1,LED-GREEN-LTST-C191GKT,LEDs:LED_0603,https://www.digikey.com/product-detail/en/lite-on-inc/LTST-C191GKT/160-1443-1-ND/386828,LTST-C191GKT
+LS1,1,Speaker,footprints:speaker-1508,http://www.cui.com/product/resource/cvs-1508.pdf,CVS-1508
+P1,1,CONN_01X03,open-automation:Pin_Header_Straight_1x03_Pitch2.54mm_CORRECTED,http://www.digikey.com/product-detail/en/hirose-electric-co-ltd/DF13C-3P-1.25V(21)/H121960CT-ND/3907735,A04KR04DA28W51B
+PROG1,1,SW_PUSH,Buttons_Switches_SMD:SW_SPST_KMR2,http://www.mouser.com/ds/2/60/KMR2_9aug12-25127.pdf,KMR211NG LFS
+Q1,1,Q_NPN_BEC,TO_SOT_Packages_SMD:SOT-23,http://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF,MMBT3904LT1GOSCT-ND
+Q2,1,Q_NMOS_GSD,TO_SOT_Packages_SMD:SOT-23,http://www.mouser.com/ds/2/308/2N7002L-D-105484.pdf,2N7002L
+Q3,1,Q_PMOS_GSD,TO_SOT_Packages_SMD:SOT-23,https://www.fairchildsemi.com/datasheets/BS/BSS84.pdf,BSS84
+Q4,1,PMOS-DMG3413L,TO_SOT_Packages_SMD:SOT-23,https://www.digikey.com/product-detail/en/diodes-incorporated/DMG3413L-7/DMG3413L-7DICT-ND/5218387,DMG3413L-7
+R1 R2 R6 R7 R9 R22 R25 R26 R47,9,R_10k,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603JR-0710KL/311-10KGRCT-ND/729647,RC0603JR-0710KL
+R10,1,R_1k,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603JR-071KL/311-1.0KGRCT-ND/729624,RC0603JR-071KL
+R11 R17 R18 R23 R24,5,R_10,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/te-connectivity-passive-product/CPF0603B10RE/A119908CT-ND/4966506,CPF0603B10RE
+R19,1,R_2k,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603JR-072KL/311-2.0KGRCT-ND/729673,RC0603JR-072KL
+R20 R21,2,100K,Resistors_SMD:R_0603_HandSoldering,http://www.yageo.com/documents/recent/PYu-RC_Group_51_RoHS_L_7.pdf,RC0603JR-07150KL
+R27 R28,2,R_1M3,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603JR-071M3L/311-1.3MGRCT-ND/729634,RC0603JR-071M3L
+R3 R4 R14 R15 R16,5,1K,Resistors_SMD:R_0603_HandSoldering,http://www.digikey.com/en/resources/datasheets/yageo/rc-series-l-suffix-datasheet,RC0603JR-071KL
+R29 R30,2,R_40k2,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603FR-0740K2L/311-40.2KHRCT-ND/730168,RC0603FR-0740K2L
+R31 R32 R33 R34 R35 R36 R43 R44 R45 R46,10,R_15M,Resistors_SMD:R_0603,https://www.digikey.com/products/en?keywords=RC0603JR-0715ML,RC0603JR-0715ML
+R39 R40,2,R_150k,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603FR-07150KL/311-150KHRCT-ND/729906,RC0603FR-07150KL
+R41,1,R_10M,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603JR-0710ML/311-10MGRCT-ND/729648,RC0603JR-0710ML
+R37 R38 R42,3,R_100k,Resistors_SMD:R_0603,https://www.digikey.com/product-detail/en/yageo/RC0603JR-07100KL/311-100KGRCT-ND/729645,RC0603JR-07100KL
+R5 R8 R12 R13,4,36,Resistors_SMD:R_0603_HandSoldering,http://www.yageo.com.tw/exep/pages/download/literatures/PYu-R_INT-thick_7.pdf,RC0603JR-0736RL
+U1,1,ESP-WROOM-32,footprints:ESP-WROOM-32,http://espressif.com/sites/default/files/documentation/esp-wroom-32_datasheet_en.pdf
+U9 U10,2,IRA-S210ST01,open-automation:IRA-S210ST01,https://www.digikey.com/product-detail/en/murata-electronics-north-america/IRA-S210ST01/490-11915-ND/5012561,IRA-S210ST01
+U12,1,soft-button-4x,open-automation:soft-button-4,
+U11 U13,2,OPA349SA/3K,TO_SOT_Packages_SMD:SOT-23-5,https://www.digikey.com/product-detail/en/texas-instruments/OPA349NA-3K/296-39127-1-ND/5143141,OPA349NA/3K
+U14 U15,2,TLV369IDCKT,TO_SOT_Packages_SMD:SOT-23-5,https://www.digikey.com/product-detail/en/texas-instruments/TLV369IDCKT/296-44550-1-ND/6128458,TLV369IDCKT
+U16 U17,2,TLV3691IDCKR,TO_SOT_Packages_SMD:SOT-353_SC-70-5_Handsoldering,https://www.digikey.com/product-detail/en/texas-instruments/TLV3691IDCKR/296-37910-1-ND/4900957,TLV3691IDCKR
+U18,1,AZ1117E,TO_SOT_Packages_SMD:SOT-223,https://www.digikey.com/product-detail/en/diodes-incorporated/AZ1117EH-3.3TRG1/AZ1117EH-3.3TRG1DICT-ND/5001336,AZ1117EH-3.3TRG1
+U2,1,PT5529B/L2/H2-F,footprints:PT5529,http://www.everlight.com/file/ProductFile/PT5529B-L2-H2-F.pdf,1080-1161-ND
+U3,1,SPH0645LM4H-B,open-automation:SPH0645LM4H-B,https://www.digikey.com/product-detail/en/knowles/SPH0645LM4H-B/423-1405-6-ND/5332436,SPH0645LM4H-B
+U4,1,MCP73831T,TO_SOT_Packages_SMD:SOT-23-5,https://www.digikey.com/product-detail/en/microchip-technology/MCP73831T-2ACI-OT/MCP73831T-2ACI-OTCT-ND/1979802,MCP73831T
+U5,1,OPT3001,Housings_DFN_QFN:DFN-6-1EP_2x2mm_Pitch0.65mm,https://www.digikey.com/product-detail/en/texas-instruments/OPT3001DNPR/296-40474-1-ND/5178351,OPT3001
+U6,1,SI7020-A20,open-automation:SI7020-A20,https://www.digikey.com/product-detail/en/silicon-labs/SI7020-A20-GM1R/336-3596-1-ND/5823452,SI7020-A20-GM1R
+U7,1,RGB-LED,open-automation:RGB-LED-J-Lead-SMD-6,https://www.digikey.com/product-detail/en/osram-opto-semiconductors-inc/LTRBGFSF-ABCB-QKYO-Z/475-2899-6-ND/2415092,LTRBGFSF-ABCB-QKYO-Z
+U8,1,Amplifier-D-TS4962IQT,open-automation:Amplifier-D-TS4962IQT,https://www.digikey.com/product-detail/en/stmicroelectronics/TS4962IQT/497-5993-1-ND/1578476,TS4962IQT

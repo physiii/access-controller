@@ -1,0 +1,20 @@
+sdspi_crc.o: /usr/local/src/esp/esp-idf/components/driver/sdspi_crc.c \
+ /usr/local/src/esp/esp-idf/components/newlib/include/stdint.h \
+ /usr/local/src/esp/esp-idf/components/newlib/include/machine/_default_types.h \
+ /usr/local/src/esp/esp-idf/components/newlib/include/sys/features.h \
+ /usr/local/src/esp/esp-idf/components/newlib/include/sys/_intsup.h \
+ /usr/local/src/esp/esp-idf/components/esp32/include/rom/crc.h \
+ /usr/local/src/esp/esp-idf/components/driver/sdspi_crc.h
+
+/usr/local/src/esp/esp-idf/components/newlib/include/stdint.h:
+
+/usr/local/src/esp/esp-idf/components/newlib/include/machine/_default_types.h:
+
+/usr/local/src/esp/esp-idf/components/newlib/include/sys/features.h:
+
+/usr/local/src/esp/esp-idf/components/newlib/include/sys/_intsup.h:
+
+/usr/local/src/esp/esp-idf/components/esp32/include/rom/crc.h:
+
+/usr/local/src/esp/esp-idf/components/driver/sdspi_crc.h:
+/usr/local/src/esp/esp-idf/components/driver/./sdspi_crc.c:

@@ -1,0 +1,358 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:open-automation
+LIBS:liger-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 9
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L GND #PWR012
+U 1 1 5909DD67
+P 5125 3875
+F 0 "#PWR012" H 5125 3625 50  0001 C CNN
+F 1 "GND" H 5125 3725 50  0000 C CNN
+F 2 "" H 5125 3875 50  0000 C CNN
+F 3 "" H 5125 3875 50  0000 C CNN
+	1    5125 3875
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR013
+U 1 1 59A4BAA9
+P 3500 3850
+F 0 "#PWR013" H 3500 3600 50  0001 C CNN
+F 1 "GND" H 3500 3700 50  0000 C CNN
+F 2 "" H 3500 3850 50  0000 C CNN
+F 3 "" H 3500 3850 50  0000 C CNN
+	1    3500 3850
+	1    0    0    -1  
+$EndComp
+Text Label 4750 1400 0    394  ~ 0
+Power
+$Comp
+L R_1k R10
+U 1 1 59B41A3B
+P 6575 3450
+F 0 "R10" V 6655 3450 50  0000 C CNN
+F 1 "R_1k" V 6575 3450 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 6505 3450 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/RC0603JR-071KL/311-1.0KGRCT-ND/729624" V 6655 3450 50  0001 C CNN
+F 4 "RC0603JR-071KL" V 6755 3550 60  0001 C CNN "Part Number"
+	1    6575 3450
+	0    1    1    0   
+$EndComp
+$Comp
+L MCP73831T U4
+U 1 1 59B41D1D
+P 7325 3550
+F 0 "U4" H 7325 3350 60  0000 C CNN
+F 1 "MCP73831T" H 7275 3750 60  0000 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23-5" H 7575 3250 60  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/microchip-technology/MCP73831T-2ACI-OT/MCP73831T-2ACI-OTCT-ND/1979802" H 7825 3150 60  0001 C CNN
+F 4 "MCP73831T-2ACI/OT" H 7275 3850 60  0001 C CNN "Part Number"
+	1    7325 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR014
+U 1 1 59B41D6D
+P 7975 3950
+F 0 "#PWR014" H 7975 3700 50  0001 C CNN
+F 1 "GND" H 7975 3800 50  0000 C CNN
+F 2 "" H 7975 3950 50  0000 C CNN
+F 3 "" H 7975 3950 50  0000 C CNN
+	1    7975 3950
+	1    0    0    -1  
+$EndComp
+Text GLabel 8125 3250 1    60   Input ~ 0
+V_BAT
+$Comp
+L PMOS-DMG3413L Q4
+U 1 1 59B57188
+P 3400 3125
+F 0 "Q4" H 3550 3275 50  0000 L CNN
+F 1 "PMOS-DMG3413L" H 3150 2975 50  0001 L CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23" H 3600 3050 50  0001 L CIN
+F 3 "https://www.digikey.com/product-detail/en/diodes-incorporated/DMG3413L-7/DMG3413L-7DICT-ND/5218387" H 3600 3200 50  0001 L CNN
+F 4 "DMG3413L-7" H 3700 3300 60  0001 C CNN "Part Number"
+	1    3400 3125
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR015
+U 1 1 59B57C4B
+P 8275 3950
+F 0 "#PWR015" H 8275 3700 50  0001 C CNN
+F 1 "GND" H 8275 3800 50  0000 C CNN
+F 2 "" H 8275 3950 50  0000 C CNN
+F 3 "" H 8275 3950 50  0000 C CNN
+	1    8275 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED-GREEN-LTST-C191GKT D3
+U 1 1 59B58167
+P 6375 3650
+F 0 "D3" H 6375 3750 50  0000 C CNN
+F 1 "LED-GREEN-LTST-C191GKT" H 6375 3850 50  0001 C CNN
+F 2 "LEDs:LED_0603_HandSoldering" H 6275 3650 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/lite-on-inc/LTST-C191GKT/160-1443-1-ND/386828" H 6375 3750 50  0001 C CNN
+F 4 "LTST-C191GKT" H 6475 3850 60  0001 C CNN "Part Number"
+	1    6375 3650
+	0    -1   -1   0   
+$EndComp
+Text GLabel 6775 3150 1    60   Input ~ 0
+V_USB
+$Comp
+L GND #PWR016
+U 1 1 59B58DE3
+P 2975 3925
+F 0 "#PWR016" H 2975 3675 50  0001 C CNN
+F 1 "GND" H 2975 3775 50  0000 C CNN
+F 2 "" H 2975 3925 50  0000 C CNN
+F 3 "" H 2975 3925 50  0000 C CNN
+	1    2975 3925
+	1    0    0    -1  
+$EndComp
+$Comp
+L R_10k R22
+U 1 1 59B5A0F4
+P 2975 3700
+F 0 "R22" V 2975 3700 50  0000 C CNN
+F 1 "R_10k" V 2875 3700 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 2905 3700 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/RC0603JR-0710KL/311-10KGRCT-ND/729647" V 3055 3700 50  0001 C CNN
+F 4 "RC0603JR-0710KL" V 3155 3800 60  0001 C CNN "Part Number"
+	1    2975 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L R_2k R19
+U 1 1 59B5A181
+P 7975 3700
+F 0 "R19" V 7975 3700 50  0000 C CNN
+F 1 "R_2k" V 7875 3700 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 7905 3700 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/RC0603JR-072KL/311-2.0KGRCT-ND/729673" V 8055 3700 50  0001 C CNN
+F 4 "RC0603JR-072KL" V 8155 3800 60  0001 C CNN "Part Number"
+	1    7975 3700
+	-1   0    0    1   
+$EndComp
+Text GLabel 2775 3450 0    60   Input ~ 0
+V_USB
+$Comp
+L C_1uF C3
+U 1 1 59BA119E
+P 3500 3650
+F 0 "C3" H 3525 3750 50  0000 L CNN
+F 1 "C_1uF" H 3250 3550 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 3600 3950 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/CC0603ZRY5V7BB105/311-1372-1-ND/2103156" H 3500 3400 50  0001 C CNN
+F 4 "CC0603ZRY5V7BB105" H 3625 3850 60  0001 C CNN "Part Number"
+	1    3500 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L C_1uF C4
+U 1 1 59BA1591
+P 5125 3675
+F 0 "C4" H 5150 3775 50  0000 L CNN
+F 1 "C_1uF" H 5150 3600 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 5225 3975 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/CC0603ZRY5V7BB105/311-1372-1-ND/2103156" H 5125 3425 50  0001 C CNN
+F 4 "CC0603ZRY5V7BB105" H 5250 3875 60  0001 C CNN "Part Number"
+	1    5125 3675
+	1    0    0    -1  
+$EndComp
+$Comp
+L 18650_Battery_Cell_1043 BT1
+U 1 1 59BA3E14
+P 8275 3750
+F 0 "BT1" H 8375 3850 50  0000 L CNN
+F 1 "18650_Battery_Cell_1043" H 8375 3750 50  0001 L CNN
+F 2 "" V 8275 3810 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/keystone-electronics/1043/36-1043-ND/2745669" V 8275 3810 50  0001 C CNN
+F 4 "36-1043-ND" H 8475 3950 60  0001 C CNN "Part Number"
+	1    8275 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L D_Schottky-BAT20JFILM D6
+U 1 1 59EBB5BE
+P 3200 3450
+F 0 "D6" H 3200 3550 50  0000 C CNN
+F 1 "D_Schottky-BAT20JFILM" H 3200 3350 50  0001 C CNN
+F 2 "Diodes_SMD:D_SOD-323_HandSoldering" H 3200 3275 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/stmicroelectronics/BAT20JFILM/497-3381-1-ND/669138" H 3200 3200 50  0001 C CNN
+F 4 "BAT20JFILM" H 3250 3625 60  0001 C CNN "Part Number"
+	1    3200 3450
+	-1   0    0    1   
+$EndComp
+Text GLabel 3500 2800 1    60   Input ~ 0
+V_BAT
+Wire Wire Line
+	3500 2800 3500 2925
+Connection ~ 2975 3450
+Wire Wire Line
+	2775 3450 3050 3450
+Wire Wire Line
+	2975 3925 2975 3850
+Wire Wire Line
+	8275 3850 8275 3950
+Wire Wire Line
+	8275 3450 8275 3550
+Wire Wire Line
+	7775 3550 7975 3550
+Connection ~ 7975 3900
+Wire Wire Line
+	7825 3900 7975 3900
+Wire Wire Line
+	7975 3850 7975 3950
+Connection ~ 8125 3450
+Connection ~ 6775 3450
+Wire Wire Line
+	6775 3150 6775 3450
+Wire Wire Line
+	6725 3800 6725 3650
+Wire Wire Line
+	6375 3800 6725 3800
+Wire Wire Line
+	6375 3450 6375 3500
+Wire Wire Line
+	6425 3450 6375 3450
+Wire Wire Line
+	6825 3450 6725 3450
+Wire Wire Line
+	8125 3250 8125 3450
+Wire Wire Line
+	7775 3450 8700 3450
+Wire Wire Line
+	6725 3650 6825 3650
+Wire Wire Line
+	7825 3650 7825 3900
+Wire Wire Line
+	7775 3650 7825 3650
+Connection ~ 3500 3450
+Wire Wire Line
+	3500 3850 3500 3800
+Wire Wire Line
+	3350 3450 3900 3450
+Wire Wire Line
+	3500 3325 3500 3500
+Wire Wire Line
+	5125 3875 5125 3825
+$Comp
+L C_1uF C5
+U 1 1 59EBD4F3
+P 8700 3700
+F 0 "C5" H 8725 3800 50  0000 L CNN
+F 1 "C_1uF" H 8475 3600 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 8800 4000 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/CC0603ZRY5V7BB105/311-1372-1-ND/2103156" H 8700 3450 50  0001 C CNN
+F 4 "CC0603ZRY5V7BB105" H 8825 3900 60  0001 C CNN "Part Number"
+	1    8700 3700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8700 3450 8700 3550
+Connection ~ 8275 3450
+$Comp
+L GND #PWR017
+U 1 1 59EBD5C7
+P 8700 3950
+F 0 "#PWR017" H 8700 3700 50  0001 C CNN
+F 1 "GND" H 8700 3800 50  0000 C CNN
+F 2 "" H 8700 3950 50  0000 C CNN
+F 3 "" H 8700 3950 50  0000 C CNN
+	1    8700 3950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8700 3950 8700 3850
+Text GLabel 3075 3125 0    60   Input ~ 0
+V_USB
+Wire Wire Line
+	3075 3125 3200 3125
+Wire Wire Line
+	2975 3550 2975 3450
+$Comp
+L AP2112 U9
+U 1 1 5A164E45
+P 4350 3525
+F 0 "U9" H 4525 3350 60  0000 C CNN
+F 1 "AP2112" H 4350 3725 60  0000 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23-5" H 4350 3200 60  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/diodes-incorporated/AP2112K-3.3TRG1/AP2112K-3.3TRG1DICT-ND/4505257" H 4350 3100 60  0001 C CNN
+F 4 "AP2112K-3.3TRG1" H 4350 3825 60  0001 C CNN "Part Number"
+	1    4350 3525
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR018
+U 1 1 5A1650D9
+P 4850 3650
+F 0 "#PWR018" H 4850 3400 50  0001 C CNN
+F 1 "GND" H 4850 3500 50  0000 C CNN
+F 2 "" H 4850 3650 50  0000 C CNN
+F 3 "" H 4850 3650 50  0000 C CNN
+	1    4850 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4800 3600 4850 3600
+Wire Wire Line
+	4850 3600 4850 3650
+Wire Wire Line
+	5125 3450 5125 3525
+Wire Wire Line
+	4800 3450 5250 3450
+Wire Wire Line
+	3850 3600 3900 3600
+Wire Wire Line
+	3850 3300 3850 3600
+Connection ~ 3850 3450
+Text GLabel 5250 3450 2    60   Input ~ 0
+3V3
+Connection ~ 5125 3450
+Text GLabel 3850 3300 1    60   Input ~ 0
+V_IN
+$EndSCHEMATC

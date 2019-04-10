@@ -1,0 +1,10 @@
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/install/strip.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/install/local.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/install.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/list_install_components.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/dist.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/edit_cache.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/websockets.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/package.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/package_source.dir
+/home/andy/devices/liger/code/build/libwebsockets/CMakeFiles/rebuild_cache.dir

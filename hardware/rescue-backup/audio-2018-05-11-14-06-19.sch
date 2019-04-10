@@ -1,0 +1,304 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:open-automation
+LIBS:liger-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 4 9
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text Label 5425 1950 0    197  ~ 0
+AUDIO
+$Comp
+L SPH0645LM4H-B U3
+U 1 1 5A1620A8
+P 4100 4300
+F 0 "U3" H 4300 4000 60  0000 C CNN
+F 1 "SPH0645LM4H-B" H 4100 4500 60  0000 C CNN
+F 2 "open-automation:SPH0645LM4H-B" H 4100 3900 60  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/knowles/SPH0645LM4H-B/423-1405-6-ND/5332436" H 4050 3800 60  0001 C CNN
+F 4 "SPH0645LM4H-B" H 4100 4600 60  0001 C CNN "Part Number"
+	1    4100 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR06
+U 1 1 5A1620A9
+P 3650 4550
+F 0 "#PWR06" H 3650 4300 50  0001 C CNN
+F 1 "GND" H 3650 4400 50  0000 C CNN
+F 2 "" H 3650 4550 50  0000 C CNN
+F 3 "" H 3650 4550 50  0000 C CNN
+	1    3650 4550
+	1    0    0    -1  
+$EndComp
+Text GLabel 4600 4450 2    60   Input ~ 0
+I2S_BCLK
+Text GLabel 5050 4150 2    60   Input ~ 0
+I2S_DATA_IN
+Text GLabel 4600 4350 2    60   Input ~ 0
+I2S_WS
+$Comp
+L C_0.1uF C8
+U 1 1 5A1620AA
+P 3400 4550
+F 0 "C8" H 3425 4650 50  0000 L CNN
+F 1 "C_0.1uF" H 3075 4450 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 3500 4850 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/kemet/C0603C104K5RACTU/399-5089-1-ND/1465623" H 3400 4300 50  0001 C CNN
+F 4 "C0603C104K5RACTU" H 3525 4750 60  0001 C CNN "Part Number"
+	1    3400 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR07
+U 1 1 5A1620AB
+P 3400 4750
+F 0 "#PWR07" H 3400 4500 50  0001 C CNN
+F 1 "GND" H 3400 4600 50  0000 C CNN
+F 2 "" H 3400 4750 50  0000 C CNN
+F 3 "" H 3400 4750 50  0000 C CNN
+	1    3400 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L R_47.5 R11
+U 1 1 5A1620AC
+P 4750 4150
+F 0 "R11" V 4750 4150 50  0000 C CNN
+F 1 "R_47.5" V 4675 4150 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 4680 4150 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/RC0603FR-0747R5L/311-47.5HRCT-ND/730201" V 4830 4150 50  0001 C CNN
+F 4 "RC0603FR-0747R5L" V 4930 4250 60  0001 C CNN "Part Number"
+	1    4750 4150
+	0    1    1    0   
+$EndComp
+$Comp
+L R_100k R9
+U 1 1 5A1620AD
+P 4750 3950
+F 0 "R9" V 4750 3950 50  0000 C CNN
+F 1 "R_100k" V 4650 3950 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 4680 3950 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/RC0603JR-07100KL/311-100KGRCT-ND/729645" V 4830 3950 50  0001 C CNN
+F 4 "RC0603JR-07100KL" V 4930 4050 60  0001 C CNN "Part Number"
+	1    4750 3950
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR08
+U 1 1 5A1620AE
+P 4950 3950
+F 0 "#PWR08" H 4950 3700 50  0001 C CNN
+F 1 "GND" H 4950 3800 50  0000 C CNN
+F 2 "" H 4950 3950 50  0000 C CNN
+F 3 "" H 4950 3950 50  0000 C CNN
+	1    4950 3950
+	0    -1   -1   0   
+$EndComp
+Text GLabel 3250 4250 0    60   Input ~ 0
+3V3
+Connection ~ 4550 4150
+Wire Wire Line
+	4600 3950 4550 3950
+Wire Wire Line
+	4550 4150 4600 4150
+Wire Wire Line
+	4550 3950 4550 4250
+Wire Wire Line
+	4550 4250 4500 4250
+Wire Wire Line
+	4900 3950 4950 3950
+Wire Wire Line
+	4900 4150 5050 4150
+Wire Wire Line
+	3400 4700 3400 4750
+Connection ~ 3400 4250
+Wire Wire Line
+	3400 4400 3400 4250
+Wire Wire Line
+	3250 4250 3700 4250
+Connection ~ 3650 4500
+Wire Wire Line
+	3700 4350 3650 4350
+Wire Wire Line
+	3650 4350 3650 4550
+Wire Wire Line
+	3700 4500 3650 4500
+Wire Wire Line
+	4600 4350 4500 4350
+Wire Wire Line
+	4500 4450 4600 4450
+Text Label 3200 3550 0    197  ~ 0
+Microphone
+$Comp
+L R_100k R17
+U 1 1 5A1620AF
+P 7000 4325
+F 0 "R17" V 7000 4325 50  0000 C CNN
+F 1 "R_100k" V 6925 4325 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 6930 4325 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/RC0603JR-07100KL/311-100KGRCT-ND/729645" V 7080 4325 50  0001 C CNN
+F 4 "RC0603JR-07100KL" V 7180 4425 60  0001 C CNN "Part Number"
+	1    7000 4325
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR09
+U 1 1 5A1620B0
+P 7225 4550
+F 0 "#PWR09" H 7225 4300 50  0001 C CNN
+F 1 "GND" H 7225 4400 50  0000 C CNN
+F 2 "" H 7225 4550 50  0000 C CNN
+F 3 "" H 7225 4550 50  0000 C CNN
+	1    7225 4550
+	1    0    0    -1  
+$EndComp
+Text GLabel 7175 4150 0    60   Input ~ 0
+I2S_DATA_OUT
+Text GLabel 6900 4450 0    60   Input ~ 0
+V_IN
+Wire Wire Line
+	7225 4550 7225 4525
+Wire Wire Line
+	7225 4525 7250 4525
+Wire Wire Line
+	6900 4450 7250 4450
+Wire Wire Line
+	7175 4150 7250 4150
+Wire Wire Line
+	8350 4150 8500 4150
+Wire Wire Line
+	8350 4250 8575 4250
+Text GLabel 8450 4350 2    60   Input ~ 0
+I2S_WS
+Text GLabel 8450 4450 2    60   Input ~ 0
+I2S_BCLK
+Wire Wire Line
+	8450 4450 8350 4450
+Wire Wire Line
+	8450 4350 8350 4350
+$Comp
+L MAX98357AETE+T U5
+U 1 1 5A1620B1
+P 7600 4275
+F 0 "U5" H 8050 3925 60  0000 C CNN
+F 1 "MAX98357AETE+T" H 7800 4500 60  0000 C CNN
+F 2 "open-automation:MAX98357A" H 7950 3825 60  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/maxim-integrated/MAX98357AETE-T/MAX98357AETE-TCT-ND/7603777" H 7775 3850 60  0001 C CNN
+F 4 "MAX98357AETE+T" H 7800 4575 60  0000 C CNN "Part Number"
+	1    7600 4275
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7250 4350 7200 4350
+Wire Wire Line
+	7200 4350 7200 4450
+Connection ~ 7200 4450
+$Comp
+L GND #PWR010
+U 1 1 5A1620B2
+P 6750 4325
+F 0 "#PWR010" H 6750 4075 50  0001 C CNN
+F 1 "GND" V 6700 4150 50  0000 C CNN
+F 2 "" H 6750 4325 50  0000 C CNN
+F 3 "" H 6750 4325 50  0000 C CNN
+	1    6750 4325
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6750 4325 6850 4325
+Wire Wire Line
+	7150 4325 7175 4325
+Wire Wire Line
+	7175 4325 7175 4250
+Wire Wire Line
+	7175 4250 7250 4250
+$Comp
+L C_1uF C10
+U 1 1 5A1620B3
+P 7000 4625
+F 0 "C10" H 7025 4725 50  0000 L CNN
+F 1 "C_1uF" H 6775 4525 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 7100 4925 50  0001 C CNN
+F 3 "https://www.digikey.com/product-detail/en/yageo/CC0603ZRY5V7BB105/311-1372-1-ND/2103156" H 7000 4375 50  0001 C CNN
+F 4 "CC0603ZRY5V7BB105" H 7125 4825 60  0001 C CNN "Part Number"
+	1    7000 4625
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7000 4475 7000 4450
+Connection ~ 7000 4450
+$Comp
+L GND #PWR011
+U 1 1 5A1620B4
+P 7000 4825
+F 0 "#PWR011" H 7000 4575 50  0001 C CNN
+F 1 "GND" H 7000 4675 50  0000 C CNN
+F 2 "" H 7000 4825 50  0000 C CNN
+F 3 "" H 7000 4825 50  0000 C CNN
+	1    7000 4825
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7000 4825 7000 4775
+$Comp
+L speaker-CVS-1508 LS1
+U 1 1 5A1620B5
+P 8825 3950
+F 0 "LS1" H 8825 4075 50  0000 R CNN
+F 1 "speaker-CVS-1508" H 8875 4100 50  0001 R CNN
+F 2 "open-automation:speaker-1508" H 8825 3750 50  0001 C CNN
+F 3 "http://www.cui.com/product/resource/cvs-1508.pdf" H 8815 3900 50  0001 C CNN
+F 4 "CVS-1508" H 8975 4275 60  0001 C CNN "Part Number"
+	1    8825 3950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8500 4150 8500 3950
+Wire Wire Line
+	8500 3950 8625 3950
+Wire Wire Line
+	8575 4250 8575 4050
+Wire Wire Line
+	8575 4050 8625 4050
+Text Label 7225 3525 0    197  ~ 0
+Speaker
+$EndSCHEMATC
