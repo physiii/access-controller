@@ -48,7 +48,7 @@ static void nfc_service(void *pvParameter) {
   uint8_t r ;
 
   // char str[100];
-  // strcpy(str,"{\"uids\":[\"2ed34be1\",\"45f77a853280\",\"446352bcd4280\"]}");
+  // strcpy(str,"{\"uids\":[\"95eaa63\",\"45f77a853280\",\"446352bcd4280\"]}");
   // store_nfc_uids(cJSON_Parse(str));
 
   while (1) {

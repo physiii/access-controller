@@ -5,6 +5,7 @@
 #include "../components/libwebsockets/plugins/protocol_lws_status.c"
 #include <protocol_esp32_lws_reboot_to_factory.c>
 
+bool ENABLE_MOTION = false;
 bool dimmer_enabled =  true;
 char server_address[20] = "dev.pyfi.org";
 int port = 443;
@@ -56,7 +57,6 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs);
 
 #include "services/storage.c"
 #include "services/alarm.c"
-// #include "services/microphone.c"
 #include "services/LED.c"
 #include "plugins/protocol_relay.c"
 #include "plugins/protocol_utility.c"
@@ -235,7 +235,7 @@ void app_main(void) {
 	LED_main();
 	schedule_main();
 	nfc_main();
-	motion_main();
+	if (ENABLE_MOTION) motion_main();
 
 	// store_char("token","");
 	// store_char("device_id","");

@@ -2065,7 +2065,7 @@ bool PICC_IsNewCardPresent(){
 
 	// printf("bufferATQA = %u\t&bufferSize = %u\n",*bufferATQA,bufferSize);
 	// uint8_t result = PICC_RequestA(bufferATQA, &bufferSize);
-	
+
 	uint8_t result = PICC_REQA_or_WUPA(PICC_CMD_REQA, bufferATQA, &bufferSize);
 	return (result == STATUS_OK || result == STATUS_COLLISION);
 }
