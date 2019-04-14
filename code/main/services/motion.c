@@ -60,7 +60,7 @@ static void motion_service(void *pvParameter) {
         arm_lock(false);
 
         createMotionServiceMessage();
-        if (isArmed()) createAlarmServiceMessage();
+        // if (isArmed()) createAlarmServiceMessage();
         createDimmerServiceMessage(BUTTON_UP);
         vTaskDelay(MOTION_DEBOUNCE / portTICK_PERIOD_MS);
       }

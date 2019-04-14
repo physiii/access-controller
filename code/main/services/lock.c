@@ -1,9 +1,23 @@
 #define LOCK_IO    0
 
-cJSON *lock_payload = NULL;
 char lock_service_message[2000];
 bool lock_service_message_ready = false;
 int relock_delay = 4 * 1000;
+
+void createLockServiceMessage(bool value) {
+  char value_str[10];
+  if (value) {
+    strcpy(value_str,"true");
+  } else {
+    strcpy(value_str,"false");
+  }
+
+  snprintf(lock_service_message,sizeof(lock_service_message),""
+  "{\"event_type\":\"service/state\","
+  " \"payload\":{\"service_id\":\"lock_1\",\"state\":{\"locked\":%s}}}"
+  , value_str);
+  lock_service_message_ready = true;
+}
 
 int store_lock_state(cJSON * state) {
   printf("Storing lock state: %s\n",cJSON_PrintUnformatted(state));
@@ -53,6 +67,16 @@ void lock_init() {
     gpio_config(&io_conf);
 }
 
+int handle_property(char * prop) {
+  printf("lock property: %s\n",prop);
+
+	if (strcmp(prop,"lock")==0) {
+    arm_lock(cJSON_IsTrue(cJSON_GetObjectItem(lock_payload,"value")));
+	}
+
+	return 0;
+}
+
 static void lock_service(void *pvParameter) {
   load_lock_state_from_flash();
 
@@ -60,10 +84,11 @@ static void lock_service(void *pvParameter) {
     // incoming messages from other services
     if (lock_payload) {
 
-      if (cJSON_GetObjectItem(lock_payload,"arm")) {
-        bool arm = cJSON_IsTrue(cJSON_GetObjectItem(lock_payload,"arm"));
-        arm_lock(arm);
-        lwsl_notice("[lock_service] arm %d\n",arm);
+      if (cJSON_GetObjectItem(lock_payload,"property")) {
+        char property[20];
+        strcpy(property, cJSON_GetObjectItem(lock_payload,"property")->valuestring);
+        handle_property(property);
+        lwsl_notice("[lock_service] property %s\n",property);
       }
 
       lock_payload = NULL;

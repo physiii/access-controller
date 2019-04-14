@@ -1,70 +1,10 @@
 #include <libwebsockets.h>
 #include <string.h>
 #include "cJSON.h"
+#include "./automation.h"
 
 #include "../components/libwebsockets/plugins/protocol_lws_status.c"
 #include <protocol_esp32_lws_reboot_to_factory.c>
-
-bool ENABLE_MOTION = false;
-bool dimmer_enabled =  true;
-char server_address[20] = "dev.pyfi.org";
-int port = 443;
-bool use_ssl = true;
-
-int DISCONNECTED = 0;
-int CONNECTING   = 1;
-int CONNECTED    = 2;
-int utility_server_status = 0;
-int relay_status = 0;
-
-struct lws *wsi_token;
-int wsi_connect = 1;
-unsigned int rl_token = 0;
-unsigned int rl_ping = 0;
-unsigned int rl_device_id = 0;
-char token[1000];
-char device_id[100];
-bool start_service_loop = false;
-bool token_received = false;
-bool reconnect_with_token = false;
-static struct lws_client_connect_info relay;
-static struct lws_client_connect_info utility_server;
-struct lws_vhost *vh;
-bool sent_load_event = false;
-char load_message[500];
-static struct lws_context_creation_info info;
-struct lws_context *context;
-cJSON *payload = NULL;
-cJSON *utility_payload = NULL;
-cJSON *dimmer_payload = NULL;
-cJSON *button_payload = NULL;
-cJSON *LED_payload = NULL;
-cJSON *schedule_payload = NULL;
-cJSON *alarm_payload = NULL;
-cJSON *motion_payload = NULL;
-cJSON *microphone_payload = NULL;
-
-int current_time = 0;
-bool got_ip = false;
-
-//needs to go in headers
-bool isLockArmed = false;
-void arm_lock(bool);
-int set_switch(int);
-int set_brightness(int);
-void debounce_pir();
-static int ratelimit_connects(unsigned int *last, unsigned int secs);
-
-#include "services/storage.c"
-#include "services/alarm.c"
-#include "services/LED.c"
-#include "plugins/protocol_relay.c"
-#include "plugins/protocol_utility.c"
-#include "services/button.c"
-#include "services/motion.c"
-#include "services/scheduler.c"
-#include "services/lock.c"
-#include "services/nfc.c"
 
 static const struct lws_protocols protocols_station[] = {
 	{
@@ -215,33 +155,7 @@ int load_device_id() {
 	return 0;
 }
 
-void app_main(void) {
-	lws_esp32_set_creation_defaults(&info);
-
-	info.port = CONTEXT_PORT_NO_LISTEN;
-	info.vhost_name = "station";
-	info.protocols = protocols_station;
-
-	storage_init();
-	lws_esp32_wlan_config();
-
-	ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL));
-
-	lws_esp32_wlan_start_station();
-	context = lws_esp32_init(&info, &vh);
-
-	alarm_main();
-	buttons_main();
-	LED_main();
-	schedule_main();
-	nfc_main();
-	if (ENABLE_MOTION) motion_main();
-
-	// store_char("token","");
-	// store_char("device_id","");
-	load_device_id();
-
-	printf("Device ID: %s\n",device_id);
+void web_task () {
 
 	strcpy(token,get_char("token"));
 	if (strcmp(token,"")==0) {
@@ -254,7 +168,7 @@ void app_main(void) {
 	int service_context_cnt = 0;
 	int cnt = 0;
 
-	memset(&relay, 0, sizeof relay);
+	memset(&relay, 0, sizeof(relay));
 	relay.address = server_address;
 	relay.port = port;
 	relay.host = relay.address;
@@ -272,49 +186,36 @@ void app_main(void) {
 	snprintf(load_message,sizeof(load_message),""
 	"{\"event_type\":\"load\","
 	" \"payload\":{\"services\":["
-	"{\"type\":\"dimmer\","
-	"\"state\":{\"level\":0, \"on\":false},\"id\":\"dimmer_1\",\"schedule\":[]},"
-	"{\"type\":\"LED\","
-	"\"state\":{\"rgb\":[0,0,0]},"
-	"\"id\":\"rgb_1\"}"
-	",{\"type\":\"button\","
-	"\"state\":{\"value\":1},"
-	"\"id\":\"button_1\"}"
-	",{\"type\":\"alarm\","
-	"\"state\":{\"value\":1},"
-	"\"id\":\"alarm_1\"}"
-	",{\"type\":\"microphone\","
-	"\"state\":{\"sensitivity\":1},"
-	"\"id\":\"microphone_1\"}"
-	",{\"type\":\"motion\","
-	"\"state\":{\"sensitivity\":1},"
-	"\"id\":\"motion_1\"}"
+	"{\"type\":\"lock\","
+	"\"state\":{\"level\":0, \"on\":false},\"id\":\"lock_1\"},"
+	"{\"type\":\"nfc\","
+	"\"settings\":{\"auth_uids\":[\"95eaa63\",\"45f77a853280\",\"446352bcd4280\"]},"
+	"\"id\":\"nfc_1\"}"
 	"]}}");
 
 	strcpy(wss_data_out,load_message);
 	wss_data_out_ready = true;
 	printf("load_mesage %s\n",load_message);
 
-	int main_cnt=0;
 	while (1) {
-		// This should be non-blocking
 		if (relay_status == DISCONNECTED) {
 			setLED(0, 0, 0);
 			vTaskDelay(300 / portTICK_RATE_MS);
 			setLED(0, 0, 255);
+			vTaskDelay(300 / portTICK_RATE_MS);
 		}
 
-		if (buttons_service_message_ready && !wss_data_out_ready) {
-			strcpy(wss_data_out,buttons_service_message);
-			buttons_service_message_ready = false;
-			wss_data_out_ready = true;
-		}
-
-		if (alarm_service_message_ready && !wss_data_out_ready) {
-			strcpy(wss_data_out,alarm_service_message);
-			alarm_service_message_ready = false;
-			wss_data_out_ready = true;
-		}
+		// if (buttons_service_message_ready && !wss_data_out_ready) {
+		// 	strcpy(wss_data_out,buttons_service_message);
+		// 	buttons_service_message_ready = false;
+		// 	wss_data_out_ready = true;
+		// }
+		//
+		// if (alarm_service_message_ready && !wss_data_out_ready) {
+		// 	strcpy(wss_data_out,alarm_service_message);
+		// 	alarm_service_message_ready = false;
+		// 	wss_data_out_ready = true;
+		// }
 
 		if (got_ip
 			&& relay_status == CONNECTED
@@ -331,11 +232,47 @@ void app_main(void) {
 		}
 
 		if (got_ip && relay_status != DISCONNECTED) {
-				printf("lws_service %d\n",lws_service(context, 100));
-				taskYIELD();
+				lws_service(context, 50);
 		}
 
-		printf("Count\t%d\n",main_cnt++);
+		taskYIELD();
+		// vTaskDelay(1000 / portTICK_RATE_MS);
+	}
+}
+
+void app_main(void) {
+	lws_esp32_set_creation_defaults(&info);
+
+	info.port = CONTEXT_PORT_NO_LISTEN;
+	info.vhost_name = "station";
+	info.protocols = protocols_station;
+
+	storage_init();
+	lws_esp32_wlan_config();
+
+	ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL));
+
+	lws_esp32_wlan_start_station();
+	context = lws_esp32_init(&info, &vh);
+
+	buttons_main();
+	LED_main();
+	nfc_main();
+	log_main();
+
+	if (ENABLE_MOTION) motion_main();
+
+	// store_char("token","");
+	// store_char("device_id","");
+	load_device_id();
+
+	printf("Device ID: %s\n",device_id);
+
+	xTaskCreate(&web_task, "web_task", 20000, NULL, 5, NULL);
+
+	int main_cnt=0;
+	while (1) {
+		printf("Main\t%d\n",main_cnt++);
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }

@@ -13,6 +13,7 @@ int data_part_count = 0;
 char wss_data_in[2000];
 char wss_data_out[2000];
 bool wss_data_out_ready = false;
+int callback_id = 0;
 
 struct pss__wss {
 	int number;
@@ -103,6 +104,24 @@ handle_event(char * event_type)
 		return 1;
 	}
 
+	if (strcmp(event_type,"lock")==0) {
+		lock_payload = payload;
+		payload = NULL;
+		return 1;
+	}
+
+	if (strcmp(event_type,"nfc")==0) {
+		nfc_payload = payload;
+		payload = NULL;
+		return 1;
+	}
+
+	if (strcmp(event_type,"log/get")==0) {
+		log_payload = payload;
+		payload = NULL;
+		return 1;
+	}
+
 	if (strcmp(event_type,"load")==0) {
 		char result[500];
 		snprintf(result,sizeof(result),"%s",cJSON_GetObjectItem(payload,"result")->valuestring);
@@ -149,13 +168,9 @@ wss_event_handler(struct lws *wsi, cJSON * root)
 		snprintf(event_type,sizeof(event_type),"%s",cJSON_GetObjectItem(root,"event_type")->valuestring);
 		payload = cJSON_GetObjectItemCaseSensitive(root,"payload");
 
-		// Reply with callback
+		// Get callback ID
 		if (cJSON_GetObjectItemCaseSensitive(root,"id")) {
-			int callback_id = cJSON_GetObjectItemCaseSensitive(root,"id")->valueint;
-			char callback[70];
-			snprintf(callback,sizeof(callback),"{\"id\":%d,\"callback\":true,\"payload\":[false,\"\"]}",callback_id);
-			strcpy(wss_data_out,callback);
-			wss_data_out_ready = true;
+			callback_id = cJSON_GetObjectItemCaseSensitive(root,"id")->valueint;
 		}
 
 		return handle_event(event_type);
