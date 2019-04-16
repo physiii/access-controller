@@ -20,6 +20,11 @@ bool isArmed();
 void createAlarmServiceMessage();
 static int ratelimit_connects(unsigned int *last, unsigned int secs);
 
+int seconds_in_minute = 60;
+int minutes_in_hour = 60;
+int hours_in_day = 24;
+int central_time_hours = -6;
+
 bool ENABLE_MOTION = false;
 bool dimmer_enabled =  true;
 char server_address[20] = "dev.pyfi.org";

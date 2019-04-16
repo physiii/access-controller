@@ -14,6 +14,7 @@ int load_nfc_uids_from_flash() {
   char *uids = get_char("nfc_uids");
   if (strcmp(uids,"")==0) {
     printf("nfc_uids not found in flash.\n");
+    auth_uids = cJSON_CreateArray();
     return 1;
   } else {
     printf("nfc_uids found in flash.\n%s\n",uids);
@@ -103,13 +104,12 @@ void handle_new_card ()
     printf("UID (%s) authorized, access granted\n", get_card_uid());
   }
 
-  struct access_log test_log;
-  strcpy(test_log.date,"2019-03-22T09:19:51Z");
-  strcpy(test_log.key_id,get_card_uid());
-  strcpy(test_log.name,"Joe Shmoe");
-  test_log.registered = registered;
-  test_log.granted = granted;
-  store_log(&test_log);
+  struct access_log log;
+  strcpy(log.key_id,get_card_uid());
+  strcpy(log.name,"Joe Shmoe");
+  log.registered = registered;
+  log.granted = granted;
+  store_log(&log);
 
   if (granted) {
     arm_lock(false);
@@ -139,11 +139,18 @@ static void nfc_service (void *pvParameter)
   load_nfc_uids_from_flash();
   uint8_t r ;
 
-  // char str[50];
-  // remove_auth_uid("95eaa63");
+  // add_auth_uid("95eaa63");
   // add_auth_uid("446352bcd4280");
-  // strcpy(str,"{\"uids\":[\"95eaa63\",\"45f77a853280\",\"446352bcd4280\"]}");
-  // store_nfc_uids(cJSON_Parse(str));
+
+  char test_val[1000];
+  char test_key[1000];
+  for (int i=0; i < 25; i++) {
+    sprintf(test_key,"TEST_KEY_%d",i);
+    // sprintf(test_val,"{\"log_id\":\"log_19\",\"date\":\"1970-01-01T00:00:00Z\",\"key_id\":\"90fed9a4\",\"name\":\"Joe Shmoe\",\"key_registered\":false,\"access_granted\":false}");
+    sprintf(test_val,"log_19 date 1970-01-01T00:00:00Z 90fed9a4 Joe Shmoe 0 0");
+    store_char(test_key, test_val);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
 
   while (1) {
     // checking if a new card was seen

@@ -30,16 +30,27 @@ void createLogCallbackMessage (char * log_id, int callback_id)
   vTaskDelay(50 / portTICK_RATE_MS);
 }
 
+ssize_t get_time_iso8601(struct timeval *tv, char *buf, size_t sz)
+{
+  ssize_t written = -1;
+  struct tm *gm = gmtime(&tv->tv_sec);
+  if (gm) written = (ssize_t)strftime(buf, sz, "%Y-%m-%dT%H:%M:%SZ", gm);
+  return written;
+}
+
 int store_log (struct access_log * log)
 {
   char log_str[200];
-  char log_id[25];
-  char registered[5] = "true";
-  char granted[5] = "true";
+  char registered[10];
+  char granted[10];
   log_cnt++;
   (log->registered) ? strcpy(registered,"true") : strcpy(registered,"false");
   (log->granted) ? strcpy(granted,"true") : strcpy(granted,"false");
   sprintf(log->log_id, "log_%u", log_cnt);
+
+  struct timeval tv;
+  char _time[28];
+  get_time_iso8601(&tv, _time, sizeof(_time));
 
   sprintf(log_str,""
   "{\"log_id\":\"%s\""
@@ -48,9 +59,9 @@ int store_log (struct access_log * log)
   ",\"name\":\"%s\""
   ",\"key_registered\":%s"
   ",\"access_granted\":%s}",
-  log->log_id, log->date, log->key_id, log->name, registered, granted);
+  log->log_id, _time, log->key_id, log->name, registered, granted);
 
-  store_char(log_id, log_str);
+  store_char(log->log_id, log_str);
   store_u32("log_cnt", log_cnt);
   createLogServiceMessage(log_str);
   return 0;

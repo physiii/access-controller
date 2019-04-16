@@ -16,12 +16,8 @@ void print_events() {
 
 int check_schedule() {
 	struct timeval tv;
-  int seconds_in_minute = 60;
-  int minutes_in_hour = 60;
-  int hours_in_day = 24;
-  int central_time_hours = -6;
-  long int timezone_offset = central_time_hours*minutes_in_hour*seconds_in_minute;
 	gettimeofday(&tv, NULL);
+  long int timezone_offset = central_time_hours*minutes_in_hour*seconds_in_minute;
 
   long int seconds_into_day = tv.tv_sec % 86400 + timezone_offset;
   long int minutes_into_day = seconds_into_day / seconds_in_minute;

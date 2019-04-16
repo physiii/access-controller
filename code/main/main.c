@@ -110,7 +110,7 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
 }
 
 int load_device_id() {
-	// strcpy(device_id,get_char("device_id"));
+	strcpy(device_id,get_char("device_id"));
 
 	if (strcmp(device_id,"")==0) {
 		memset(&utility_server, 0, sizeof utility_server);
