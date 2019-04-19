@@ -41,15 +41,13 @@ Put device in program mode.
 ```
 make all flash monitor
 ```
----
-```
-Press *reboot* button
-Should see lws-factory load in terminal.
-Connect ESP device on wifi
-Go to https://192.168.4.1
-Set wifi name/password.
-Wait for IP address.
-```
+Press *reboot* button  
+Should see lws-factory load in terminal  
+Connect ESP device on wifi  
+Go to https://192.168.4.1  
+Set wifi name/password  
+Wait for IP address  
+
 ### Get NFC Lock code
 ```
 git clone https://github.com/physiii/nfc-lock
