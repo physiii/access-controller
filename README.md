@@ -33,10 +33,12 @@ git clone https://github.com/warmcat/lws-esp32-factory
 cd lws-esp32-factory
 export ESPPORT=/dev/ttyUSB0
 ```
+Put device in program mode.  
 ```
-Put device in program mode.
 make erase_flash
-Put device in program mode.
+```
+Put device in program mode.  
+```
 make all flash monitor
 ```
 ---
@@ -53,17 +55,15 @@ Wait for IP address.
 git clone https://github.com/physiii/nfc-lock
 cd nfc-lock/code
 make -j16 all
-Goto https://192.168.4.1 - or you can go to new IP address
-upload binary from code/build folder.
-After binary uploads, you can use `make all lws_flash_ota monitor` to upload code
 ```
+Goto https://192.168.4.1 - or you can go to new IP address.  
+upload binary from code/build folder.  
+After binary uploads, you can use `make all lws_flash_ota monitor` to upload code.  
 
 ### Program Mode
-Program mode makes device ready to be flashed
-
-Hold down *prog* button and press/release *reboot* button.
+Program mode makes device ready to be flashed.  
+Hold down *prog* button and press/release *reboot* button.  
 
 ### Factory Mode
-Factory mode boots from lws-factory to upload new binaries or set AP info.
-
-Hold down *fact* button then press/release *reboot* button.
+Factory mode boots from lws-factory to upload new binaries or set AP info.  
+Hold down *fact* button then press/release *reboot* button.  
