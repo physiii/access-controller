@@ -54,9 +54,9 @@ git clone https://github.com/physiii/nfc-lock
 cd nfc-lock/code
 make -j16 all
 ```
-Goto https://192.168.4.1 - or you can go to new IP address.  
-upload binary from code/build folder.  
-After binary uploads, you can use `make all lws_flash_ota monitor` to upload code.  
+Goto https://192.168.4.1 - or you can go to new IP address  
+Upload binary from code/build folder  
+After binary uploads, you can use `make all lws_flash_ota monitor` to upload code  
 
 ### Program Mode
 Program mode makes device ready to be flashed.  
