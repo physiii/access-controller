@@ -56,7 +56,7 @@ make -j16 all
 ```
 Goto https://192.168.4.1 - or you can go to new IP address  
 Upload binary from code/build folder  
-After binary uploads, you can use `make all lws_flash_ota monitor` to upload code  
+After binary uploads, you can use `make all lws_flash_ota monitor` in the future
 
 #### Program Mode
 Program mode makes device ready to be flashed.  
