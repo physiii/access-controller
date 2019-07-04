@@ -2027,26 +2027,6 @@ bool MIFARE_UnbrickUidSector(bool logErrors) {
 // Convenience functions - does not add extra functionality
 /////////////////////////////////////////////////////////////////////////////////////
 
-/** OLD
- * Returns true if a PICC responds to PICC_CMD_REQA.
- * Only "new" cards in state IDLE are invited. Sleeping cards in state HALT are ignored.
- *
- * @return bool
-
-
-bool PICC_IsNewCardPresent(){
-	static uint8_t bufferATQA[2]={0,0};
-	uint8_t bufferSize = sizeof(bufferATQA);
-	// Reset baud rates
-	PCD_WriteRegister(TxModeReg, 0x00);
-	PCD_WriteRegister(RxModeReg, 0x00);
-	// Reset ModWidthReg
-	PCD_WriteRegister(ModWidthReg, 0x26);
-	// return STATUS_OK;
-	uint8_t result = PICC_RequestA(bufferATQA, &bufferSize);
-	return (result == STATUS_OK || result == STATUS_COLLISION);
-}*/
-
 /**
  * Returns true if a PICC responds to PICC_CMD_REQA.
  * Only "new" cards in state IDLE are invited. Sleeping cards in state HALT are ignored.
@@ -2062,11 +2042,7 @@ bool PICC_IsNewCardPresent(){
 	PCD_WriteRegister(RxModeReg, 0x00);
 	// Reset ModWidthReg
 	PCD_WriteRegister(ModWidthReg, 0x26);
-
-	// printf("bufferATQA = %u\t&bufferSize = %u\n",*bufferATQA,bufferSize);
-	// uint8_t result = PICC_RequestA(bufferATQA, &bufferSize);
-
-	uint8_t result = PICC_REQA_or_WUPA(PICC_CMD_REQA, bufferATQA, &bufferSize);
+	uint8_t result = PICC_RequestA(bufferATQA, &bufferSize);
 	return (result == STATUS_OK || result == STATUS_COLLISION);
 }
 
@@ -2143,7 +2119,7 @@ void rc522_init(void * vParam) {
 	//	PICC_HaltA();
 	//	PCD_StopCrypto1();
 	PCD_Init();
-	uint8_t r = 0;
+	uint8_t r ;
 	while (1) {
 		if (debounce_nfc) {
 			vTaskDelay(debounce_nfc / portTICK_PERIOD_MS);
@@ -2151,9 +2127,12 @@ void rc522_init(void * vParam) {
 		}
 		r = PICC_IsNewCardPresent();
 		if (r) {
+			// printf("------------------ Found Card ---------------------%s\n",GetStatusCodeName(r));
 			if (PICC_ReadCardSerial()) {
 				cardFound = true;
 				create_uid_string(&uid.uidByte, uid.size);
+				// dump_byte_array(&uid.uidByte, uid.size);
+				// PICC_DumpToSerial(&uid);
 			}
 		}
 		vTaskDelay(100 / portTICK_PERIOD_MS);

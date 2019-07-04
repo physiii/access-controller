@@ -25,9 +25,12 @@
 #include "sdkconfig.h"
 #include <unistd.h>
 #include "freertos/semphr.h"
+// #include "rc522_2.h"
+// #include "rc522_2.c"
 
 #ifndef MAIN_MAINAPP_H_
 #define MAIN_MAINAPP_H_
+#include "myTypeDef.h"
 #endif /* MAIN_MAINAPP_H_ */
 
 #define null 0

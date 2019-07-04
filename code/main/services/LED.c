@@ -6,13 +6,13 @@ int current_LED_level = 0;
 int pwm_factor = 2;
 
 int setLED(int r, int g, int b) {
-  // lwsl_notice("set LED [%d,%d,%d]\n",r,g,b);
+  // printf("set LED [%d,%d,%d]\n",r,g,b);
   set_pixel_by_index(0, r, g, b, 1);
   return 0;
 }
 
 void flashLED(int r, int g, int b, int duration) {
-  // lwsl_notice("set LED [%d,%d,%d]\n",r,g,b);
+  // printf("set LED [%d,%d,%d]\n",r,g,b);
   setLED(r,g,b);
   vTaskDelay(100 / portTICK_RATE_MS);
   setLED(0,0,0);
@@ -26,7 +26,7 @@ int toggleLED() {
     new_LED_level = 100;
   }
 
-  lwsl_notice("toggle LED from %d to %d\n",current_LED_level,new_LED_level);
+  printf("toggle LED from %d to %d\n",current_LED_level,new_LED_level);
   setLED(new_LED_level,new_LED_level,new_LED_level);
   current_LED_level = new_LED_level;
   return current_LED_level;
@@ -53,13 +53,13 @@ static void LED_service(void *pvParameter) {
       if (cJSON_GetObjectItem(LED_payload,"level")) {
         int level = cJSON_GetObjectItem(LED_payload,"level")->valueint;
         setLED(level,level,level);
-        lwsl_notice("[LED_service] level %d\n",level);
+        printf("[LED_service] level %d\n",level);
       }
 
       if (cJSON_GetObjectItem(LED_payload,"toggle")) {
         int level = cJSON_GetObjectItem(LED_payload,"level")->valueint;
         toggleLED();
-        lwsl_notice("[LED_service] toggle %d\n",current_LED_level);
+        printf("[LED_service] toggle %d\n",current_LED_level);
       }
 
       if (cJSON_GetObjectItem(LED_payload,"flash")) {
@@ -73,31 +73,31 @@ static void LED_service(void *pvParameter) {
         }
         int duration = cJSON_GetObjectItem(LED_payload,"duration")->valueint;
         flashLED(r,g,b,duration);
-        lwsl_notice("[LED_service] flash RGB: %d, %d, %d\n",r,g,b);
+        printf("[LED_service] flash RGB: %d, %d, %d\n",r,g,b);
       }
 
       if (cJSON_GetObjectItem(LED_payload,"increment")) {
         int increment = cJSON_GetObjectItem(LED_payload,"increment")->valueint;
         //incLED(increment);
-        lwsl_notice("[LED_service] increment %d\n",increment);
+        printf("[LED_service] increment %d\n",increment);
       }
 
       if (cJSON_GetObjectItem(LED_payload,"decrement")) {
         int decrement = cJSON_GetObjectItem(LED_payload,"decrement")->valueint;
         //decLED(decrement);
-        lwsl_notice("[LED_service] decrement %d\n",decrement);
+        printf("[LED_service] decrement %d\n",decrement);
       }
 
       if (cJSON_GetObjectItem(LED_payload,"fade")) {
         int fade = cJSON_GetObjectItem(LED_payload,"fade")->valueint;
         fadeLED(0,fade,0);
-        lwsl_notice("[LED_service] level %d\n",fade);
+        printf("[LED_service] level %d\n",fade);
       }
 
       if (cJSON_GetObjectItem(LED_payload,"fade")) {
         /*int fade = cJSON_GetObjectItem(LED_payload,"fade")->valueint;
         fadeLED(0,fade,0);
-        lwsl_notice("[LED_service] fade %d\n",fade);*/
+        printf("[LED_service] fade %d\n",fade);*/
       }
 
       LED_payload = NULL;

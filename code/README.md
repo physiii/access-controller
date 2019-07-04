@@ -1,90 +1,115 @@
-lws-esp32-test-server-demos
-===========================
+# ESPNOW Example
 
-## For use with lws-esp32-factory
+(See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This relies on setup capability provided by
+This example shows how to use ESPNOW of wifi. Example does the following steps:
 
-https://github.com/warmcat/lws-esp32-factory
+* Start WiFi.
+* Initialize ESPNOW.
+* Register ESPNOW sending or receiving callback function.
+* Add ESPNOW peer information.
+* Send and receive ESPNOW data. 
 
-which runs from the "factory" partition on ESP32.  This app is
-designed to run from the 2.9MB OTA partition.
+This example need at least two ESP devices:
 
-## New!
+* In order to get the MAC address of the other device, Device1 firstly send broadcast ESPNOW data with 'state' set as 0. 
+* When Device2 receiving broadcast ESPNOW data from Device1 with 'state' as 0, adds Device1 into the peer list. 
+  Then start sending broadcast ESPNOW data with 'state' set as 1. 
+* When Device1 receiving broadcast ESPNOW data with 'state' as 1, compares the local magic number with that in the data. 
+  If the local one is bigger than that one, stop sending broadcast ESPNOW data and starts sending unicast ESPNOW data to Device2. 
+* If Device2 receives unicast ESPNOW data, also stop sending broadcast ESPNOW data. 
+  
+In practice, if the MAC address of the other device is known, it's not required to send/receive broadcast ESPNOW data first, 
+just add the device into the peer list and send/receive unicast ESPNOW data.
 
-This includes the latest lws HTTP/2 support now, improved
-memory management for headers, and mbedTLS wrapper fixes to
-improve speed when multiple SSL connections are coming.
+There are a lot of "extras" on top of ESPNOW data, such as type, state, sequence number, CRC and magic in this example. These "extras" are 
+not required to use ESPNOW. They are only used to make this example to run correctly. However, it is recommended that users add some "extras" 
+to make ESPNOW data more safe and more reliable.
 
-It also now supports ws-over-http2 tunelling, meaning all
-the ws connections and the http actions share the same tls
-tunnel.  This makes a massive improvement in speed and
-reduced memory consumption.
+## How to use example
 
-As of 2018-04-12 only Chrome Canary 67 supports this new
-mode, but support in other browsers is coming.  Chrome
-Canary 67 must be started to --enable-websocket-over-http2 to
-allow the new feature to operate.
-
-## About this demo
-
-This demo is the standard lws test server using the standard lws test
-protocol plugins.
-
-When you open the page the html / png assets are served over http/2
-or http/1 depending on how you connected.  Then the browser connects
-back over http/1 and upgrades to ws.
-
-Basic auth is also demoed, see main/main.c for the details of how it
-works.  You can visit the URL /secret, which you cannot see until
-you log in with "user" and "password".  These are set in code in
-main/main.c.
-
-It opens a lot of simultaneous https connections, one for each ws
-protocol and one for http/2 to carry the HTML and images, so on ESP32
-it's a bit slow to start up.
-
-The demo uses my mbedtls patches for dynamic buffer allocation, so
-compared to the unpatched mbedtls, you can open many tls connections
-without killing your RAM.  **NOTE** You should set MBEDTLS_SSL_MAX_CONTENT_LEN
-to 16384 in your sdkconfig.  The patched mbedtls will adapt the buffer
-sizes according to what is actually sent or received.
-
-## Build
-
-This was built and tested againt esp-idf 4b91c82cc447640e5b61407e810f1d6f3eabd233 from 2018-06-20.
-
-Clone and bring in the lws submodule (it's unpatched lws master)
+### Configure the project
 
 ```
-  $ git clone git@github.com:warmcat/lws-esp32-test-server-demos.git
-  $ git submodule update --init --recursive
+make menuconfig
 ```
 
+* Set serial port under Serial Flasher Options.
+* Set WiFi mode (station or SoftAP) under Example Configuration Options.
+* Set ESPNOW primary master key under Example Configuration Options. 
+  This parameter must be set to the same value for sending and recving devices.
+* Set ESPNOW local master key under Example Configuration Options.
+  This parameter must be set to the same value for sending and recving devices.
+* Set Channel under Example Configuration Options.
+  The sending device and the recving device must be on the same channel.
+* Set Send count and Send delay under Example Configuration Options.
+* Set Send len under Example Configuration Options.
+
+### Build and Flash
+
+Build the project and flash it to the board, then run monitor tool to view serial output:
+
 ```
- $ make flash_ota ; make monitor
+make -j4 flash monitor
 ```
 
-## Using the lws test apps
+(To exit the serial monitor, type ``Ctrl-]``.)
 
-See what IP your ESP32 got from your AP, the visit it in your browser
-using, eg https://192.168.2.249
+See the Getting Started Guide for full steps to configure and use ESP-IDF to build projects.
 
-If your dhcp server provides your dns, you can also reach the device
-using lws-serial, eg, https://lws-1234 or https://lws-1234.local
+## Example Output
 
- - dumb increment should be updating at ~20Hz
+Here is the example of ESPNOW receiving device console output.
 
- - mirror should let you draw in the canvas... open a second browser
-   instance and they should be able to see each other's drawings
+```
+I (898) phy: phy_version: 3960, 5211945, Jul 18 2018, 10:40:07, 0, 0
+I (898) wifi: mode : sta (30:ae:a4:80:45:68)
+I (898) espnow_example: WiFi started
+I (898) ESPNOW: espnow [version: 1.0] init
+I (5908) espnow_example: Start sending broadcast data
+I (6908) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (7908) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (52138) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (52138) espnow_example: Receive 0th broadcast data from: 30:ae:a4:0c:34:ec, len: 200
+I (53158) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (53158) espnow_example: Receive 1th broadcast data from: 30:ae:a4:0c:34:ec, len: 200
+I (54168) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (54168) espnow_example: Receive 2th broadcast data from: 30:ae:a4:0c:34:ec, len: 200
+I (54168) espnow_example: Receive 0th unicast data from: 30:ae:a4:0c:34:ec, len: 200
+I (54678) espnow_example: Receive 1th unicast data from: 30:ae:a4:0c:34:ec, len: 200
+I (55668) espnow_example: Receive 2th unicast data from: 30:ae:a4:0c:34:ec, len: 200
+```
 
- - close testing should work
+Here is the example of ESPNOW sending device console output.
 
- - server info should reflect browsers open on the site dynamically
+```
+I (915) phy: phy_version: 3960, 5211945, Jul 18 2018, 10:40:07, 0, 0
+I (915) wifi: mode : sta (30:ae:a4:0c:34:ec)
+I (915) espnow_example: WiFi started
+I (915) ESPNOW: espnow [version: 1.0] init
+I (5915) espnow_example: Start sending broadcast data
+I (5915) espnow_example: Receive 41th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (5915) espnow_example: Receive 42th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (5925) espnow_example: Receive 44th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (5935) espnow_example: Receive 45th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (6965) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (6965) espnow_example: Receive 46th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (7975) espnow_example: send data to ff:ff:ff:ff:ff:ff
+I (7975) espnow_example: Receive 47th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (7975) espnow_example: Start sending unicast data
+I (7975) espnow_example: send data to 30:ae:a4:80:45:68
+I (9015) espnow_example: send data to 30:ae:a4:80:45:68
+I (9015) espnow_example: Receive 48th broadcast data from: 30:ae:a4:80:45:68, len: 200
+I (10015) espnow_example: send data to 30:ae:a4:80:45:68
+I (16075) espnow_example: send data to 30:ae:a4:80:45:68
+I (17075) espnow_example: send data to 30:ae:a4:80:45:68
+I (24125) espnow_example: send data to 30:ae:a4:80:45:68
+```
 
- - POST tests should pass the string and upload the file if one given
+## Troubleshooting
 
- - The button at the bottom should reset you into the setup / factory app
+If ESPNOW data can not be received from another device, maybe the two devices are not 
+on the same channel or the primary key and local key are different. 
 
- - The "War and Peace" demo should load the 4MB text from the 1.2MB gzipped zip
-   file directly, using gzipped data to the browser.
+In real application, if the receiving device is in station mode only and it connects to an AP, 
+modem sleep should be disabled. Otherwise, it may fail to revceive ESPNOW data from other devices.

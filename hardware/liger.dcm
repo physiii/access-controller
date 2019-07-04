@@ -1,9 +1,0 @@
-EESchema-DOCLIB  Version 2.0
-#
-$CMP SPX3819
-D Constant current  LED driver, internal switch, up to 40V/1.2A, SOT-89-5
-K Switching LED driver
-F www.issi.com/WW/pdf/31LT3360.pdf
-$ENDCMP
-#
-#End Doc Library

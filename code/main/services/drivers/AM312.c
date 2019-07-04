@@ -29,6 +29,7 @@ static void pir_service(void* arg) {
     uint32_t io_num;
     for(;;) {
         if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
+            printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
             if (gpio_get_level(io_num) == 0) {
               motion_active = false;
             } else {

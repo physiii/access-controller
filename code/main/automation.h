@@ -1,3 +1,5 @@
+#include "cJSON.h"
+
 cJSON *payload = NULL;
 cJSON *utility_payload = NULL;
 cJSON *dimmer_payload = NULL;
@@ -19,6 +21,7 @@ void debounce_pir();
 bool isArmed();
 void createAlarmServiceMessage();
 static int ratelimit_connects(unsigned int *last, unsigned int secs);
+
 
 int seconds_in_minute = 60;
 int minutes_in_hour = 60;
@@ -55,6 +58,7 @@ char load_message[500];
 static struct lws_context_creation_info info;
 struct lws_context *context;
 
+bool transmit_uid = true;
 int current_time = 0;
 bool got_ip = false;
 
@@ -67,12 +71,16 @@ struct access_log {
   bool granted;
 };
 
+uint8_t keypad_code[4];
+int code_size = 4;
+
 #include "services/storage.c"
 #include "services/LED.c"
-#include "plugins/protocol_relay.c"
-#include "plugins/protocol_utility.c"
-#include "services/log.c"
-#include "services/button.c"
-#include "services/motion.c"
+// #include "plugins/protocol_relay.c"
+// #include "plugins/protocol_utility.c"
+// #include "services/log.c"
+// #include "services/button.c"
+// #include "services/motion.c"
 #include "services/lock.c"
+#include "services/keypad.c"
 #include "services/nfc.c"
