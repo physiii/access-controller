@@ -20,15 +20,26 @@
 
 static const char *TAG = "espnow_example";
 
+#define REMOTE
+
+#ifndef CONTROLLER
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+#endif
+
+#ifndef REMOTE
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+#endif
+
 int TX_RX_MODE = 0;
 int CHECK_UID = 0;
 int ADD_UID = 1;
 int REMOVE_UID = 2;
-int mode = 0;
+int current_mode = 0;
 
 static xQueueHandle s_example_espnow_queue;
 
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 static uint16_t s_example_espnow_seq[EXAMPLE_ESPNOW_DATA_MAX] = { 1, 2, 3, 122, 256, 1234 };
 
 static void example_espnow_deinit(example_espnow_send_param_t *send_param);
@@ -111,19 +122,18 @@ static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
 
 int handle_uid (char * uid)
 {
-  int mode = CHECK_UID;
 
-  if (mode == ADD_UID) {
+  if (current_mode == ADD_UID) {
     add_auth_uid(uid);
     return 0;
   }
 
-  if (mode == REMOVE_UID) {
+  if (current_mode == REMOVE_UID) {
     remove_auth_uid(uid);
     return 0;
   }
 
-  if (mode == CHECK_UID) {
+  if (current_mode == CHECK_UID) {
     if (!is_uid_authorized(uid)) {
       printf("UID is NOT Authorized.\n");
       return 0;
@@ -131,9 +141,7 @@ int handle_uid (char * uid)
   }
 
   printf("Access granted to %s.\n", uid);
-  arm_lock(false);
-  vTaskDelay(relock_delay / portTICK_RATE_MS);
-  arm_lock(true);
+  pulse_lock();
   return 0;
 }
 
@@ -399,7 +407,7 @@ static esp_err_t example_espnow_init(void)
     peer->channel = CONFIG_ESPNOW_CHANNEL;
     peer->ifidx = ESPNOW_WIFI_IF;
     peer->encrypt = false;
-    memcpy(peer->peer_addr, s_example_broadcast_mac, ESP_NOW_ETH_ALEN);
+    memcpy(peer->peer_addr, s_peer_mac, ESP_NOW_ETH_ALEN);
     ESP_ERROR_CHECK( esp_now_add_peer(peer) );
     free(peer);
 
@@ -427,7 +435,7 @@ static esp_err_t example_espnow_init(void)
         esp_now_deinit();
         return ESP_FAIL;
     }
-    memcpy(send_param->dest_mac, s_example_broadcast_mac, ESP_NOW_ETH_ALEN);
+    memcpy(send_param->dest_mac, s_peer_mac, ESP_NOW_ETH_ALEN);
     example_espnow_data_prepare(send_param);
 
     xTaskCreate(example_espnow_task, "example_espnow_task", 2048, send_param, 4, NULL);
@@ -458,4 +466,9 @@ void app_main()
     lock_main();
     nfc_main();
     // keypad_driver_main();
+
+    // add_auth_uid("12345");
+    // add_auth_uid("23456");
+    // add_auth_uid("34567");
+    // add_auth_uid("45678");
 }

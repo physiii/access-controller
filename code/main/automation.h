@@ -1,4 +1,6 @@
 #include "cJSON.h"
+#include "soc/gpio_struct.h"
+#include "driver/gpio.h"
 
 cJSON *payload = NULL;
 cJSON *utility_payload = NULL;
@@ -21,7 +23,6 @@ void debounce_pir();
 bool isArmed();
 void createAlarmServiceMessage();
 static int ratelimit_connects(unsigned int *last, unsigned int secs);
-
 
 int seconds_in_minute = 60;
 int minutes_in_hour = 60;
@@ -75,12 +76,12 @@ uint8_t keypad_code[4];
 int code_size = 4;
 
 #include "services/storage.c"
-#include "services/LED.c"
+// #include "services/LED.c"
 // #include "plugins/protocol_relay.c"
 // #include "plugins/protocol_utility.c"
 // #include "services/log.c"
 // #include "services/button.c"
 // #include "services/motion.c"
 #include "services/lock.c"
-#include "services/keypad.c"
+// #include "services/keypad.c"
 #include "services/nfc.c"
