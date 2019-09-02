@@ -23,13 +23,13 @@ static const char *TAG = "espnow_example";
 #define REMOTE
 
 #ifndef CONTROLLER
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 #endif
 
 #ifndef REMOTE
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 #endif
 
 int TX_RX_MODE = 0;
@@ -141,7 +141,7 @@ int handle_uid (char * uid)
   }
 
   printf("Access granted to %s.\n", uid);
-  pulse_lock();
+  pulse_lock(lock_1.channel);
   return 0;
 }
 

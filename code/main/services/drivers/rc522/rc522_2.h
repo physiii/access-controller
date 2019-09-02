@@ -42,7 +42,13 @@
 #define PIN_NUM_MOSI 14
 #define PIN_NUM_CLK  13
 #define PIN_NUM_CS   12
-#define PIN_NUM_RST  22
+#define PIN_NUM_RST  25
+
+// #define PIN_NUM_MISO 23
+// #define PIN_NUM_MOSI 14
+// #define PIN_NUM_CLK  13
+// #define PIN_NUM_CS   12
+// #define PIN_NUM_RST  22
 
 #define MFRC522_SPICLOCK SPI_CLOCK_DIV4			// MFRC522 accept upto 10MHz
 

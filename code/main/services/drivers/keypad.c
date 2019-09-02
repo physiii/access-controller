@@ -20,7 +20,7 @@
 #define R4_IO    27
 
 #define C1_IO    4
-#define C2_IO    23
+#define C2_IO    24
 #define C3_IO    26
 #define C4_IO    0
 

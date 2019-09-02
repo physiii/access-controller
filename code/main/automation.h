@@ -16,7 +16,7 @@ cJSON *lock_payload = NULL;
 cJSON *log_payload = NULL;
 
 bool isLockArmed = false;
-void arm_lock(bool);
+void arm_lock(int,bool);
 int set_switch(int);
 int set_brightness(int);
 void debounce_pir();
