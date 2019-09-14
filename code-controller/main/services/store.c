@@ -1,18 +1,15 @@
-#include "drivers/rc522/rc522_2.c"
-
-char nfc_service_message[1000];
-bool nfc_service_message_ready = false;
+char store_service_message[1000];
+bool store_service_message_ready = false;
 cJSON *auth_uids = NULL;
 
-
-int store_nfc_uids(cJSON * uids)
+int store_uids(cJSON * uids)
 {
   printf("Storing UIDs: %s\n",cJSON_PrintUnformatted(uids));
   store_char("nfc_uids", cJSON_PrintUnformatted(uids));
   return 0;
 }
 
-int load_nfc_uids_from_flash()
+int load_uids_from_flash()
 {
   char *uids = get_char("nfc_uids");
   if (strcmp(uids,"")==0) {
@@ -51,7 +48,7 @@ void add_auth_uid (char * new_id)
   }
   cJSON *id_obj =  cJSON_CreateString(new_id);
   cJSON_AddItemToArray(auth_uids, id_obj);
-  store_nfc_uids(auth_uids);
+  store_uids(auth_uids);
 }
 
 void remove_auth_uid (char * target_id)
@@ -73,7 +70,7 @@ void remove_auth_uid (char * target_id)
     // }
   }
 
-  store_nfc_uids(new_auth_uids);
+  store_uids(new_auth_uids);
 }
 
 bool is_uid_authorized (char * uid)
@@ -91,28 +88,10 @@ bool is_uid_authorized (char * uid)
   return false;
 }
 
-static void nfc_service (void *pvParameter)
+void store_main()
 {
-  uint32_t io_num;
-  rc522_main();
-  uint8_t r ;
-
-  load_nfc_uids_from_flash();
-
-  while (1) {
-    // checking if a new card was seen
-    // if (new_card_found()) {
-    //   printf("new card found: %s\n",get_card_uid());
-    //   transmit_uid = true;
-    // }
-
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-  }
-}
-
-void nfc_main()
-{
-  printf("starting nfc service\n");
-  TaskHandle_t nfc_service_task;
-  xTaskCreate(&nfc_service, "nfc_service_task", 5000, NULL, 5, NULL);
+  printf("starting store service\n");
+  load_uids_from_flash();
+  // TaskHandle_t store_service_task;
+  // xTaskCreate(&store_service, "store_service_task", 5000, NULL, 5, NULL);
 }

@@ -5,13 +5,15 @@
 #define EXIT_BUTTON_IO_1        4
 #define FOB_IO_2                17
 #define EXIT_BUTTON_IO_2        22
-#define GPIO_INPUT_PIN_SEL    ((1ULL<<FOB_IO_1) | (1ULL<<EXIT_BUTTON_IO_1) | (1ULL<<FOB_IO_2) | (1ULL<<EXIT_BUTTON_IO_2))
+#define DISABLE_BTN_IO          12
+#define GPIO_INPUT_PIN_SEL    ((1ULL<<FOB_IO_1) | (1ULL<<EXIT_BUTTON_IO_1) | (1ULL<<FOB_IO_2) | (1ULL<<EXIT_BUTTON_IO_2) | (1ULL<<DISABLE_BTN_IO))
 #define ESP_INTR_FLAG_DEFAULT 0
 
 char lock_service_message[2000];
 bool lock_service_message_ready = false;
-int relock_delay = 4 * 1000;
+int relock_delay = 2 * 1000;
 int normally_open = true;
+int button_disabled = false;
 
 struct lock
 {
@@ -134,7 +136,7 @@ static void gpio_task_example(void* arg)
               printf("FOB 1: %d\n", gpio_get_level(io_num));
             }
 
-            if (io_num == exit_1.gpio) {
+            if (io_num == exit_1.gpio && !button_disabled) {
               pulse_lock(lock_1.channel);
               printf("EXIT BUTTON 1: %d\n", gpio_get_level(io_num));
             }
@@ -144,9 +146,14 @@ static void gpio_task_example(void* arg)
               printf("FOB 2: %d\n", gpio_get_level(io_num));
             }
 
-            if (io_num == exit_2.gpio) {
+            if (io_num == exit_2.gpio && !button_disabled) {
               pulse_lock(lock_2.channel);
               printf("EXIT BUTTON 2: %d\n", gpio_get_level(io_num));
+            }
+
+            if (io_num == DISABLE_BTN_IO) {
+              button_disabled = gpio_get_level(io_num);
+              printf("DISABLE BTN: %d\n", gpio_get_level(io_num));
             }
 
         }
@@ -197,6 +204,7 @@ void lock_init() {
     gpio_isr_handler_add(fob_2.gpio, gpio_isr_handler, (void*) fob_2.gpio );
     gpio_isr_handler_add(exit_1.gpio, gpio_isr_handler, (void*) exit_1.gpio);
     gpio_isr_handler_add(exit_2.gpio, gpio_isr_handler, (void*) exit_2.gpio);
+    gpio_isr_handler_add(DISABLE_BTN_IO, gpio_isr_handler, (void*) DISABLE_BTN_IO);
 }
 
 int handle_property(char * prop) {

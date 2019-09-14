@@ -15,8 +15,8 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "driver/spi_master.h"
-// #include "soc/gpio_struct.h"
-// #include "driver/gpio.h"
+#include "soc/gpio_struct.h"
+#include "driver/gpio.h"
 #include "esp_timer.h"
 #include <stdint.h>
 #include "esp_log.h"
@@ -37,6 +37,18 @@
 
 #define F(x) x
 #define printfln(x) printf(x)
+
+// #define PIN_NUM_MISO 23
+// #define PIN_NUM_MOSI 14
+// #define PIN_NUM_CLK  13
+// #define PIN_NUM_CS   12
+// #define PIN_NUM_RST  25
+
+#define PIN_NUM_MISO 23
+#define PIN_NUM_MOSI 14
+#define PIN_NUM_CLK  13
+#define PIN_NUM_CS   12
+#define PIN_NUM_RST  22
 
 #define MFRC522_SPICLOCK SPI_CLOCK_DIV4			// MFRC522 accept upto 10MHz
 

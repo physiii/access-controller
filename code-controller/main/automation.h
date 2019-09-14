@@ -84,4 +84,4 @@ int code_size = 4;
 // #include "services/motion.c"
 #include "services/lock.c"
 // #include "services/keypad.c"
-#include "services/nfc.c"
+#include "services/store.c"

@@ -21,9 +21,9 @@
 static const char *TAG = "espnow_example";
 
 // Controller  MAC
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
-// Controller MAC
+// Remote MAC
 static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 int TX_RX_MODE = 0;
@@ -190,37 +190,6 @@ void example_espnow_data_prepare(example_espnow_send_param_t *send_param)
     buf->seq_num = s_example_espnow_seq[buf->type]++;
     buf->crc = 0;
     buf->magic = send_param->magic;
-    // if (uid.size > 1) {
-    //   send_param->len = uid.size+6;
-    // }
-    // printf("sending uid of size %u (%u): %s\n", uid.size, send_param->len, get_card_uid());
-
-    if (new_card_found()) {
-      buf->payload[0] = uid.size; // firt byte is buffer size
-      for (uint8_t i = 1; i <= uid.size; i++) {
-          if (i <= uid.size) {
-            printf(" %x", uid.uidByte[i-1]);
-            buf->payload[i] = uid.uidByte[i-1];
-          }
-      }
-
-      buf->payload[uid.size+1] = 0; // end with zero
-      printf("\n");
-    }
-    // else if (new_key_entered()) {
-    //   buf->payload[0] = code_size;
-    //   for (uint8_t i = 0; i < code_size; i++) {
-    //     printf(" %x", keypad_code[i]);
-    //     buf->payload[i+1] = keypad_code[i];
-    //   }
-    //
-    //   // buf->payload[code_size] = 0; // end with zero
-    //   printf("\n");
-    // }
-    else {
-      buf->payload[0] = 0;
-    }
-
     buf->crc = crc16_le(UINT16_MAX, (uint8_t const *)buf, send_param->len);
 }
 
@@ -279,11 +248,6 @@ static void example_espnow_task(void *pvParameter)
                 memcpy(send_param->dest_mac, send_cb->mac_addr, ESP_NOW_ETH_ALEN);
                 // memcpy(send_param->buffer, ptr, ESP_NOW_ETH_ALEN);
                 example_espnow_data_prepare(send_param);
-
-
-                if (new_card_found()) {
-                  printf("transmitting uid: %s\n", get_card_uid());
-                }
 
                 /* Send the next data after the previous data is sent. */
                 if (esp_now_send(send_param->dest_mac, send_param->buffer, send_param->len) != ESP_OK) {
@@ -459,7 +423,7 @@ void app_main()
     example_wifi_init();
     example_espnow_init();
     lock_main();
-    nfc_main();
+    store_main();
     // keypad_driver_main();
 
     // add_auth_uid("12345");

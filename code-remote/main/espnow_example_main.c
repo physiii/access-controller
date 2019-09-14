@@ -20,11 +20,11 @@
 
 static const char *TAG = "espnow_example";
 
-// Remote  MAC
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+// Remote MAC
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
-// Controller MAC
-static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+//Controller MAC
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 int TX_RX_MODE = 0;
 int CHECK_UID = 0;
@@ -114,6 +114,31 @@ static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
     }
 }
 
+int handle_uid (char * uid)
+{
+
+  if (current_mode == ADD_UID) {
+    add_auth_uid(uid);
+    return 0;
+  }
+
+  if (current_mode == REMOVE_UID) {
+    remove_auth_uid(uid);
+    return 0;
+  }
+
+  if (current_mode == CHECK_UID) {
+    if (!is_uid_authorized(uid)) {
+      printf("UID is NOT Authorized.\n");
+      return 0;
+    }
+  }
+
+  printf("Access granted to %s.\n", uid);
+  // pulse_lock(lock_1.channel);
+  return 0;
+}
+
 /* Parse received ESPNOW data. */
 int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic)
 {
@@ -124,6 +149,18 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
     if (data_len < sizeof(example_espnow_data_t)) {
         ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
         return -1;
+    }
+
+    // printf("data length: %u, struct size %u\n", data, sizeof(example_espnow_data_t));
+    strcpy(uid_str,"");
+    // printf("length: %u\n", buf->payload[0]);
+    for (int i=1; i <= buf->payload[0]; i++) {
+      // printf("%x ", buf->payload[i]);
+      sprintf(uid_str, "%s%x", uid_str, buf->payload[i]);
+    }
+
+    if (strcmp(uid_str, "")!=0) {
+      handle_uid(uid_str);
     }
 
     *state = buf->state;
@@ -258,6 +295,7 @@ static void example_espnow_task(void *pvParameter)
             }
             case EXAMPLE_ESPNOW_RECV_CB:
             {
+                break;
                 example_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
                 ret = example_espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_state, &recv_seq, &recv_magic);
@@ -420,6 +458,12 @@ void app_main()
 
     example_wifi_init();
     example_espnow_init();
+    // lock_main();
     nfc_main();
     // keypad_driver_main();
+
+    // add_auth_uid("12345");
+    // add_auth_uid("23456");
+    // add_auth_uid("34567");
+    // add_auth_uid("45678");
 }

@@ -15,18 +15,6 @@ cJSON *nfc_payload = NULL;
 cJSON *lock_payload = NULL;
 cJSON *log_payload = NULL;
 
-// #define PIN_NUM_MISO 23
-// #define PIN_NUM_MOSI 14
-// #define PIN_NUM_CLK  13
-// #define PIN_NUM_CS   12
-// #define PIN_NUM_RST  25
-
-#define PIN_NUM_MISO 23
-#define PIN_NUM_MOSI 14
-#define PIN_NUM_CLK  13
-#define PIN_NUM_CS   12
-#define PIN_NUM_RST  22
-
 bool isLockArmed = false;
 void arm_lock(int,bool);
 int set_switch(int);
