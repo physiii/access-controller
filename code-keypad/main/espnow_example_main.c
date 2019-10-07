@@ -65,7 +65,7 @@ static void example_wifi_init(void)
      * This is not necessary in real application if the two devices have
      * been already on the same channel.
      */
-    ESP_ERROR_CHECK( esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, 0) );
+    // ESP_ERROR_CHECK( esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, 0) );
 }
 
 /* ESPNOW sending or receiving callback function is called in WiFi task.
@@ -114,54 +114,54 @@ static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
     }
 }
 
-int handle_uid (char * uid)
-{
-
-  if (current_mode == ADD_UID) {
-    add_auth_uid(uid);
-    return 0;
-  }
-
-  if (current_mode == REMOVE_UID) {
-    remove_auth_uid(uid);
-    return 0;
-  }
-
-  if (current_mode == CHECK_UID) {
-    if (!is_uid_authorized(uid)) {
-      printf("UID is NOT Authorized.\n");
-      return 0;
-    }
-  }
-
-  printf("Access granted to %s.\n", uid);
-  // pulse_lock(lock_1.channel);
-  return 0;
-}
+// int handle_uid (char * uid)
+// {
+//
+//   if (current_mode == ADD_UID) {
+//     add_auth_uid(uid);
+//     return 0;
+//   }
+//
+//   if (current_mode == REMOVE_UID) {
+//     remove_auth_uid(uid);
+//     return 0;
+//   }
+//
+//   if (current_mode == CHECK_UID) {
+//     if (!is_uid_authorized(uid)) {
+//       printf("UID is NOT Authorized.\n");
+//       return 0;
+//     }
+//   }
+//
+//   printf("Access granted to %s.\n", uid);
+//   // pulse_lock(lock_1.channel);
+//   return 0;
+// }
 
 /* Parse received ESPNOW data. */
 int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic)
 {
     example_espnow_data_t *buf = (example_espnow_data_t *)data;
     uint16_t crc, crc_cal = 0;
-    char uid_str[20];
-
-    if (data_len < sizeof(example_espnow_data_t)) {
-        ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
-        return -1;
-    }
-
-    // printf("data length: %u, struct size %u\n", data, sizeof(example_espnow_data_t));
-    strcpy(uid_str,"");
-    // printf("length: %u\n", buf->payload[0]);
-    for (int i=1; i <= buf->payload[0]; i++) {
-      // printf("%x ", buf->payload[i]);
-      sprintf(uid_str, "%s%x", uid_str, buf->payload[i]);
-    }
-
-    if (strcmp(uid_str, "")!=0) {
-      handle_uid(uid_str);
-    }
+    // char uid_str[20];
+    //
+    // if (data_len < sizeof(example_espnow_data_t)) {
+    //     ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
+    //     return -1;
+    // }
+    //
+    // // printf("data length: %u, struct size %u\n", data, sizeof(example_espnow_data_t));
+    // strcpy(uid_str,"");
+    // // printf("length: %u\n", buf->payload[0]);
+    // for (int i=1; i <= buf->payload[0]; i++) {
+    //   // printf("%x ", buf->payload[i]);
+    //   sprintf(uid_str, "%s%x", uid_str, buf->payload[i]);
+    // }
+    //
+    // if (strcmp(uid_str, "")!=0) {
+    //   handle_uid(uid_str);
+    // }
 
     *state = buf->state;
     *seq = buf->seq_num;
@@ -194,28 +194,29 @@ void example_espnow_data_prepare(example_espnow_send_param_t *send_param)
     // }
     // printf("sending uid of size %u (%u): %s\n", uid.size, send_param->len, get_card_uid());
 
-    if (new_card_found()) {
-      buf->payload[0] = uid.size; // firt byte is buffer size
-      for (uint8_t i = 1; i <= uid.size; i++) {
-          if (i <= uid.size) {
-            printf(" %x", uid.uidByte[i-1]);
-            buf->payload[i] = uid.uidByte[i-1];
-          }
+    if (0) {
+      // buf->payload[0] = uid.size; // firt byte is buffer size
+      // for (uint8_t i = 1; i <= uid.size; i++) {
+      //     if (i <= uid.size) {
+      //       printf(" %x", uid.uidByte[i-1]);
+      //       buf->payload[i] = uid.uidByte[i-1];
+      //     }
+      // }
+      //
+      // buf->payload[uid.size+1] = 0; // end with zero
+      // printf("\n");
+    }
+    else if (new_key_entered()) {
+      buf->payload[0] = code_size;
+      printf("\nSending code: ");
+      for (uint8_t i = 0; i < code_size; i++) {
+        printf(" %x", keypad_code[i]);
+        buf->payload[i+1] = keypad_code[i];
       }
 
-      buf->payload[uid.size+1] = 0; // end with zero
+      // buf->payload[code_size] = 0; // end with zero
       printf("\n");
     }
-    // else if (new_key_entered()) {
-    //   buf->payload[0] = code_size;
-    //   for (uint8_t i = 0; i < code_size; i++) {
-    //     printf(" %x", keypad_code[i]);
-    //     buf->payload[i+1] = keypad_code[i];
-    //   }
-    //
-    //   // buf->payload[code_size] = 0; // end with zero
-    //   printf("\n");
-    // }
     else {
       buf->payload[0] = 0;
     }
@@ -280,9 +281,9 @@ static void example_espnow_task(void *pvParameter)
                 example_espnow_data_prepare(send_param);
 
 
-                if (new_card_found()) {
-                  printf("transmitting uid: %s\n", get_card_uid());
-                }
+                // if (new_card_found()) {
+                //   printf("transmitting uid: %s\n", get_card_uid());
+                // }
 
                 /* Send the next data after the previous data is sent. */
                 if (esp_now_send(send_param->dest_mac, send_param->buffer, send_param->len) != ESP_OK) {

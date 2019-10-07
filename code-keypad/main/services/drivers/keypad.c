@@ -14,14 +14,14 @@
 #include "freertos/queue.h"
 #include "driver/gpio.h"
 
-#define R1_IO    12
-#define R2_IO    33
-#define R3_IO    15
-#define R4_IO    27
+#define R1_IO    23 // brown
+#define R2_IO    33 // blue
+#define R3_IO    25 // green
+#define R4_IO    13 // orange
 
-#define C1_IO    4
-#define C2_IO    24
-#define C3_IO    26
+#define C1_IO    14 // red
+#define C2_IO    22 // black
+#define C3_IO    12 // yellow
 #define C4_IO    0
 
 
@@ -155,11 +155,11 @@ static void keypad_task_example(void* arg)
                 printf("Key Pressed: %d\n", num);
 
                 if (num == 11 && code_count >= code_size) {
-                    printf("Sending code: %d %d %d %d\n",
-                    keypad_code[0], keypad_code[1], keypad_code[2], keypad_code[3]);
+                    // printf("Sending code: %d %d %d %d\n",
+                    // keypad_code[0], keypad_code[1], keypad_code[2], keypad_code[3]);
                     code_count = 0;
                     new_key_ready = true;
-                    vTaskDelay(2000 / portTICK_RATE_MS);
+                    vTaskDelay(1000 / portTICK_RATE_MS);
                 } else {
                   keypad_code[code_count] = num;
                   code_count++;
