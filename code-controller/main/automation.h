@@ -75,13 +75,14 @@ struct access_log {
 uint8_t keypad_code[4];
 int code_size = 4;
 
-#include "services/storage.c"
+#include "services/store.c"
+// #include "services/authorize.c"
 // #include "services/LED.c"
 // #include "plugins/protocol_relay.c"
 // #include "plugins/protocol_utility.c"
 // #include "services/log.c"
 // #include "services/button.c"
 // #include "services/motion.c"
-// #include "services/lock.c"
-#include "services/keypad.c"
+#include "services/lock.c"
+// #include "services/keypad.c"
 // #include "services/nfc.c"

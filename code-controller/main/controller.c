@@ -18,7 +18,7 @@
 
 #include "automation.h"
 
-static const char *TAG = "espnow_example";
+static const char *TAG = "[controller]";
 
 // Controller  MAC
 static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
@@ -65,7 +65,7 @@ static void example_wifi_init(void)
      * This is not necessary in real application if the two devices have
      * been already on the same channel.
      */
-    ESP_ERROR_CHECK( esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, 0) );
+    // ESP_ERROR_CHECK( esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, 0) );
 }
 
 /* ESPNOW sending or receiving callback function is called in WiFi task.
@@ -419,10 +419,10 @@ void app_main()
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK( ret );
-
+    printf("Starting controller.\n");
     example_wifi_init();
-    example_espnow_init();
-    lock_main();
+    // example_espnow_init();
+    // lock_main();
     store_main();
     // keypad_driver_main();
 
@@ -430,4 +430,11 @@ void app_main()
     // add_auth_uid("23456");
     // add_auth_uid("34567");
     // add_auth_uid("45678");
+
+    int cnt = 0;
+    while (1) {
+      printf("main loop %d\n", cnt++);
+
+      vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
 }

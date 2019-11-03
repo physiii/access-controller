@@ -1,32 +1,31 @@
-#include "storage.c"
-char store_service_message[1000];
-bool store_service_message_ready = false;
+char auth_service_message[1000];
+bool auth_service_message_ready = false;
 cJSON *auth_uids = NULL;
 
-int store_uids(cJSON * uids)
+int store_auth_uids(cJSON * uids)
 {
   printf("Storing UIDs: %s\n",cJSON_PrintUnformatted(uids));
-  store_char("uids", cJSON_PrintUnformatted(uids));
+  store_char("auth_uids", cJSON_PrintUnformatted(uids));
   return 0;
 }
 
-int load_uids_from_flash()
+int load_auth_uids_from_flash()
 {
-  char *uids = get_char("uids");
+  char *uids = get_char("auth_uids");
   if (strcmp(uids,"")==0) {
-    printf("nfc_uids not found in flash.\n");
+    printf("auth_uids not found in flash.\n");
     auth_uids = cJSON_CreateArray();
     return 1;
   } else {
-    printf("nfc_uids found in flash.\n%s\n",uids);
+    printf("auth_uids found in flash.\n%s\n",uids);
   }
 
   cJSON *obj = cJSON_Parse(uids);
   if (cJSON_IsArray(obj)) {
     auth_uids = obj;
-    printf("Loaded nfc_uids from flash. %s\n", uids);
+    printf("Loaded auth_uids from flash. %s\n", uids);
   } else {
-    printf("nfc_uids are not in a json array\n");
+    printf("auth_uids are not in a json array\n");
   }
 
   return 0;
@@ -49,7 +48,7 @@ void add_auth_uid (char * new_id)
   }
   cJSON *id_obj =  cJSON_CreateString(new_id);
   cJSON_AddItemToArray(auth_uids, id_obj);
-  store_uids(auth_uids);
+  store_auth_uids(auth_uids);
 }
 
 void remove_auth_uid (char * target_id)
@@ -71,7 +70,7 @@ void remove_auth_uid (char * target_id)
     // }
   }
 
-  store_uids(new_auth_uids);
+  store_auth_uids(new_auth_uids);
 }
 
 bool is_uid_authorized (char * uid)
@@ -89,10 +88,20 @@ bool is_uid_authorized (char * uid)
   return false;
 }
 
-void store_main()
+static void auth_service (void *pvParameter)
 {
-  printf("starting store service\n");
-  load_uids_from_flash();
-  // TaskHandle_t store_service_task;
-  // xTaskCreate(&store_service, "store_service_task", 5000, NULL, 5, NULL);
+  uint32_t io_num;
+  uint8_t r ;
+  load_auth_uids_from_flash();
+
+  while (1) {
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+  }
+}
+
+void auth_main()
+{
+  printf("starting auth service\n");
+  TaskHandle_t auth_service_task;
+  xTaskCreate(&auth_service, "auth_service_task", 5000, NULL, 5, NULL);
 }
