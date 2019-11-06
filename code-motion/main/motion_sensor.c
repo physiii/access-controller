@@ -1,36 +1,12 @@
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <assert.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "freertos/timers.h"
-#include "nvs_flash.h"
-#include "esp_event_loop.h"
-#include "tcpip_adapter.h"
-#include "esp_wifi.h"
-#include "esp_log.h"
-#include "esp_system.h"
-#include "esp_now.h"
-#include "rom/ets_sys.h"
-#include "rom/crc.h"
-#include "espnow_example.h"
-
 #include "automation.h"
 
-static const char *TAG = "[controller]";
-
-// Controller  MAC
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static const char *TAG = "[motion_sensor.c]";
 
 // Remote MAC
-static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
-int TX_RX_MODE = 0;
-int CHECK_UID = 0;
-int ADD_UID = 1;
-int REMOVE_UID = 2;
-int current_mode = 0;
+//Controller MAC
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 static xQueueHandle s_example_espnow_queue;
 
@@ -114,58 +90,54 @@ static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
     }
 }
 
-int handle_uid (char * uid)
-{
-
-  if (current_mode == ADD_UID) {
-    add_auth_uid(uid);
-    return 0;
-  }
-
-  if (current_mode == REMOVE_UID) {
-    remove_auth_uid(uid);
-    return 0;
-  }
-
-  if (current_mode == CHECK_UID) {
-    if (!is_uid_authorized(uid)) {
-      printf("UID is NOT Authorized.\n");
-      return 0;
-    }
-  }
-
-  printf("Access granted to %s.\n", uid);
-  pulse_lock(lock_1.channel);
-  pulse_lock(lock_2.channel);
-  return 0;
-}
+// int handle_uid (char * uid)
+// {
+//
+//   if (current_mode == ADD_UID) {
+//     add_auth_uid(uid);
+//     return 0;
+//   }
+//
+//   if (current_mode == REMOVE_UID) {
+//     remove_auth_uid(uid);
+//     return 0;
+//   }
+//
+//   if (current_mode == CHECK_UID) {
+//     if (!is_uid_authorized(uid)) {
+//       printf("UID is NOT Authorized.\n");
+//       return 0;
+//     }
+//   }
+//
+//   printf("Access granted to %s.\n", uid);
+//   // pulse_lock(lock_1.channel);
+//   return 0;
+// }
 
 /* Parse received ESPNOW data. */
 int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic)
 {
     example_espnow_data_t *buf = (example_espnow_data_t *)data;
     uint16_t crc, crc_cal = 0;
-    char message_str[20];
-    char length = 20;
-
-    if (data_len < sizeof(example_espnow_data_t)) {
-        ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
-        return -1;
-    }
-
-    strcpy(message_str,"");
-    uint8_t payload[length];
-    for (int i=0; i <= length; i++)
-      payload[i] = buf->payload[i];
-
-    memcpy(message_str, payload, length);
-    if (strcmp(message_str,"")==0) {
-      return -1;
-    }
-    printf("Message received: %s\n", message_str);
-    if (strcmp(message_str, "")!=0) {
-      // handle_uid(message_str);
-    }
+    // char uid_str[20];
+    //
+    // if (data_len < sizeof(example_espnow_data_t)) {
+    //     ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
+    //     return -1;
+    // }
+    //
+    // // printf("data length: %u, struct size %u\n", data, sizeof(example_espnow_data_t));
+    // strcpy(uid_str,"");
+    // // printf("length: %u\n", buf->payload[0]);
+    // for (int i=1; i <= buf->payload[0]; i++) {
+    //   // printf("%x ", buf->payload[i]);
+    //   sprintf(uid_str, "%s%x", uid_str, buf->payload[i]);
+    // }
+    //
+    // if (strcmp(uid_str, "")!=0) {
+    //   handle_uid(uid_str);
+    // }
 
     *state = buf->state;
     *seq = buf->seq_num;
@@ -184,6 +156,8 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
 /* Prepare ESPNOW data to be sent. */
 void example_espnow_data_prepare(example_espnow_send_param_t *send_param)
 {
+    char message_str[20];
+    int message_size = sizeof(message_str)/sizeof(message_str[0]);
     example_espnow_data_t *buf = (example_espnow_data_t *)send_param->buffer;
 
     assert(send_param->len >= sizeof(example_espnow_data_t));
@@ -193,6 +167,22 @@ void example_espnow_data_prepare(example_espnow_send_param_t *send_param)
     buf->seq_num = s_example_espnow_seq[buf->type]++;
     buf->crc = 0;
     buf->magic = send_param->magic;
+
+    if (new_motion_event()) {
+      if (get_motion_state()) {
+        printf("\nSending start motion event.\n");
+        strcpy(message_str,"{motion:1}");
+      } else {
+        printf("\nSending stop motion event.\n");
+        strcpy(message_str,"{motion:0}");
+      }
+      uint8_t * u = (uint8_t *)message_str;
+      memcpy(buf->payload, u, sizeof(message_str)/sizeof(message_str[0]));
+    }
+    else {
+      buf->payload[0] = 0;
+    }
+
     buf->crc = crc16_le(UINT16_MAX, (uint8_t const *)buf, send_param->len);
 }
 
@@ -252,6 +242,11 @@ static void example_espnow_task(void *pvParameter)
                 // memcpy(send_param->buffer, ptr, ESP_NOW_ETH_ALEN);
                 example_espnow_data_prepare(send_param);
 
+
+                // if (new_card_found()) {
+                //   printf("transmitting uid: %s\n", get_card_uid());
+                // }
+
                 /* Send the next data after the previous data is sent. */
                 if (esp_now_send(send_param->dest_mac, send_param->buffer, send_param->len) != ESP_OK) {
                   ESP_LOGE(TAG, "Send error");
@@ -263,6 +258,7 @@ static void example_espnow_task(void *pvParameter)
             }
             case EXAMPLE_ESPNOW_RECV_CB:
             {
+                break;
                 example_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
                 ret = example_espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_state, &recv_seq, &recv_magic);
@@ -422,21 +418,15 @@ void app_main()
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK( ret );
-    printf("Starting controller.\n");
+
     example_wifi_init();
     example_espnow_init();
     // lock_main();
-    store_main();
-    // keypad_driver_main();
+    // nfc_main();
+    motion_main();
 
     // add_auth_uid("12345");
     // add_auth_uid("23456");
     // add_auth_uid("34567");
     // add_auth_uid("45678");
-
-    int cnt = 0;
-    while (1) {
-      printf("Up time: %d minutes\n", cnt++);
-      vTaskDelay(60 * 1000 / portTICK_PERIOD_MS);
-    }
 }
