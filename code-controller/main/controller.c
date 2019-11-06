@@ -135,8 +135,29 @@ int handle_uid (char * uid)
   }
 
   printf("Access granted to %s.\n", uid);
-  pulse_lock(lock_1.channel);
-  pulse_lock(lock_2.channel);
+  // pulse_lock(lock_1.channel);
+  // pulse_lock(lock_2.channel);
+  return 0;
+}
+
+int motion_event (bool val) {
+  light_motion(val);
+  if (val) {
+    printf("Motion detected.\n");
+  } else {
+    printf("Motion not detected.\n");
+  }
+  return 0;
+}
+
+int handle_msg (char * msg)
+{
+  cJSON *msg_json = cJSON_Parse(msg);
+
+  if (cJSON_GetObjectItem(msg_json,"motion")) {
+    motion_event(cJSON_IsTrue(cJSON_GetObjectItem(msg_json,"motion")));
+  }
+  
   return 0;
 }
 
@@ -162,9 +183,9 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
     if (strcmp(message_str,"")==0) {
       return -1;
     }
-    printf("Message received: %s\n", message_str);
+
     if (strcmp(message_str, "")!=0) {
-      // handle_uid(message_str);
+      handle_msg(message_str);
     }
 
     *state = buf->state;
@@ -425,8 +446,9 @@ void app_main()
     printf("Starting controller.\n");
     example_wifi_init();
     example_espnow_init();
-    // lock_main();
     store_main();
+    lightswitch_main();
+    // lock_main();
     // keypad_driver_main();
 
     // add_auth_uid("12345");

@@ -170,11 +170,11 @@ void example_espnow_data_prepare(example_espnow_send_param_t *send_param)
 
     if (new_motion_event()) {
       if (get_motion_state()) {
-        printf("\nSending start motion event.\n");
-        strcpy(message_str,"{motion:1}");
+        printf("Sending start motion event.\n");
+        strcpy(message_str,"{\"motion\":true}");
       } else {
-        printf("\nSending stop motion event.\n");
-        strcpy(message_str,"{motion:0}");
+        printf("Sending stop motion event.\n");
+        strcpy(message_str,"{\"motion\":false}");
       }
       uint8_t * u = (uint8_t *)message_str;
       memcpy(buf->payload, u, sizeof(message_str)/sizeof(message_str[0]));
@@ -429,4 +429,9 @@ void app_main()
     // add_auth_uid("23456");
     // add_auth_uid("34567");
     // add_auth_uid("45678");
+    int cnt = 0;
+    while (1) {
+      printf("Up time: %d minutes\n", cnt++);
+      vTaskDelay(60 * 1000 / portTICK_PERIOD_MS);
+    }
 }

@@ -59,3 +59,41 @@ menu "Example Configuration"
             When enable long range, the PHY rate of ESP32 will be 512Kbps or 256Kbps
 
 endmenu
+
+menu "Lightswitch Config"
+
+    config LIGHT_1_IO
+        int "LIGHT 1 IO"
+        range 0 34
+        default 25
+        help
+          GPIO number to control light 1.
+
+    config LIGHT_2_IO
+        int "LIGHT 2 IO"
+        range 0 34
+        default 26
+        help
+            GPIO number to control light 2.
+
+    config SWITCH_1_IO
+        int "SWITCH 1 IO"
+        range 0 34
+        default 12
+        help
+            GPIO number to control light 1.
+
+    config SWITCH_2_IO
+        int "SWITCH 2 IO"
+        range 0 34
+        default 13
+        help
+            GPIO number to control light 2.
+
+    config LIGHT_OFF_TIME
+        int "Delay time(m) turn off light"
+        range 0 60000
+        default 5
+        help
+            If no activity detected, turn off lights after this amount of minutes.
+endmenu

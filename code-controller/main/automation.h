@@ -76,6 +76,7 @@ uint8_t keypad_code[4];
 int code_size = 4;
 
 #include "services/store.c"
+#include "services/lightswitch.c"
 // #include "services/authorize.c"
 // #include "services/LED.c"
 // #include "plugins/protocol_relay.c"
@@ -83,6 +84,6 @@ int code_size = 4;
 // #include "services/log.c"
 // #include "services/button.c"
 // #include "services/motion.c"
-#include "services/lock.c"
+// #include "services/lock.c"
 // #include "services/keypad.c"
 // #include "services/nfc.c"
