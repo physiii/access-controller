@@ -1,24 +1,6 @@
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <assert.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "freertos/timers.h"
-#include "nvs_flash.h"
-#include "esp_event_loop.h"
-#include "tcpip_adapter.h"
-#include "esp_wifi.h"
-#include "esp_log.h"
-#include "esp_system.h"
-#include "esp_now.h"
-#include "rom/ets_sys.h"
-#include "rom/crc.h"
-#include "espnow_example.h"
-
-#include "automation.h"
 
 static const char *TAG = "[controller]";
+#include "automation.h"
 
 // Controller  MAC
 static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
@@ -157,7 +139,7 @@ int handle_msg (char * msg)
   if (cJSON_GetObjectItem(msg_json,"motion")) {
     motion_event(cJSON_IsTrue(cJSON_GetObjectItem(msg_json,"motion")));
   }
-  
+
   return 0;
 }
 
@@ -448,6 +430,7 @@ void app_main()
     example_espnow_init();
     store_main();
     lightswitch_main();
+    ota_main();
     // lock_main();
     // keypad_driver_main();
 

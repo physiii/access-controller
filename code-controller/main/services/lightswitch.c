@@ -5,6 +5,7 @@
 #define SWITCH_2_IO CONFIG_SWITCH_2_IO
 
 #define LIGHT_OFF_TIME CONFIG_LIGHT_OFF_TIME
+#define DEBOUNCE_SWITCH_TIME 10
 
 static xQueueHandle switch_evt_queue = NULL;
 
@@ -21,6 +22,8 @@ struct lightswitch ls2;
 
 bool light_off_timer_expired = true;
 int light_off_count = 0;
+bool debounce_switch_active = false;
+int debounce_switch_count = 0;
 
 static void IRAM_ATTR switch_isr_handler(void* arg)
 {
@@ -38,6 +41,16 @@ void start_light_off_timer(bool val)
   }
 }
 
+void debounce_switch(bool val)
+{
+  if (val) {
+    debounce_switch_active = true;
+    debounce_switch_count = 0;
+  } else {
+    debounce_switch_active = false;
+  }
+}
+
 void light_on (struct lightswitch ls, bool val) {
   gpio_set_level(ls.light_io, val);
   ls.light_state = val;
@@ -51,11 +64,23 @@ void lights_on (bool val) {
 
 void light_motion (bool val) {
   if (val) {
+    debounce_switch(true);
     lights_on(val);
   } else {
     start_light_off_timer(true);
   }
 }
+
+static void debounce_switch_timer(void *pvParameter)
+{
+  while (1) {
+    if (debounce_switch_count >= DEBOUNCE_SWITCH_TIME && debounce_switch_active) {
+      debounce_switch(false);
+    } else debounce_switch_count++;
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
+}
+
 
 static void light_off_timer(void *pvParameter)
 {
@@ -74,6 +99,7 @@ static void lightswitch_task(void* arg)
     for(;;) {
         if(xQueueReceive(switch_evt_queue, &io_num, portMAX_DELAY)) {
             int state = gpio_get_level(io_num);
+            if (debounce_switch_active) continue;
             if (io_num == ls1.switch_io) {
               light_on(ls1, state);
             }
@@ -93,6 +119,14 @@ void lightswitch_main(void)
     ls2.light_io = LIGHT_2_IO;
 
     gpio_config_t io_conf;
+
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = ((1ULL<<ls1.light_io) | (1ULL<<ls2.light_io));
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 1;
+    gpio_config(&io_conf);
+
     io_conf.intr_type = GPIO_PIN_INTR_ANYEDGE;
     io_conf.pin_bit_mask = ((1ULL<<ls1.switch_io) | (1ULL<<ls2.switch_io));
     io_conf.mode = GPIO_MODE_INPUT;
@@ -110,4 +144,5 @@ void lightswitch_main(void)
     gpio_isr_handler_add(ls2.switch_io, switch_isr_handler, (void*) ls2.switch_io);
 
     xTaskCreate(light_off_timer, "light_off_timer", 2048, NULL, 10, NULL);
+    xTaskCreate(debounce_switch_timer, "debounce_switch_timer", 2048, NULL, 10, NULL);
 }

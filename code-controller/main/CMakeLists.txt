@@ -1,4 +1,5 @@
-set(COMPONENT_SRCS "controller.c")
-set(COMPONENT_ADD_INCLUDEDIRS ".")
-
-register_component()
+# Embed the server root certificate into the final binary
+idf_build_get_property(project_dir PROJECT_DIR)
+idf_component_register(SRCS "controller.c"
+                    INCLUDE_DIRS "."
+                    EMBED_TXTFILES ${project_dir}/server_certs/ca_cert.pem)

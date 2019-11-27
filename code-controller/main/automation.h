@@ -1,3 +1,27 @@
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <assert.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/timers.h"
+#include "esp_event_loop.h"
+#include "tcpip_adapter.h"
+#include "esp_wifi.h"
+#include "esp_log.h"
+#include "esp_system.h"
+#include "esp_now.h"
+#include "rom/ets_sys.h"
+#include "rom/crc.h"
+#include "espnow_example.h"
+#include "freertos/task.h"
+#include "esp_event.h"
+#include "esp_ota_ops.h"
+#include "esp_http_client.h"
+#include "esp_https_ota.h"
+#include "protocol_examples_common.h"
+#include "nvs.h"
+#include "nvs_flash.h"
 #include "cJSON.h"
 #include "soc/gpio_struct.h"
 #include "driver/gpio.h"
@@ -75,6 +99,7 @@ struct access_log {
 uint8_t keypad_code[4];
 int code_size = 4;
 
+#include "services/ota.c"
 #include "services/store.c"
 #include "services/lightswitch.c"
 // #include "services/authorize.c"
