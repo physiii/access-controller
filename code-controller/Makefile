@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := espnow_example
+PROJECT_NAME := controller
 
 EXTRA_COMPONENT_DIRS = $(IDF_PATH)/examples/common_components/protocol_examples_common
 

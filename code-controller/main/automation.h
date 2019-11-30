@@ -99,6 +99,7 @@ struct access_log {
 uint8_t keypad_code[4];
 int code_size = 4;
 
+#include "services/station.c"
 #include "services/ota.c"
 #include "services/store.c"
 #include "services/lightswitch.c"
