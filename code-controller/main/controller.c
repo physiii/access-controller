@@ -1,64 +1,53 @@
-/* ESPNOW Example
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-
-/*
-   This example shows how to use ESPNOW.
-   Prepare two device, one for sending ESPNOW data and another for receiving
-   ESPNOW data.
-*/
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <assert.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "freertos/timers.h"
-#include "nvs_flash.h"
-#include "esp_event.h"
-#include "tcpip_adapter.h"
-#include "esp_wifi.h"
-#include "esp_log.h"
-#include "esp_system.h"
-#include "esp_now.h"
-#include "esp_crc.h"
-#include "espnow_example.h"
-
-
-static const char *TAG = "espnow_example";
+static const char *TAG = "[controller]";
 #include "automation.h"
+
+// Controller  MAC
+static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+// Remote MAC
+static uint8_t s_peer_mac[ESP_NOW_ETH_ALEN] = { 0xAF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+int TX_RX_MODE = 0;
+int CHECK_UID = 0;
+int ADD_UID = 1;
+int REMOVE_UID = 2;
+int current_mode = 0;
 
 static xQueueHandle s_example_espnow_queue;
 
-static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-static uint16_t s_example_espnow_seq[EXAMPLE_ESPNOW_DATA_MAX] = { 0, 0 };
+static uint16_t s_example_espnow_seq[EXAMPLE_ESPNOW_DATA_MAX] = { 1, 2, 3, 122, 256, 1234 };
 
 static void example_espnow_deinit(example_espnow_send_param_t *send_param);
+
+static esp_err_t example_event_handler(void *ctx, system_event_t *event)
+{
+    switch(event->event_id) {
+    case SYSTEM_EVENT_STA_START:
+        ESP_LOGI(TAG, "WiFi started");
+        break;
+    default:
+        break;
+    }
+    return ESP_OK;
+}
 
 /* WiFi should start before using ESPNOW */
 static void example_wifi_init(void)
 {
-    tcpip_adapter_init();
-    // ESP_ERROR_CHECK(esp_event_loop_create_default());
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+    // tcpip_adapter_init();
+    // ESP_ERROR_CHECK( esp_event_loop_init(example_event_handler, NULL) );
+    // wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    // ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
     ESP_ERROR_CHECK( esp_wifi_set_mode(ESPNOW_WIFI_MODE) );
-    ESP_ERROR_CHECK( esp_wifi_start());
+    // ESP_ERROR_CHECK( esp_wifi_start());
 
     /* In order to simplify example, channel is set after WiFi started.
      * This is not necessary in real application if the two devices have
      * been already on the same channel.
      */
-
-#if CONFIG_ESPNOW_ENABLE_LONG_RANGE
-    ESP_ERROR_CHECK( esp_wifi_set_protocol(ESPNOW_WIFI_IF, WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N|WIFI_PROTOCOL_LR) );
-#endif
+    // ESP_ERROR_CHECK( esp_wifi_set_channel(9, 9) );
 }
 
 /* ESPNOW sending or receiving callback function is called in WiFi task.
@@ -107,15 +96,78 @@ static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
     }
 }
 
+int handle_uid (char * uid)
+{
+
+  if (current_mode == ADD_UID) {
+    add_auth_uid(uid);
+    return 0;
+  }
+
+  if (current_mode == REMOVE_UID) {
+    remove_auth_uid(uid);
+    return 0;
+  }
+
+  if (current_mode == CHECK_UID) {
+    if (!is_uid_authorized(uid)) {
+      printf("UID is NOT Authorized.\n");
+      return 0;
+    }
+  }
+
+  printf("Access granted to %s.\n", uid);
+  // pulse_lock(lock_1.channel);
+  // pulse_lock(lock_2.channel);
+  return 0;
+}
+
+int motion_event (bool val) {
+  light_motion(val);
+  if (val) {
+    printf("Motion detected.\n");
+  } else {
+    printf("Motion not detected.\n");
+  }
+  return 0;
+}
+
+int handle_msg (char * msg)
+{
+  cJSON *msg_json = cJSON_Parse(msg);
+
+  if (cJSON_GetObjectItem(msg_json,"motion")) {
+    motion_event(cJSON_IsTrue(cJSON_GetObjectItem(msg_json,"motion")));
+  }
+
+  return 0;
+}
+
 /* Parse received ESPNOW data. */
 int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic)
 {
     example_espnow_data_t *buf = (example_espnow_data_t *)data;
     uint16_t crc, crc_cal = 0;
+    char message_str[20];
+    char length = 20;
 
     if (data_len < sizeof(example_espnow_data_t)) {
         ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
         return -1;
+    }
+
+    strcpy(message_str,"");
+    uint8_t payload[length];
+    for (int i=0; i <= length; i++)
+      payload[i] = buf->payload[i];
+
+    memcpy(message_str, payload, length);
+    if (strcmp(message_str,"")==0) {
+      return -1;
+    }
+
+    if (strcmp(message_str, "")!=0) {
+      handle_msg(message_str);
     }
 
     *state = buf->state;
@@ -123,7 +175,7 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
     *magic = buf->magic;
     crc = buf->crc;
     buf->crc = 0;
-    crc_cal = esp_crc16_le(UINT16_MAX, (uint8_t const *)buf, data_len);
+    crc_cal = crc16_le(UINT16_MAX, (uint8_t const *)buf, data_len);
 
     if (crc_cal == crc) {
         return buf->type;
@@ -144,9 +196,7 @@ void example_espnow_data_prepare(example_espnow_send_param_t *send_param)
     buf->seq_num = s_example_espnow_seq[buf->type]++;
     buf->crc = 0;
     buf->magic = send_param->magic;
-    /* Fill all remaining bytes after the data with random values */
-    esp_fill_random(buf->payload, send_param->len - sizeof(example_espnow_data_t));
-    buf->crc = esp_crc16_le(UINT16_MAX, (uint8_t const *)buf, send_param->len);
+    buf->crc = crc16_le(UINT16_MAX, (uint8_t const *)buf, send_param->len);
 }
 
 static void example_espnow_task(void *pvParameter)
@@ -158,11 +208,12 @@ static void example_espnow_task(void *pvParameter)
     bool is_broadcast = false;
     int ret;
 
-    vTaskDelay(5000 / portTICK_RATE_MS);
+    // vTaskDelay(5000 / portTICK_RATE_MS);
     ESP_LOGI(TAG, "Start sending broadcast data");
 
     /* Start sending broadcast ESPNOW data. */
     example_espnow_send_param_t *send_param = (example_espnow_send_param_t *)pvParameter;
+
     if (esp_now_send(send_param->dest_mac, send_param->buffer, send_param->len) != ESP_OK) {
         ESP_LOGE(TAG, "Send error");
         example_espnow_deinit(send_param);
@@ -170,9 +221,11 @@ static void example_espnow_task(void *pvParameter)
     }
 
     while (xQueueReceive(s_example_espnow_queue, &evt, portMAX_DELAY) == pdTRUE) {
+
         switch (evt.id) {
             case EXAMPLE_ESPNOW_SEND_CB:
             {
+
                 example_espnow_event_send_cb_t *send_cb = &evt.info.send_cb;
                 is_broadcast = IS_BROADCAST_ADDR(send_cb->mac_addr);
 
@@ -186,8 +239,8 @@ static void example_espnow_task(void *pvParameter)
                     send_param->count--;
                     if (send_param->count == 0) {
                         ESP_LOGI(TAG, "Send done");
-                        example_espnow_deinit(send_param);
-                        vTaskDelete(NULL);
+                        // example_espnow_deinit(send_param);
+                        // vTaskDelete(NULL);
                     }
                 }
 
@@ -199,14 +252,16 @@ static void example_espnow_task(void *pvParameter)
                 ESP_LOGI(TAG, "send data to "MACSTR"", MAC2STR(send_cb->mac_addr));
 
                 memcpy(send_param->dest_mac, send_cb->mac_addr, ESP_NOW_ETH_ALEN);
+                // memcpy(send_param->buffer, ptr, ESP_NOW_ETH_ALEN);
                 example_espnow_data_prepare(send_param);
 
                 /* Send the next data after the previous data is sent. */
                 if (esp_now_send(send_param->dest_mac, send_param->buffer, send_param->len) != ESP_OK) {
-                    ESP_LOGE(TAG, "Send error");
-                    example_espnow_deinit(send_param);
-                    vTaskDelete(NULL);
+                  ESP_LOGE(TAG, "Send error");
+                  example_espnow_deinit(send_param);
+                  vTaskDelete(NULL);
                 }
+
                 break;
             }
             case EXAMPLE_ESPNOW_RECV_CB:
@@ -317,7 +372,7 @@ static esp_err_t example_espnow_init(void)
     peer->channel = CONFIG_ESPNOW_CHANNEL;
     peer->ifidx = ESPNOW_WIFI_IF;
     peer->encrypt = false;
-    memcpy(peer->peer_addr, s_example_broadcast_mac, ESP_NOW_ETH_ALEN);
+    memcpy(peer->peer_addr, s_peer_mac, ESP_NOW_ETH_ALEN);
     ESP_ERROR_CHECK( esp_now_add_peer(peer) );
     free(peer);
 
@@ -345,7 +400,7 @@ static esp_err_t example_espnow_init(void)
         esp_now_deinit();
         return ESP_FAIL;
     }
-    memcpy(send_param->dest_mac, s_example_broadcast_mac, ESP_NOW_ETH_ALEN);
+    memcpy(send_param->dest_mac, s_peer_mac, ESP_NOW_ETH_ALEN);
     example_espnow_data_prepare(send_param);
 
     xTaskCreate(example_espnow_task, "example_espnow_task", 2048, send_param, 4, NULL);
@@ -361,20 +416,46 @@ static void example_espnow_deinit(example_espnow_send_param_t *send_param)
     esp_now_deinit();
 }
 
-void app_main(void)
+void app_main()
 {
-    // Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK( nvs_flash_erase() );
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK( ret );
+    printf("\n\n\nStarting controller.\n\n\n");
 
+    // Initialize NVS
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        // 1.OTA app partition table has a smaller NVS partition size than the non-OTA
+        // partition table. This size mismatch may cause NVS initialization to fail.
+        // 2.NVS partition contains data in new format and cannot be recognized by this version of code.
+        // If this happens, we erase NVS partition and initialize NVS again.
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(err);
     station_main();
-    vTaskDelay(5000 / portTICK_RATE_MS);
-    // example_wifi_init();
+
+
     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
     ESP_ERROR_CHECK( esp_wifi_set_mode(ESPNOW_WIFI_MODE) );
     example_espnow_init();
+
+    // example_wifi_init();
+    // example_espnow_init();
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    ota_main();
+
+    // store_main();
+    // lightswitch_main();
+    // lock_main();
+    // keypad_driver_main();
+
+    // add_auth_uid("12345");
+    // add_auth_uid("23456");
+    // add_auth_uid("34567");
+    // add_auth_uid("45678");
+
+    int cnt = 0;
+    while (1) {
+      printf("Up time: %d minutes\n", cnt++);
+      vTaskDelay(60 * 1000 / portTICK_PERIOD_MS);
+    }
 }

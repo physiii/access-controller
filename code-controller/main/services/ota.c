@@ -72,7 +72,7 @@ void simple_ota_example_task(void *pvParameter)
 
 void ota_main(void)
 {
-
+    printf("Starting OTA.\n");
     // Initialize NVS.
     // esp_err_t err = nvs_flash_init();
     // if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -84,15 +84,14 @@ void ota_main(void)
     //     err = nvs_flash_init();
     // }
     // ESP_ERROR_CHECK(err);
-    tcpip_adapter_init();
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    // tcpip_adapter_init();
+    // ESP_ERROR_CHECK(esp_event_loop_create_default());
     //
     // /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
     //  * Read "Establishing Wi-Fi or Ethernet Connection" section in
     //  * examples/protocols/README.md for more information about this function.
     //  */
-    ESP_ERROR_CHECK(example_connect());
+    // ESP_ERROR_CHECK(example_connect());
 
     xTaskCreate(&simple_ota_example_task, "ota_example_task", 8192, NULL, 5, NULL);
-    printf("Starting OTA.\n");
 }
