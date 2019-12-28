@@ -135,6 +135,13 @@ void arm_lock (int channel, bool val) {
 }
 
 void pulse_lock (int channel) {
+  if (!lock_timer_expired) {
+    printf("Debouncing locks: %d\n",lock_count);
+    return;
+  }
+
+  start_lock_timer(true);
+
   if (lock_1.channel == channel) {
     lock_1.pulse = true;
   }
