@@ -1,12 +1,12 @@
-#define LOCK_IO_1             15
-#define LOCK_IO_2             18
-#define LOCK_IO_BITMASK       (1ULL<<LOCK_IO_1 | 1ULL<<LOCK_IO_2)
-#define FOB_IO_1                23
-#define EXIT_BUTTON_IO_1        4
-#define FOB_IO_2                17
-#define EXIT_BUTTON_IO_2        22
-#define DISABLE_BTN_IO          12
-#define GPIO_INPUT_PIN_SEL    ((1ULL<<FOB_IO_1) | (1ULL<<EXIT_BUTTON_IO_1) | (1ULL<<FOB_IO_2) | (1ULL<<EXIT_BUTTON_IO_2) | (1ULL<<DISABLE_BTN_IO))
+#define LOCK_A_IO             CONFIG_LOCK_A_IO
+#define LOCK_B_IO             CONFIG_LOCK_B_IO
+#define LOCK_IO_BITMASK       (1ULL<<LOCK_A_IO | 1ULL<<LOCK_B_IO)
+#define FOB_A_IO              CONFIG_FOB_A_IO
+#define FOB_B_IO              CONFIG_FOB_B_IO
+#define EXIT_BTN_A_IO         CONFIG_EXIT_BTN_A_IO
+#define EXIT_BTN_B_IO         CONFIG_EXIT_BTN_B_IO
+#define DISABLE_EXIT_IO       CONFIG_DISABLE_EXIT_IO
+#define GPIO_INPUT_PIN_SEL    ((1ULL<<FOB_A_IO) | (1ULL<<EXIT_BTN_A_IO) | (1ULL<<FOB_B_IO) | (1ULL<<EXIT_BTN_B_IO) | (1ULL<<DISABLE_EXIT_IO))
 #define ESP_INTR_FLAG_DEFAULT 0
 
 char lock_service_message[2000];
@@ -184,7 +184,7 @@ static void gpio_task_example(void* arg)
               printf("EXIT BUTTON 2: %d\n", gpio_get_level(io_num));
             }
 
-            if (io_num == DISABLE_BTN_IO) {
+            if (io_num == DISABLE_EXIT_IO) {
               button_disabled = gpio_get_level(io_num);
               printf("DISABLE BTN: %d\n", gpio_get_level(io_num));
             }
@@ -197,18 +197,18 @@ void lock_init() {
 
 
     lock_1.channel = 1;
-    lock_1.gpio = LOCK_IO_1;
+    lock_1.gpio = LOCK_A_IO;
     lock_1.isLocked = true;
 
     lock_2.channel = 2;
-    lock_2.gpio = LOCK_IO_2;
+    lock_2.gpio = LOCK_B_IO;
     lock_2.isLocked = true;
 
-    fob_1.gpio = FOB_IO_1;
-    fob_2.gpio = FOB_IO_2;
+    fob_1.gpio = FOB_A_IO;
+    fob_2.gpio = FOB_B_IO;
 
-    exit_1.gpio = EXIT_BUTTON_IO_1;
-    exit_2.gpio = EXIT_BUTTON_IO_2;
+    exit_1.gpio = EXIT_BTN_A_IO;
+    exit_2.gpio = EXIT_BTN_B_IO;
 
     gpio_config_t io_conf;
     //disable interrupt
@@ -237,7 +237,7 @@ void lock_init() {
     gpio_isr_handler_add(fob_2.gpio, gpio_isr_handler, (void*) fob_2.gpio );
     gpio_isr_handler_add(exit_1.gpio, gpio_isr_handler, (void*) exit_1.gpio);
     gpio_isr_handler_add(exit_2.gpio, gpio_isr_handler, (void*) exit_2.gpio);
-    gpio_isr_handler_add(DISABLE_BTN_IO, gpio_isr_handler, (void*) DISABLE_BTN_IO);
+    gpio_isr_handler_add(DISABLE_EXIT_IO, gpio_isr_handler, (void*) DISABLE_EXIT_IO);
 }
 
 int handle_property(char * prop) {

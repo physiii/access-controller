@@ -1,4 +1,63 @@
-menu "Example Configuration"
+menu "Access Control"
+
+    menu "Locks"
+        config LOCK_A_IO
+            int "Door A IO"
+            range 0 34
+            default 15
+            help
+              GPIO number to control door A.
+
+        config LOCK_B_IO
+            int "Door B IO"
+            range 0 18
+            default 26
+            help
+              GPIO number to control door B.
+    endmenu
+
+    menu "Exit Buttons"
+        config EXIT_BTN_A_IO
+            int "Exit Button A IO"
+            range 0 34
+            default 4
+            help
+              GPIO number to receive the exit signal from button A.
+
+        config EXIT_BTN_B_IO
+            int "Exit Button B IO"
+            range 0 34
+            default 5
+            help
+              GPIO number to receive the exit signal from button B.
+
+        config DISABLE_EXIT_IO
+            int "Disable Exit Button IO"
+            range 0 34
+            default 12
+            help
+              GPIO number to disable both exit buttons.
+    endmenu
+
+    menu "FOB Buttons"
+        config FOB_A_IO
+            int "Exit Button A IO"
+            range 0 34
+            default 23
+            help
+              GPIO number to receive the exit signal from button A.
+
+        config FOB_B_IO
+            int "Exit Button B IO"
+            range 0 34
+            default 17
+            help
+              GPIO number to receive the exit signal from button B.
+    endmenu
+
+endmenu
+
+menu "ESPNow Configuration"
 
     choice ESPNOW_WIFI_MODE
         prompt "WiFi mode"
