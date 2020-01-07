@@ -41,8 +41,6 @@ int CONNECTED    = 2;
 int utility_server_status = 0;
 int relay_status = 0;
 
-struct lws *wsi_token;
-int wsi_connect = 1;
 unsigned int rl_token = 0;
 unsigned int rl_ping = 0;
 unsigned int rl_device_id = 0;
@@ -51,20 +49,15 @@ char device_id[100];
 bool start_service_loop = false;
 bool token_received = false;
 bool reconnect_with_token = false;
-static struct lws_client_connect_info relay;
-static struct lws_client_connect_info utility_server;
-struct lws_vhost *vh;
 bool sent_load_event = false;
 char load_message[500];
-static struct lws_context_creation_info info;
-struct lws_context *context;
 
 bool transmit_uid = true;
 int current_time = 0;
 bool got_ip = false;
 
 struct access_log {
-	char log_id[25];
+  char log_id[25];
   char date[25];
   char key_id[25];
   char name[50];

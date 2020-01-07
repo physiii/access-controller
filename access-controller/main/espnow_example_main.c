@@ -145,7 +145,7 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
 {
     example_espnow_data_t *buf = (example_espnow_data_t *)data;
     uint16_t crc, crc_cal = 0;
-    char uid_str[20];
+    char uid_str[100];
 
     if (data_len < sizeof(example_espnow_data_t)) {
         ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
@@ -157,7 +157,8 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
     // printf("length: %u\n", buf->payload[0]);
     for (int i=1; i <= buf->payload[0]; i++) {
       // printf("%x ", buf->payload[i]);
-      sprintf(uid_str, "%s%x", uid_str, buf->payload[i]);
+      // sprintf(uid_str, "%s%x", uid_str, buf->payload[i]);
+      strcat(uid_str,buf->payload[i]);
     }
 
     if (strcmp(uid_str, "")!=0) {
@@ -420,8 +421,8 @@ void app_main()
     }
     ESP_ERROR_CHECK( ret );
 
-    example_wifi_init();
-    example_espnow_init();
+    //example_wifi_init();
+    //example_espnow_init();
     lock_main();
     store_main();
     // keypad_driver_main();
