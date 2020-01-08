@@ -14,8 +14,10 @@ bool lock_service_message_ready = false;
 int relock_delay = 2 * 1000;
 int normally_open = true;
 int button_disabled = false;
-
+int d_cnt = 0;
 int LOCK_DEBOUNCE_DELAY = 5;
+int LOCK_COUNT_MAX = 3;
+int D_COUNT_MAX = 4;
 bool lock_timer_expired = true;
 int lock_count = 0;
 
@@ -64,7 +66,7 @@ lock_timer(void *pvParameter)
     if (lock_count >= LOCK_DEBOUNCE_DELAY && !lock_timer_expired) {
       lock_timer_expired = true;
     } else lock_count++;
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(20 / portTICK_PERIOD_MS);
   }
 }
 
@@ -136,19 +138,22 @@ void arm_lock (int channel, bool val) {
 
 void pulse_lock (int channel) {
   if (!lock_timer_expired) {
-    printf("Debouncing locks: %d\n",lock_count);
+    printf("Debounce count: %d\n",d_cnt);
+    if (d_cnt > D_COUNT_MAX) {
+      d_cnt=0;
+      printf("LOCK_COUNT_MAX Reached!\n");
+      if (lock_1.channel == channel) {
+        lock_1.pulse = true;
+      }
+
+      if (lock_2.channel == channel) {
+        lock_2.pulse = true;
+      }
+    }
+    d_cnt++;
     return;
   }
-
   start_lock_timer(true);
-
-  if (lock_1.channel == channel) {
-    lock_1.pulse = true;
-  }
-
-  if (lock_2.channel == channel) {
-    lock_2.pulse = true;
-  }
 }
 
 static xQueueHandle gpio_evt_queue = NULL;
@@ -194,8 +199,6 @@ static void gpio_task_example(void* arg)
 }
 
 void lock_init() {
-
-
     lock_1.channel = 1;
     lock_1.gpio = LOCK_A_IO;
     lock_1.isLocked = true;

@@ -41,14 +41,14 @@ menu "Access Control"
 
     menu "FOB Buttons"
         config FOB_A_IO
-            int "Exit Button A IO"
+            int "FOB Button A IO"
             range 0 34
             default 23
             help
               GPIO number to receive the exit signal from button A.
 
         config FOB_B_IO
-            int "Exit Button B IO"
+            int "FOB Button B IO"
             range 0 34
             default 17
             help
