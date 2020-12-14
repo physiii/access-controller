@@ -1,0 +1,529 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr USLedger 17000 11000
+encoding utf-8
+Sheet 1 6
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text Label 11100 6050 0    50   ~ 0
+SCL
+Text Label 11100 6150 0    50   ~ 0
+SDA
+Text Label 7400 6350 0    50   ~ 0
+MAIN_EN
+Text Label 6000 6050 2    50   ~ 0
+BATTERY
+Text Label 9600 5150 2    50   ~ 0
+MAIN_EN
+Text Label 11100 5300 0    50   ~ 0
+TXD
+Text Label 11100 5400 0    50   ~ 0
+RXD
+Text Label 9600 5250 2    50   ~ 0
+AUDIO_STBY
+Text Label 9600 5350 2    50   ~ 0
+AUDIO_MUTE
+Text Label 7400 6250 0    50   ~ 0
+DISPLAY_EN
+Text Label 9600 5050 2    50   ~ 0
+DISPLAY_EN
+Text Label 6000 6150 2    50   ~ 0
+5V
+Text Label 6250 4450 2    50   ~ 0
+5V
+Text Label 6250 4550 2    50   ~ 0
+ESP_EN
+Text Label 6250 4650 2    50   ~ 0
+PROG
+$Comp
+L Open_Automation:radio-housing-mounts U?
+U 1 1 5CCA1F9C
+P 1150 1000
+AR Path="/5ABD187E/5CCA1F9C" Ref="U?"  Part="1" 
+AR Path="/5CCA1F9C" Ref="U1"  Part="1" 
+F 0 "U1" H 1275 1225 60  0000 L CNN
+F 1 "radio-housing-mounts" H 650 800 60  0000 L CNN
+F 2 "Open_Automation:radio-housing-mounts" H 1300 1300 60  0001 C CNN
+F 3 "" H 1150 1050 60  0001 C CNN
+	1    1150 1000
+	1    0    0    -1  
+$EndComp
+$Sheet
+S 6050 5950 1300 1050
+U 5A7BADB8
+F0 "Power" 50
+F1 "power.sch" 50
+F2 "CURRENT_SENSE" I R 7350 6500 50 
+F3 "3V3" I L 6050 6250 50 
+F4 "5V" I L 6050 6150 50 
+F5 "MAIN_EN" I R 7350 6350 50 
+F6 "DISPLAY_EN" I R 7350 6250 50 
+F7 "BATTERY" I L 6050 6050 50 
+F8 "BATT_ADC" I R 7350 6600 50 
+F9 "DISPLAY_POWER" I R 7350 6050 50 
+F10 "MAIN_POWER" I R 7350 6150 50 
+F11 "TRIGGER0" I L 6050 6600 50 
+F12 "SENSE0" I L 6050 6700 50 
+F13 "TRIGGER1" I L 6050 6800 50 
+F14 "SENSE1" I L 6050 6900 50 
+$EndSheet
+Wire Wire Line
+	6050 6050 6000 6050
+Wire Wire Line
+	6050 6150 6000 6150
+Text Label 6000 6250 2    50   ~ 0
+3V3
+Wire Wire Line
+	6050 6250 6000 6250
+Wire Wire Line
+	7350 6350 7400 6350
+Wire Wire Line
+	7350 6250 7400 6250
+Text Label 7400 6500 0    50   ~ 0
+CURRENT_SENSE
+Wire Wire Line
+	11050 6150 11100 6150
+Wire Wire Line
+	11100 6050 11050 6050
+Wire Wire Line
+	11050 5400 11100 5400
+Wire Wire Line
+	11100 5300 11050 5300
+Wire Wire Line
+	6250 4450 6300 4450
+Wire Wire Line
+	6250 4650 6300 4650
+Text Label 9600 5950 2    50   ~ 0
+CURRENT_SENSE
+Text Label 5950 1700 2    50   ~ 0
+J1850
+Wire Wire Line
+	5950 1700 6000 1700
+Text Label 5950 1800 2    50   ~ 0
+INSIDE_AIR_TEMP
+Wire Wire Line
+	5950 1800 6000 1800
+Text Label 5950 1900 2    50   ~ 0
+UPPER_RIGHT_AIR_TEMP
+Wire Wire Line
+	5950 1900 6000 1900
+Text Label 5950 2000 2    50   ~ 0
+LOW_REF
+Wire Wire Line
+	5950 2000 6000 2000
+Text Label 5950 2100 2    50   ~ 0
+AMBIENT_AIR_TEMP
+Wire Wire Line
+	5950 2100 6000 2100
+Text Label 5950 2200 2    50   ~ 0
+DRIVER_SUNLOAD
+Wire Wire Line
+	5950 2200 6000 2200
+Text Label 5950 2300 2    50   ~ 0
+PASSENGER_SUNLOAD
+Wire Wire Line
+	5950 2300 6000 2300
+Text Label 5950 2400 2    50   ~ 0
+AMBIENT_LIGHT
+Wire Wire Line
+	5950 2400 6000 2400
+Wire Wire Line
+	6550 1700 6500 1700
+Wire Wire Line
+	6550 1800 6500 1800
+Wire Wire Line
+	6550 2000 6500 2000
+Wire Wire Line
+	6500 1900 6550 1900
+Text Label 5950 2500 2    50   ~ 0
+UPPER_LEFT_AIR_TEMP
+Wire Wire Line
+	5950 2500 6000 2500
+Text Label 5950 2600 2    50   ~ 0
+REAR_DEFOG
+Wire Wire Line
+	5950 2600 6000 2600
+Text Label 5950 2700 2    50   ~ 0
+INSIDE_AIR_TEMP_BLOWER
+Wire Wire Line
+	5950 2700 6000 2700
+Text Label 6550 1700 0    50   ~ 0
+PASSENGER_HEATED_SEAT_STATUS
+Wire Wire Line
+	5950 2800 6000 2800
+Text Label 6550 1800 0    50   ~ 0
+DRIVER_HEATED_SEAT_STATUS
+Text Label 6550 1900 0    50   ~ 0
+IGNITION
+Text Label 6550 2000 0    50   ~ 0
+BATTERY
+Text Label 6550 2100 0    50   ~ 0
+BLOWER_MOTOR
+Wire Wire Line
+	6550 2100 6500 2100
+Text Label 6550 2200 0    50   ~ 0
+PASSENGER_SEAT_TEMP_CONTROL
+Wire Wire Line
+	6550 2200 6500 2200
+Text Label 6550 2300 0    50   ~ 0
+DRIVER_SEAT_TEMP_CONTROL
+Wire Wire Line
+	6550 2300 6500 2300
+Wire Wire Line
+	6550 2400 6500 2400
+Wire Wire Line
+	6550 2500 6500 2500
+Wire Wire Line
+	6550 2700 6500 2700
+Wire Wire Line
+	6550 2600 6500 2600
+Wire Wire Line
+	6550 2800 6500 2800
+Text Label 6550 2400 0    50   ~ 0
+INSTRUMENT_SUPPLY_VOLTAGE_4
+Text Label 7400 6600 0    50   ~ 0
+BATTERY_VOLTAGE_SENSE
+Wire Wire Line
+	7400 6600 7350 6600
+Wire Wire Line
+	7400 6500 7350 6500
+Text Label 6000 6600 2    50   ~ 0
+IGNITION
+Text Label 6000 6700 2    50   ~ 0
+IGNITION_SENSE
+$Sheet
+S 9650 4850 1400 1550
+U 6077D777
+F0 "Microcontroller" 50
+F1 "microcontroller.sch" 50
+F2 "RXD" I R 11050 5400 50 
+F3 "TXD" I R 11050 5300 50 
+F4 "IO5" I R 11050 5650 50 
+F5 "3V3" I R 11050 4950 50 
+F6 "IO4" I R 11050 5900 50 
+F7 "SCL" I R 11050 6050 50 
+F8 "SDA" I R 11050 6150 50 
+F9 "IO33" I L 9650 5850 50 
+F10 "IO32" I L 9650 5750 50 
+F11 "IO18" I L 9650 5150 50 
+F12 "ESP_EN" I R 11050 5050 50 
+F13 "PROG" I R 11050 5150 50 
+F14 "IO35" I L 9650 6050 50 
+F15 "IO34" I L 9650 5950 50 
+F16 "IO16" I R 11050 5800 50 
+F17 "IO17" I R 11050 5550 50 
+F18 "IO13" I L 9650 4950 50 
+F19 "IO15" I L 9650 5050 50 
+F20 "IO25" I L 9650 5450 50 
+F21 "IO19" I L 9650 5250 50 
+F22 "IO23" I L 9650 5350 50 
+F23 "IO26" I L 9650 5550 50 
+F24 "IO27" I L 9650 5650 50 
+F25 "FACT" I L 9650 6200 50 
+$EndSheet
+Text Label 11100 4950 0    50   ~ 0
+3V3
+Text Label 11100 5800 0    50   ~ 0
+J1850_RX
+Text Label 11100 5900 0    50   ~ 0
+J1850_TX
+Wire Wire Line
+	11050 5800 11100 5800
+Wire Wire Line
+	11100 5900 11050 5900
+Wire Wire Line
+	11100 5550 11050 5550
+Wire Wire Line
+	11050 5650 11100 5650
+Text Label 11100 5650 0    50   ~ 0
+CAN_TX
+Text Label 11100 5550 0    50   ~ 0
+CAN_RX
+Wire Wire Line
+	11100 4950 11050 4950
+Text Label 11100 5050 0    50   ~ 0
+ESP_EN
+Wire Wire Line
+	11100 5050 11050 5050
+Wire Wire Line
+	11100 5150 11050 5150
+Text Label 11100 5150 0    50   ~ 0
+PROG
+Wire Wire Line
+	9600 5050 9650 5050
+Wire Wire Line
+	9600 5150 9650 5150
+Wire Wire Line
+	9600 5850 9650 5850
+Wire Wire Line
+	9650 5750 9600 5750
+Wire Wire Line
+	9600 5950 9650 5950
+Wire Wire Line
+	9600 6050 9650 6050
+Wire Wire Line
+	9600 5650 9650 5650
+Wire Wire Line
+	9650 5550 9600 5550
+Wire Wire Line
+	9600 5450 9650 5450
+Wire Wire Line
+	9650 5350 9600 5350
+Wire Wire Line
+	9600 5250 9650 5250
+Text Label 7400 6050 0    50   ~ 0
+DISPLAY_POWER
+Text Label 7400 6150 0    50   ~ 0
+MAIN_POWER
+Wire Wire Line
+	7400 6150 7350 6150
+Wire Wire Line
+	7350 6050 7400 6050
+Text Label 9600 5750 2    50   ~ 0
+IO32
+Text Label 9600 5550 2    50   ~ 0
+IO26
+Text Label 9600 5450 2    50   ~ 0
+IO25
+Text Label 9600 5650 2    50   ~ 0
+IO27
+Text Label 9600 4950 2    50   ~ 0
+IO13
+Wire Wire Line
+	9600 4950 9650 4950
+$Sheet
+S 6300 4350 700  500 
+U 60DDD162
+F0 "USB" 50
+F1 "usb.sch" 50
+F2 "RXD" I R 7000 4500 50 
+F3 "TXD" I R 7000 4600 50 
+F4 "ESP_EN" I L 6300 4550 50 
+F5 "5V" I L 6300 4450 50 
+F6 "PROG" I L 6300 4650 50 
+$EndSheet
+Wire Wire Line
+	6250 4550 6300 4550
+Text Label 7050 4500 0    50   ~ 0
+RXD
+Text Label 7050 4600 0    50   ~ 0
+TXD
+Wire Wire Line
+	7050 4500 7000 4500
+Wire Wire Line
+	7000 4600 7050 4600
+Text Label 9600 5850 2    50   ~ 0
+WHEEL_CONTROLS_SIGNAL
+Text Label 6550 2700 0    50   ~ 0
+5V
+Text Label 6550 2600 0    50   ~ 0
+3V3
+Text Label 6200 3050 2    50   ~ 0
+LOW_REF
+Wire Wire Line
+	6250 3050 6200 3050
+$Comp
+L Open_Automation:Molex_Mini-Fit_Jr_5566 J2
+U 1 1 5FD129DC
+P 6200 2200
+F 0 "J2" H 6250 2917 50  0000 C CNN
+F 1 "Molex_Mini-Fit_Jr_5566" H 6250 2826 50  0000 C CNN
+F 2 "Connector_Molex:Molex_Mini-Fit_Jr_5566-24A2_2x12_P4.20mm_Vertical" H 6250 3000 50  0001 C CNN
+F 3 "https://www.molex.com/webdocs/datasheets/pdf/en-us/0039299243_PCB_HEADERS.pdf" H 6200 2200 50  0001 C CNN
+F 4 "39299243" H 6250 1400 50  0001 C CNN "Part Number"
+F 5 "https://www.molex.com/molex/products/part-detail/pcb_headers/0039299243" H 6200 2900 50  0001 C CNN "Website"
+	1    6200 2200
+	1    0    0    -1  
+$EndComp
+Text Label 9650 2300 2    50   ~ 0
+5V
+$Comp
+L power:GND #PWR?
+U 1 1 601BEF81
+P 5950 2800
+AR Path="/5ABD187E/601BEF81" Ref="#PWR?"  Part="1" 
+AR Path="/601BEF81" Ref="#PWR03"  Part="1" 
+AR Path="/5A7BADB8/601BEF81" Ref="#PWR?"  Part="1" 
+F 0 "#PWR03" H 5950 2550 50  0001 C CNN
+F 1 "GND" V 6000 2650 50  0000 C CNN
+F 2 "" H 5950 2800 50  0001 C CNN
+F 3 "" H 5950 2800 50  0001 C CNN
+	1    5950 2800
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 601BF455
+P 6550 2800
+AR Path="/5ABD187E/601BF455" Ref="#PWR?"  Part="1" 
+AR Path="/601BF455" Ref="#PWR05"  Part="1" 
+AR Path="/5A7BADB8/601BF455" Ref="#PWR?"  Part="1" 
+F 0 "#PWR05" H 6550 2550 50  0001 C CNN
+F 1 "GND" V 6500 2650 50  0000 C CNN
+F 2 "" H 6550 2800 50  0001 C CNN
+F 3 "" H 6550 2800 50  0001 C CNN
+	1    6550 2800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 601BFAAA
+P 6250 3050
+AR Path="/5ABD187E/601BFAAA" Ref="#PWR?"  Part="1" 
+AR Path="/601BFAAA" Ref="#PWR04"  Part="1" 
+AR Path="/5A7BADB8/601BFAAA" Ref="#PWR?"  Part="1" 
+F 0 "#PWR04" H 6250 2800 50  0001 C CNN
+F 1 "GND" V 6200 2900 50  0000 C CNN
+F 2 "" H 6250 3050 50  0001 C CNN
+F 3 "" H 6250 3050 50  0001 C CNN
+	1    6250 3050
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6050 6700 6000 6700
+Wire Wire Line
+	6000 6600 6050 6600
+Text Label 6000 6800 2    50   ~ 0
+TRIGGER1
+Text Label 6000 6900 2    50   ~ 0
+SENSE1
+Wire Wire Line
+	6050 6900 6000 6900
+Wire Wire Line
+	6000 6800 6050 6800
+Text Label 10250 2200 0    50   ~ 0
+TXD
+Wire Wire Line
+	10200 2000 10250 2000
+Text Label 10250 2300 0    50   ~ 0
+RXD
+Wire Wire Line
+	9700 2600 9650 2600
+Wire Wire Line
+	10200 2100 10250 2100
+Text Label 10250 2100 0    50   ~ 0
+SCL
+Text Label 10250 2000 0    50   ~ 0
+SDA
+Wire Wire Line
+	10200 2300 10250 2300
+Wire Wire Line
+	10250 2200 10200 2200
+Wire Wire Line
+	9700 2200 9650 2200
+Text Label 9650 2500 2    50   ~ 0
+PROG
+Wire Wire Line
+	9700 2500 9650 2500
+Text Label 9650 2000 2    50   ~ 0
+FACT
+Text Label 9650 2100 2    50   ~ 0
+ESP_EN
+Wire Wire Line
+	9700 2100 9650 2100
+Wire Wire Line
+	9650 2000 9700 2000
+$Comp
+L power:GND #PWR?
+U 1 1 5FE25541
+P 9600 1800
+AR Path="/5ABD187E/5FE25541" Ref="#PWR?"  Part="1" 
+AR Path="/5FE25541" Ref="#PWR02"  Part="1" 
+AR Path="/5A7BADDB/5FE25541" Ref="#PWR?"  Part="1" 
+AR Path="/6077D777/5FE25541" Ref="#PWR?"  Part="1" 
+F 0 "#PWR02" H 9600 1550 50  0001 C CNN
+F 1 "GND" V 9600 1600 50  0000 C CNN
+F 2 "" H 9600 1800 50  0001 C CNN
+F 3 "" H 9600 1800 50  0001 C CNN
+	1    9600 1800
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5FE25547
+P 9650 2600
+AR Path="/5ABD187E/5FE25547" Ref="#PWR?"  Part="1" 
+AR Path="/5FE25547" Ref="#PWR01"  Part="1" 
+AR Path="/5A7BADDB/5FE25547" Ref="#PWR?"  Part="1" 
+AR Path="/6077D777/5FE25547" Ref="#PWR?"  Part="1" 
+F 0 "#PWR01" H 9650 2350 50  0001 C CNN
+F 1 "GND" V 9600 2450 50  0000 C CNN
+F 2 "" H 9650 2600 50  0001 C CNN
+F 3 "" H 9650 2600 50  0001 C CNN
+	1    9650 2600
+	0    1    1    0   
+$EndComp
+Text Label 9650 2200 2    50   ~ 0
+3V3
+Wire Wire Line
+	9650 2300 9700 2300
+Wire Wire Line
+	9650 2400 9700 2400
+Wire Wire Line
+	10200 2400 10250 2400
+Text Label 9600 6200 2    50   ~ 0
+FACT
+Wire Wire Line
+	9600 6200 9650 6200
+Wire Wire Line
+	10200 2600 10250 2600
+Wire Wire Line
+	10250 2500 10200 2500
+Text Label 10250 2600 0    50   ~ 0
+IO26
+Text Label 10250 2500 0    50   ~ 0
+IO25
+$Comp
+L Connector_Generic:Conn_02x09_Odd_Even J1
+U 1 1 600AFE56
+P 9900 2200
+F 0 "J1" H 9950 2817 50  0000 C CNN
+F 1 "Conn_02x09_Odd_Even" H 9950 2726 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x09_P2.54mm_Vertical_SMD" H 9900 2200 50  0001 C CNN
+F 3 "~" H 9900 2200 50  0001 C CNN
+	1    9900 2200
+	1    0    0    -1  
+$EndComp
+Text Label 10250 1800 0    50   ~ 0
+OUT11
+Text Label 10250 2400 0    50   ~ 0
+AIN9
+Text Label 10250 1900 0    50   ~ 0
+AIN10
+Wire Wire Line
+	10250 1900 10200 1900
+Wire Wire Line
+	10250 1800 10200 1800
+Text Label 9650 1900 2    50   ~ 0
+5V
+Wire Wire Line
+	9600 1800 9700 1800
+Wire Wire Line
+	9650 1900 9700 1900
+Text Label 9600 6050 2    50   ~ 0
+BATTERY_VOLTAGE_SENSE
+Text Label 9650 2400 2    50   ~ 0
+BATTERY
+Text Label 6550 2500 0    50   ~ 0
+BATTERY
+$Sheet
+S 2650 4900 1150 1150
+U 5FE7DE37
+F0 "Door" 50
+F1 "door.sch" 50
+$EndSheet
+$Sheet
+S 8100 7850 1150 950 
+U 5FE8FE83
+F0 "Sheet5FE8FE82" 50
+F1 "hvac.sch" 50
+$EndSheet
+$EndSCHEMATC

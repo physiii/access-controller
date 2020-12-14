@@ -1,0 +1,731 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 6
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	3700 2700 3750 2700
+Text Label 3700 2700 2    50   ~ 0
+BUTTON
+Wire Wire Line
+	3700 3050 3750 3050
+Text Label 3700 3050 2    50   ~ 0
+KEYPAD
+Wire Wire Line
+	4150 3250 4200 3250
+Wire Wire Line
+	4200 3050 4150 3050
+Wire Wire Line
+	4150 2900 4200 2900
+Wire Wire Line
+	4200 2700 4150 2700
+Wire Wire Line
+	4850 3300 4850 3250
+Wire Wire Line
+	4850 3250 4800 3250
+Wire Wire Line
+	4150 3300 4150 3250
+Wire Wire Line
+	4800 2900 4850 2900
+Text Label 5350 2700 0    50   ~ 0
+3V3
+Wire Wire Line
+	5350 2700 5300 2700
+Wire Wire Line
+	5350 3050 5300 3050
+Wire Wire Line
+	4800 2700 4850 2700
+Wire Wire Line
+	4800 3050 4850 3050
+Connection ~ 4850 2700
+Wire Wire Line
+	4850 2700 4900 2700
+Connection ~ 4850 3050
+Wire Wire Line
+	4850 3050 4900 3050
+Wire Wire Line
+	5350 3050 5350 2700
+Text Label 4850 2550 0    50   ~ 0
+BUTTON_SENSE
+Wire Wire Line
+	4850 2550 4850 2700
+Wire Wire Line
+	4850 3050 4850 3200
+Text Label 4850 3200 0    50   ~ 0
+KEYPAD_SENSE
+$Comp
+L Open_Automation:LTV-827S U?
+U 1 1 5FE87378
+P 4500 3000
+AR Path="/5FBF1F61/5FE87378" Ref="U?"  Part="1" 
+AR Path="/5A7BADB8/5FE87378" Ref="U?"  Part="1" 
+AR Path="/5FE87378" Ref="U?"  Part="1" 
+AR Path="/5FE7DE37/5FE87378" Ref="U?"  Part="1" 
+F 0 "U?" H 4500 3525 50  0000 C CNN
+F 1 "LTV-827S" H 4500 3434 50  0000 C CNN
+F 2 "Package_DIP:SMDIP-8_W9.53mm" H 4450 3550 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1811092010_Lite-On-LTV-827S-TA1_C22112.pdf" H 4400 3400 50  0001 C CNN
+F 4 "LTV-827S-TA1" H 4450 3650 50  0001 C CNN "Part Number"
+F 5 "C22112" H 2250 -2150 50  0001 C CNN "LCSC"
+	1    4500 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE87380
+P 3950 2700
+AR Path="/5FBF1F61/5FE87380" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE87380" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE87380" Ref="R?"  Part="1" 
+AR Path="/5FE87380" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE87380" Ref="R?"  Part="1" 
+F 0 "R?" V 3950 2700 50  0000 C CNN
+F 1 "R_10K" V 3850 2700 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 3880 2700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 4030 2700 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 4130 2800 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2250 -2150 50  0001 C CNN "LCSC"
+	1    3950 2700
+	0    1    1    0   
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE87388
+P 3950 3050
+AR Path="/5FBF1F61/5FE87388" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE87388" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE87388" Ref="R?"  Part="1" 
+AR Path="/5FE87388" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE87388" Ref="R?"  Part="1" 
+F 0 "R?" V 3950 3050 50  0000 C CNN
+F 1 "R_10K" V 4050 3050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 3880 3050 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 4030 3050 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 4130 3150 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2250 -2150 50  0001 C CNN "LCSC"
+	1    3950 3050
+	0    1    1    0   
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE8738E
+P 4150 2900
+AR Path="/5ABD187E/5FE8738E" Ref="#PWR?"  Part="1" 
+AR Path="/5FE8738E" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE8738E" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE8738E" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE8738E" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE8738E" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4150 2650 50  0001 C CNN
+F 1 "GND" V 4100 2750 50  0000 C CNN
+F 2 "" H 4150 2900 50  0000 C CNN
+F 3 "" H 4150 2900 50  0000 C CNN
+	1    4150 2900
+	0    1    1    0   
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE87394
+P 4150 3300
+AR Path="/5ABD187E/5FE87394" Ref="#PWR?"  Part="1" 
+AR Path="/5FE87394" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE87394" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE87394" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE87394" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE87394" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4150 3050 50  0001 C CNN
+F 1 "GND" H 4150 3150 50  0000 C CNN
+F 2 "" H 4150 3300 50  0000 C CNN
+F 3 "" H 4150 3300 50  0000 C CNN
+	1    4150 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE8739A
+P 4850 3300
+AR Path="/5ABD187E/5FE8739A" Ref="#PWR?"  Part="1" 
+AR Path="/5FE8739A" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE8739A" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE8739A" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE8739A" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE8739A" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4850 3050 50  0001 C CNN
+F 1 "GND" H 4850 3150 50  0000 C CNN
+F 2 "" H 4850 3300 50  0000 C CNN
+F 3 "" H 4850 3300 50  0000 C CNN
+	1    4850 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE873A0
+P 4850 2900
+AR Path="/5ABD187E/5FE873A0" Ref="#PWR?"  Part="1" 
+AR Path="/5FE873A0" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE873A0" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE873A0" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE873A0" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE873A0" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4850 2650 50  0001 C CNN
+F 1 "GND" V 4950 2850 50  0000 C CNN
+F 2 "" H 4850 2900 50  0000 C CNN
+F 3 "" H 4850 2900 50  0000 C CNN
+	1    4850 2900
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE873A8
+P 5100 2700
+AR Path="/5FBF1F61/5FE873A8" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE873A8" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE873A8" Ref="R?"  Part="1" 
+AR Path="/5FE873A8" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE873A8" Ref="R?"  Part="1" 
+F 0 "R?" V 5100 2700 50  0000 C CNN
+F 1 "R_10K" V 5000 2700 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 5030 2700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 5180 2700 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 5280 2800 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2250 -2150 50  0001 C CNN "LCSC"
+	1    5100 2700
+	0    1    1    0   
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE873B0
+P 5100 3050
+AR Path="/5FBF1F61/5FE873B0" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE873B0" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE873B0" Ref="R?"  Part="1" 
+AR Path="/5FE873B0" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE873B0" Ref="R?"  Part="1" 
+F 0 "R?" V 5100 3050 50  0000 C CNN
+F 1 "R_10K" V 5000 3050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 5030 3050 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 5180 3050 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 5280 3150 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2250 -2150 50  0001 C CNN "LCSC"
+	1    5100 3050
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7200 3400 7200 3350
+Text Label 6750 2750 2    50   ~ 0
+POWER
+Wire Wire Line
+	6750 3050 6800 3050
+Wire Wire Line
+	6750 2750 6800 2750
+Text Label 7200 2500 0    50   ~ 0
+3V3
+Wire Wire Line
+	7200 2500 7200 2550
+Wire Wire Line
+	7600 2950 7650 2950
+Wire Wire Line
+	7650 2950 7650 2900
+Text Label 7650 3050 0    50   ~ 0
+FAULT
+Wire Wire Line
+	7650 3050 7600 3050
+Text Label 7700 2950 0    50   ~ 0
+VIOUT
+Wire Wire Line
+	7700 2950 7650 2950
+Connection ~ 7650 2950
+Wire Wire Line
+	7200 2500 7650 2500
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE873C7
+P 7650 2700
+AR Path="/5FBF1F61/5FE873C7" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE873C7" Ref="R?"  Part="1" 
+AR Path="/6063934A/5FE873C7" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE873C7" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE873C7" Ref="R?"  Part="1" 
+F 0 "R?" H 7800 2750 50  0000 C CNN
+F 1 "R_10K" H 7800 2850 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7580 2700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 7730 2700 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 7830 2800 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2250 -2100 50  0001 C CNN "LCSC"
+	1    7650 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:ACS711 U?
+U 1 1 5FE873CF
+P 7200 2950
+AR Path="/5A7BADB8/5FE873CF" Ref="U?"  Part="1" 
+AR Path="/5FE7DE37/5FE873CF" Ref="U?"  Part="1" 
+F 0 "U?" H 7400 3200 50  0000 C CNN
+F 1 "ACS711" H 7400 3300 50  0000 C CNN
+F 2 "Sensor_Current:Allegro_QFN-12-10-1EP_3x3mm_P0.5mm" H 6150 3600 50  0001 L CIN
+F 3 "https://datasheet.lcsc.com/szlcsc/Allegro-MicroSystems-LLC-ACS711KEXLT-15AB-T_C150824.pdf" H 7200 2950 50  0001 C CNN
+F 4 "ACS711KEXLT-15AB-T" H 7200 2950 50  0001 C CNN "Part Number"
+F 5 "C150824" H 7200 2950 50  0001 C CNN "LCSC"
+	1    7200 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE873D5
+P 7200 3400
+AR Path="/5A7BADB8/5FE873D5" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE873D5" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 7200 3150 50  0001 C CNN
+F 1 "GND" H 7200 3250 50  0000 C CNN
+F 2 "" H 7200 3400 50  0000 C CNN
+F 3 "" H 7200 3400 50  0000 C CNN
+	1    7200 3400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 4050 3700 4050
+Text Label 3650 4050 2    50   ~ 0
+LOCK_STATE
+Wire Wire Line
+	3650 4400 3700 4400
+Text Label 3650 4400 2    50   ~ 0
+AUX
+Wire Wire Line
+	4100 4600 4150 4600
+Wire Wire Line
+	4150 4400 4100 4400
+Wire Wire Line
+	4100 4250 4150 4250
+Wire Wire Line
+	4150 4050 4100 4050
+Wire Wire Line
+	4800 4650 4800 4600
+Wire Wire Line
+	4800 4600 4750 4600
+Wire Wire Line
+	4100 4650 4100 4600
+Wire Wire Line
+	4750 4250 4800 4250
+Text Label 5300 4050 0    50   ~ 0
+3V3
+Wire Wire Line
+	5300 4050 5250 4050
+Wire Wire Line
+	5300 4400 5250 4400
+Wire Wire Line
+	4750 4050 4800 4050
+Wire Wire Line
+	4750 4400 4800 4400
+Connection ~ 4800 4050
+Wire Wire Line
+	4800 4050 4850 4050
+Connection ~ 4800 4400
+Wire Wire Line
+	4800 4400 4850 4400
+Wire Wire Line
+	5300 4400 5300 4050
+Text Label 4800 3900 0    50   ~ 0
+LOCK_STATE_SENSE
+Wire Wire Line
+	4800 3900 4800 4050
+Wire Wire Line
+	4800 4400 4800 4550
+Text Label 4800 4550 0    50   ~ 0
+AUX_SENSE
+$Comp
+L Open_Automation:LTV-827S U?
+U 1 1 5FE89F66
+P 4450 4350
+AR Path="/5FBF1F61/5FE89F66" Ref="U?"  Part="1" 
+AR Path="/5A7BADB8/5FE89F66" Ref="U?"  Part="1" 
+AR Path="/5FE89F66" Ref="U?"  Part="1" 
+AR Path="/5FE7DE37/5FE89F66" Ref="U?"  Part="1" 
+F 0 "U?" H 4450 4875 50  0000 C CNN
+F 1 "LTV-827S" H 4450 4784 50  0000 C CNN
+F 2 "Package_DIP:SMDIP-8_W9.53mm" H 4400 4900 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1811092010_Lite-On-LTV-827S-TA1_C22112.pdf" H 4350 4750 50  0001 C CNN
+F 4 "LTV-827S-TA1" H 4400 5000 50  0001 C CNN "Part Number"
+F 5 "C22112" H 2200 -800 50  0001 C CNN "LCSC"
+	1    4450 4350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE89F72
+P 3900 4050
+AR Path="/5FBF1F61/5FE89F72" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89F72" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE89F72" Ref="R?"  Part="1" 
+AR Path="/5FE89F72" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE89F72" Ref="R?"  Part="1" 
+F 0 "R?" V 3900 4050 50  0000 C CNN
+F 1 "R_10K" V 3800 4050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 3830 4050 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 3980 4050 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 4080 4150 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2200 -800 50  0001 C CNN "LCSC"
+	1    3900 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE89F7E
+P 3900 4400
+AR Path="/5FBF1F61/5FE89F7E" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89F7E" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE89F7E" Ref="R?"  Part="1" 
+AR Path="/5FE89F7E" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE89F7E" Ref="R?"  Part="1" 
+F 0 "R?" V 3900 4400 50  0000 C CNN
+F 1 "R_10K" V 4000 4400 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 3830 4400 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 3980 4400 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 4080 4500 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2200 -800 50  0001 C CNN "LCSC"
+	1    3900 4400
+	0    1    1    0   
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE89F88
+P 4100 4250
+AR Path="/5ABD187E/5FE89F88" Ref="#PWR?"  Part="1" 
+AR Path="/5FE89F88" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE89F88" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89F88" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE89F88" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE89F88" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4100 4000 50  0001 C CNN
+F 1 "GND" V 4050 4100 50  0000 C CNN
+F 2 "" H 4100 4250 50  0000 C CNN
+F 3 "" H 4100 4250 50  0000 C CNN
+	1    4100 4250
+	0    1    1    0   
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE89F92
+P 4100 4650
+AR Path="/5ABD187E/5FE89F92" Ref="#PWR?"  Part="1" 
+AR Path="/5FE89F92" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE89F92" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89F92" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE89F92" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE89F92" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4100 4400 50  0001 C CNN
+F 1 "GND" H 4100 4500 50  0000 C CNN
+F 2 "" H 4100 4650 50  0000 C CNN
+F 3 "" H 4100 4650 50  0000 C CNN
+	1    4100 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE89F9C
+P 4800 4650
+AR Path="/5ABD187E/5FE89F9C" Ref="#PWR?"  Part="1" 
+AR Path="/5FE89F9C" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE89F9C" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89F9C" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE89F9C" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE89F9C" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4800 4400 50  0001 C CNN
+F 1 "GND" H 4800 4500 50  0000 C CNN
+F 2 "" H 4800 4650 50  0000 C CNN
+F 3 "" H 4800 4650 50  0000 C CNN
+	1    4800 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FE89FA6
+P 4800 4250
+AR Path="/5ABD187E/5FE89FA6" Ref="#PWR?"  Part="1" 
+AR Path="/5FE89FA6" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FE89FA6" Ref="#PWR?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89FA6" Ref="#PWR?"  Part="1" 
+AR Path="/5A7BADB8/5FE89FA6" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FE89FA6" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 4800 4000 50  0001 C CNN
+F 1 "GND" V 4900 4200 50  0000 C CNN
+F 2 "" H 4800 4250 50  0000 C CNN
+F 3 "" H 4800 4250 50  0000 C CNN
+	1    4800 4250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE89FB2
+P 5050 4050
+AR Path="/5FBF1F61/5FE89FB2" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89FB2" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE89FB2" Ref="R?"  Part="1" 
+AR Path="/5FE89FB2" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE89FB2" Ref="R?"  Part="1" 
+F 0 "R?" V 5050 4050 50  0000 C CNN
+F 1 "R_10K" V 4950 4050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 4980 4050 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 5130 4050 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 5230 4150 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2200 -800 50  0001 C CNN "LCSC"
+	1    5050 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FE89FBE
+P 5050 4400
+AR Path="/5FBF1F61/5FE89FBE" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FE89FBE" Ref="R?"  Part="1" 
+AR Path="/5A7BADB8/5FE89FBE" Ref="R?"  Part="1" 
+AR Path="/5FE89FBE" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FE89FBE" Ref="R?"  Part="1" 
+F 0 "R?" V 5050 4400 50  0000 C CNN
+F 1 "R_10K" V 4950 4400 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 4980 4400 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 5130 4400 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 5230 4500 60  0001 C CNN "Part Number"
+F 5 "C25804" H 2200 -800 50  0001 C CNN "LCSC"
+	1    5050 4400
+	0    1    1    0   
+$EndComp
+$Comp
+L Open_Automation:Q_DMT3020 Q?
+U 1 1 5FEED887
+P 7900 4800
+AR Path="/5FBF1F61/5FEED887" Ref="Q?"  Part="1" 
+AR Path="/601F1685/5FEED887" Ref="Q?"  Part="1" 
+AR Path="/601F213A/5FEED887" Ref="Q?"  Part="1" 
+AR Path="/5FE8FE83/5FEED887" Ref="Q?"  Part="1" 
+F 0 "Q?" H 7900 4300 50  0000 C CNN
+F 1 "Q_DMT3020" H 7900 4400 50  0000 C CNN
+F 2 "Package_SO:SO-8_3.9x4.9mm_P1.27mm" H 7950 5400 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1808280417_Diodes-Incorporated-DMT3020LSD-13_C268033.pdf" H 7800 4650 50  0001 C CNN
+F 4 "DMT3020LSD-13" H 7900 5500 50  0001 C CNN "Part Number"
+F 5 "C268033" H -1050 2200 50  0001 C CNN "LCSC"
+	1    7900 4800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:Q_MBT3904 Q?
+U 1 1 5FEED88F
+P 6950 4650
+AR Path="/5FBF1F61/5FEED88F" Ref="Q?"  Part="1" 
+AR Path="/601F1685/5FEED88F" Ref="Q?"  Part="1" 
+AR Path="/601F213A/5FEED88F" Ref="Q?"  Part="1" 
+AR Path="/5FE8FE83/5FEED88F" Ref="Q?"  Part="1" 
+F 0 "Q?" H 6975 4931 50  0000 C CNN
+F 1 "Q_MBT3904" H 6975 4840 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-363_SC-70-6_Handsoldering" H 6100 4850 50  0001 L CIN
+F 3 "https://datasheet.lcsc.com/szlcsc/Leshan-Radio-LMBT3904DW1T1G_C131781.pdf" H 6950 4650 50  0001 L CNN
+F 4 "LMBT3904DW1T1G" H 7000 5050 50  0001 C CNN "Part Number"
+F 5 "C131781" H -1050 2200 50  0001 C CNN "LCSC"
+	1    6950 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FEED897
+P 7400 4300
+AR Path="/5FBF1F61/5FEED897" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FEED897" Ref="R?"  Part="1" 
+AR Path="/601F1685/5FEED897" Ref="R?"  Part="1" 
+AR Path="/601F213A/5FEED897" Ref="R?"  Part="1" 
+AR Path="/5FE8FE83/5FEED897" Ref="R?"  Part="1" 
+F 0 "R?" V 7400 4300 50  0000 C CNN
+F 1 "R_10K" V 7300 4300 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7330 4300 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 7480 4300 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 7580 4400 60  0001 C CNN "Part Number"
+F 5 "C25804" H -1050 2200 50  0001 C CNN "LCSC"
+	1    7400 4300
+	0    -1   -1   0   
+$EndComp
+Text Label 8050 4400 0    50   ~ 0
+OUT0
+Wire Wire Line
+	8050 4400 8000 4400
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FEED89F
+P 8050 4700
+AR Path="/5ABD187E/5FEED89F" Ref="#PWR?"  Part="1" 
+AR Path="/5FEED89F" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FEED89F" Ref="#PWR?"  Part="1" 
+AR Path="/601F1685/5FEED89F" Ref="#PWR?"  Part="1" 
+AR Path="/601F213A/5FEED89F" Ref="#PWR?"  Part="1" 
+AR Path="/5FE8FE83/5FEED89F" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 8050 4450 50  0001 C CNN
+F 1 "GND" V 8100 4550 50  0000 C CNN
+F 2 "" H 8050 4700 50  0000 C CNN
+F 3 "" H 8050 4700 50  0000 C CNN
+	1    8050 4700
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8050 4700 8000 4700
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FEED8A6
+P 8050 5100
+AR Path="/5ABD187E/5FEED8A6" Ref="#PWR?"  Part="1" 
+AR Path="/5FEED8A6" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FEED8A6" Ref="#PWR?"  Part="1" 
+AR Path="/601F1685/5FEED8A6" Ref="#PWR?"  Part="1" 
+AR Path="/601F213A/5FEED8A6" Ref="#PWR?"  Part="1" 
+AR Path="/5FE8FE83/5FEED8A6" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 8050 4850 50  0001 C CNN
+F 1 "GND" V 8100 4950 50  0000 C CNN
+F 2 "" H 8050 5100 50  0000 C CNN
+F 3 "" H 8050 5100 50  0000 C CNN
+	1    8050 5100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8050 5100 8000 5100
+Text Label 8050 4800 0    50   ~ 0
+OUT1
+Wire Wire Line
+	8050 4800 8000 4800
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FEED8AF
+P 7250 4750
+AR Path="/5ABD187E/5FEED8AF" Ref="#PWR?"  Part="1" 
+AR Path="/5FEED8AF" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FEED8AF" Ref="#PWR?"  Part="1" 
+AR Path="/601F1685/5FEED8AF" Ref="#PWR?"  Part="1" 
+AR Path="/601F213A/5FEED8AF" Ref="#PWR?"  Part="1" 
+AR Path="/5FE8FE83/5FEED8AF" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 7250 4500 50  0001 C CNN
+F 1 "GND" V 7300 4600 50  0000 C CNN
+F 2 "" H 7250 4750 50  0000 C CNN
+F 3 "" H 7250 4750 50  0000 C CNN
+	1    7250 4750
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7250 4750 7200 4750
+$Comp
+L open-automation:GND #PWR?
+U 1 1 5FEED8B6
+P 7250 5100
+AR Path="/5ABD187E/5FEED8B6" Ref="#PWR?"  Part="1" 
+AR Path="/5FEED8B6" Ref="#PWR?"  Part="1" 
+AR Path="/5FBF1F61/5FEED8B6" Ref="#PWR?"  Part="1" 
+AR Path="/601F1685/5FEED8B6" Ref="#PWR?"  Part="1" 
+AR Path="/601F213A/5FEED8B6" Ref="#PWR?"  Part="1" 
+AR Path="/5FE8FE83/5FEED8B6" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 7250 4850 50  0001 C CNN
+F 1 "GND" V 7300 4950 50  0000 C CNN
+F 2 "" H 7250 5100 50  0000 C CNN
+F 3 "" H 7250 5100 50  0000 C CNN
+	1    7250 5100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7250 5100 7200 5100
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FEED8BF
+P 6500 4650
+AR Path="/5FBF1F61/5FEED8BF" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FEED8BF" Ref="R?"  Part="1" 
+AR Path="/601F1685/5FEED8BF" Ref="R?"  Part="1" 
+AR Path="/601F213A/5FEED8BF" Ref="R?"  Part="1" 
+AR Path="/5FE8FE83/5FEED8BF" Ref="R?"  Part="1" 
+F 0 "R?" V 6500 4650 50  0000 C CNN
+F 1 "R_10K" V 6400 4650 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 6430 4650 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 6580 4650 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 6680 4750 60  0001 C CNN "Part Number"
+F 5 "C25804" H -1050 2200 50  0001 C CNN "LCSC"
+	1    6500 4650
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7200 4300 7150 4300
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FEED8C8
+P 6500 5000
+AR Path="/5FBF1F61/5FEED8C8" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FEED8C8" Ref="R?"  Part="1" 
+AR Path="/601F1685/5FEED8C8" Ref="R?"  Part="1" 
+AR Path="/601F213A/5FEED8C8" Ref="R?"  Part="1" 
+AR Path="/5FE8FE83/5FEED8C8" Ref="R?"  Part="1" 
+F 0 "R?" V 6500 5000 50  0000 C CNN
+F 1 "R_10K" V 6400 5000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 6430 5000 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 6580 5000 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 6680 5100 60  0001 C CNN "Part Number"
+F 5 "C25804" H -1050 2200 50  0001 C CNN "LCSC"
+	1    6500 5000
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6700 5000 6750 5000
+Wire Wire Line
+	6750 4650 6700 4650
+$Comp
+L Open_Automation:R_10K R?
+U 1 1 5FEED8D2
+P 7300 5250
+AR Path="/5FBF1F61/5FEED8D2" Ref="R?"  Part="1" 
+AR Path="/5FFBD8EA/5FEED8D2" Ref="R?"  Part="1" 
+AR Path="/601F1685/5FEED8D2" Ref="R?"  Part="1" 
+AR Path="/601F213A/5FEED8D2" Ref="R?"  Part="1" 
+AR Path="/5FE8FE83/5FEED8D2" Ref="R?"  Part="1" 
+F 0 "R?" V 7300 5250 50  0000 C CNN
+F 1 "R_10K" V 7200 5250 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7230 5250 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 7380 5250 50  0001 C CNN
+F 4 "0603WAF1002T5E" V 7480 5350 60  0001 C CNN "Part Number"
+F 5 "C25804" H -1050 2200 50  0001 C CNN "LCSC"
+	1    7300 5250
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7200 4900 7450 4900
+Wire Wire Line
+	7450 4900 7450 4950
+Wire Wire Line
+	7450 4950 7500 4950
+Wire Wire Line
+	7200 4550 7600 4550
+Wire Wire Line
+	7500 5250 7500 4950
+Connection ~ 7500 4950
+Wire Wire Line
+	7500 4950 7600 4950
+Wire Wire Line
+	7600 4300 7600 4550
+Connection ~ 7600 4550
+Wire Wire Line
+	7050 5250 7100 5250
+Text Label 6250 4650 2    50   ~ 0
+A0
+Wire Wire Line
+	6250 4650 6300 4650
+Text Label 6250 5000 2    50   ~ 0
+A1
+Wire Wire Line
+	6250 5000 6300 5000
+Text Label 7150 4300 2    50   ~ 0
+POWER
+Text Label 7050 5250 2    50   ~ 0
+POWER
+Text Label 6750 3050 2    50   ~ 0
+OUT0
+$EndSCHEMATC
