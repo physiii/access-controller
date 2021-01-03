@@ -2,6 +2,7 @@ code/build
 build/
 sdkconfig*
 *.bak
+*-bak
 *.kicad_pcb-bak
 *_autosave*
 *cache.dcm

@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 6
+Sheet 5 10
 Title ""
 Date ""
 Rev ""
@@ -508,6 +508,7 @@ AR Path="/5FBF1F61/5FEED887" Ref="Q?"  Part="1"
 AR Path="/601F1685/5FEED887" Ref="Q?"  Part="1" 
 AR Path="/601F213A/5FEED887" Ref="Q?"  Part="1" 
 AR Path="/5FE8FE83/5FEED887" Ref="Q?"  Part="1" 
+AR Path="/5FE7DE37/5FEED887" Ref="Q?"  Part="1" 
 F 0 "Q?" H 7900 4300 50  0000 C CNN
 F 1 "Q_DMT3020" H 7900 4400 50  0000 C CNN
 F 2 "Package_SO:SO-8_3.9x4.9mm_P1.27mm" H 7950 5400 50  0001 C CNN
@@ -525,6 +526,7 @@ AR Path="/5FBF1F61/5FEED88F" Ref="Q?"  Part="1"
 AR Path="/601F1685/5FEED88F" Ref="Q?"  Part="1" 
 AR Path="/601F213A/5FEED88F" Ref="Q?"  Part="1" 
 AR Path="/5FE8FE83/5FEED88F" Ref="Q?"  Part="1" 
+AR Path="/5FE7DE37/5FEED88F" Ref="Q?"  Part="1" 
 F 0 "Q?" H 6975 4931 50  0000 C CNN
 F 1 "Q_MBT3904" H 6975 4840 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-363_SC-70-6_Handsoldering" H 6100 4850 50  0001 L CIN
@@ -543,6 +545,7 @@ AR Path="/5FFBD8EA/5FEED897" Ref="R?"  Part="1"
 AR Path="/601F1685/5FEED897" Ref="R?"  Part="1" 
 AR Path="/601F213A/5FEED897" Ref="R?"  Part="1" 
 AR Path="/5FE8FE83/5FEED897" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FEED897" Ref="R?"  Part="1" 
 F 0 "R?" V 7400 4300 50  0000 C CNN
 F 1 "R_10K" V 7300 4300 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7330 4300 50  0001 C CNN
@@ -566,6 +569,7 @@ AR Path="/5FBF1F61/5FEED89F" Ref="#PWR?"  Part="1"
 AR Path="/601F1685/5FEED89F" Ref="#PWR?"  Part="1" 
 AR Path="/601F213A/5FEED89F" Ref="#PWR?"  Part="1" 
 AR Path="/5FE8FE83/5FEED89F" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FEED89F" Ref="#PWR?"  Part="1" 
 F 0 "#PWR?" H 8050 4450 50  0001 C CNN
 F 1 "GND" V 8100 4550 50  0000 C CNN
 F 2 "" H 8050 4700 50  0000 C CNN
@@ -585,6 +589,7 @@ AR Path="/5FBF1F61/5FEED8A6" Ref="#PWR?"  Part="1"
 AR Path="/601F1685/5FEED8A6" Ref="#PWR?"  Part="1" 
 AR Path="/601F213A/5FEED8A6" Ref="#PWR?"  Part="1" 
 AR Path="/5FE8FE83/5FEED8A6" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FEED8A6" Ref="#PWR?"  Part="1" 
 F 0 "#PWR?" H 8050 4850 50  0001 C CNN
 F 1 "GND" V 8100 4950 50  0000 C CNN
 F 2 "" H 8050 5100 50  0000 C CNN
@@ -608,6 +613,7 @@ AR Path="/5FBF1F61/5FEED8AF" Ref="#PWR?"  Part="1"
 AR Path="/601F1685/5FEED8AF" Ref="#PWR?"  Part="1" 
 AR Path="/601F213A/5FEED8AF" Ref="#PWR?"  Part="1" 
 AR Path="/5FE8FE83/5FEED8AF" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FEED8AF" Ref="#PWR?"  Part="1" 
 F 0 "#PWR?" H 7250 4500 50  0001 C CNN
 F 1 "GND" V 7300 4600 50  0000 C CNN
 F 2 "" H 7250 4750 50  0000 C CNN
@@ -627,6 +633,7 @@ AR Path="/5FBF1F61/5FEED8B6" Ref="#PWR?"  Part="1"
 AR Path="/601F1685/5FEED8B6" Ref="#PWR?"  Part="1" 
 AR Path="/601F213A/5FEED8B6" Ref="#PWR?"  Part="1" 
 AR Path="/5FE8FE83/5FEED8B6" Ref="#PWR?"  Part="1" 
+AR Path="/5FE7DE37/5FEED8B6" Ref="#PWR?"  Part="1" 
 F 0 "#PWR?" H 7250 4850 50  0001 C CNN
 F 1 "GND" V 7300 4950 50  0000 C CNN
 F 2 "" H 7250 5100 50  0000 C CNN
@@ -645,6 +652,7 @@ AR Path="/5FFBD8EA/5FEED8BF" Ref="R?"  Part="1"
 AR Path="/601F1685/5FEED8BF" Ref="R?"  Part="1" 
 AR Path="/601F213A/5FEED8BF" Ref="R?"  Part="1" 
 AR Path="/5FE8FE83/5FEED8BF" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FEED8BF" Ref="R?"  Part="1" 
 F 0 "R?" V 6500 4650 50  0000 C CNN
 F 1 "R_10K" V 6400 4650 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 6430 4650 50  0001 C CNN
@@ -665,6 +673,7 @@ AR Path="/5FFBD8EA/5FEED8C8" Ref="R?"  Part="1"
 AR Path="/601F1685/5FEED8C8" Ref="R?"  Part="1" 
 AR Path="/601F213A/5FEED8C8" Ref="R?"  Part="1" 
 AR Path="/5FE8FE83/5FEED8C8" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FEED8C8" Ref="R?"  Part="1" 
 F 0 "R?" V 6500 5000 50  0000 C CNN
 F 1 "R_10K" V 6400 5000 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 6430 5000 50  0001 C CNN
@@ -687,6 +696,7 @@ AR Path="/5FFBD8EA/5FEED8D2" Ref="R?"  Part="1"
 AR Path="/601F1685/5FEED8D2" Ref="R?"  Part="1" 
 AR Path="/601F213A/5FEED8D2" Ref="R?"  Part="1" 
 AR Path="/5FE8FE83/5FEED8D2" Ref="R?"  Part="1" 
+AR Path="/5FE7DE37/5FEED8D2" Ref="R?"  Part="1" 
 F 0 "R?" V 7300 5250 50  0000 C CNN
 F 1 "R_10K" V 7200 5250 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7230 5250 50  0001 C CNN
