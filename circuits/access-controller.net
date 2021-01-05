@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/andy/devices/access-controller/circuits/access-controller.sch)
-    (date "Sat 02 Jan 2021 07:34:59 PM CST")
+    (date "Mon 04 Jan 2021 08:05:44 PM CST")
     (tool "Eeschema 5.1.7-a382d34a8~88~ubuntu20.04.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -146,10 +146,10 @@
     (comp (ref R2)
       (value R_100)
       (footprint Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder)
-      (datasheet https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10B561KB8NNNC_C84721.pdf)
+      (datasheet https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1000T5E_C22775.pdf)
       (fields
-        (field (name LCSC) C84721)
-        (field (name "Part Number") CL10B561KB8NNNC))
+        (field (name LCSC) C22775)
+        (field (name "Part Number") 0603WAF1000T5E))
       (libsource (lib Open_Automation) (part R_100) (description "100 Ohms ±5% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Moisture Resistant Thick Film"))
       (sheetpath (names /) (tstamps /))
       (tstamp 60283ADA))
@@ -2377,7 +2377,7 @@
         (pin (num 14) (name RLED-) (type passive))))
     (libpart (lib Open_Automation) (part R_100)
       (description "100 Ohms ±5% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Moisture Resistant Thick Film")
-      (docs https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10B561KB8NNNC_C84721.pdf)
+      (docs https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1000T5E_C22775.pdf)
       (footprints
         (fp R_*)
         (fp R_*))
@@ -2385,8 +2385,8 @@
         (field (name Reference) R)
         (field (name Value) R_100)
         (field (name Footprint) Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder)
-        (field (name "Part Number") CL10B561KB8NNNC)
-        (field (name LCSC) C84721))
+        (field (name "Part Number") 0603WAF1000T5E)
+        (field (name LCSC) C22775))
       (pins
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive))))

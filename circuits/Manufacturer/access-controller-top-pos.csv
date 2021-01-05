@@ -25,7 +25,7 @@ C25,C_100nF_0402,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,221.405001,-72.6850
 C26,C_100nF_0402,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,221.405001,-74,0,top
 C27,C_2.2uF_0402,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,221.0675,-75.7,0,top
 C28,C_100nF_0402,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,215.7,-73,0,top
-C29,C_10uF,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,221.05,-86.9,180,top
+C29,C_10uF,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,221.05,-87.8,180,top
 C30,C_10uF,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,135.7,-59.6,90,top
 C31,C_1uF,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,137.4,-59.6,90,top
 D1,D_Zener,D_SMB_Handsoldering,229.1,-44.6,180,top
@@ -113,7 +113,7 @@ R58,R_49.9_0402,R_0402_1005Metric_Pad0.72x0.64mm_HandSolder,225.6,-82.7025,270,t
 R59,R_2K2_0402,R_0402_1005Metric_Pad0.72x0.64mm_HandSolder,239.5,-64.95,0,top
 R60,R_2K2_0402,R_0402_1005Metric_Pad0.72x0.64mm_HandSolder,242.5,-83.9,180,top
 R61,R_12.1K_0402,R_0402_1005Metric_Pad0.72x0.64mm_HandSolder,223.4,-78.3,90,top
-R62,R_10K_0402,R_0402_1005Metric_Pad0.72x0.64mm_HandSolder,218.1475,-86.9,180,top
+R62,R_10K_0402,R_0402_1005Metric_Pad0.72x0.64mm_HandSolder,218.1475,-87.8,180,top
 R63,R_10K,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,177.4,-91.9,180,top
 R64,R_10K,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,165.8,-92.1,180,top
 RM_2.2K1,RA_2.2K_(4x0603)_4B8_Smashed,R_0603_MATRIX_4,213.6,-81.9,90,top
