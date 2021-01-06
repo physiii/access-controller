@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/andy/devices/access-controller/circuits/access-controller.sch</source>
-    <date>Mon 04 Jan 2021 08:09:44 PM CST</date>
+    <date>Wed 06 Jan 2021 10:00:15 AM CST</date>
     <tool>Eeschema 5.1.7-a382d34a8~88~ubuntu20.04.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -458,7 +458,7 @@
     </comp>
     <comp ref="R15">
       <value>R_10K_QUAD</value>
-      <footprint>Open_Automation:R_0402_1005Metric_Quad</footprint>
+      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
       <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
       <fields>
         <field name="LCSC">C25725</field>
@@ -530,7 +530,7 @@
     </comp>
     <comp ref="R20">
       <value>R_10K_QUAD</value>
-      <footprint>Open_Automation:R_0402_1005Metric_Quad</footprint>
+      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
       <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
       <fields>
         <field name="LCSC">C25725</field>
@@ -602,7 +602,7 @@
     </comp>
     <comp ref="R25">
       <value>R_10K_QUAD</value>
-      <footprint>Open_Automation:R_0402_1005Metric_Quad</footprint>
+      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
       <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
       <fields>
         <field name="LCSC">C25725</field>
@@ -674,7 +674,7 @@
     </comp>
     <comp ref="R30">
       <value>R_10K_QUAD</value>
-      <footprint>Open_Automation:R_0402_1005Metric_Quad</footprint>
+      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
       <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
       <fields>
         <field name="LCSC">C25725</field>
@@ -2912,7 +2912,7 @@
       <fields>
         <field name="Reference">R</field>
         <field name="Value">R_10K_QUAD</field>
-        <field name="Footprint">Open_Automation:R_0402_1005Metric_Quad</field>
+        <field name="Footprint">Resistor_SMD:R_Array_Concave_4x0402</field>
         <field name="Part Number">4D02WGJ0103TCE</field>
         <field name="LCSC">C25725</field>
       </fields>
@@ -3343,6 +3343,7 @@
       <node ref="Q1" pin="4"/>
       <node ref="Q1" pin="1"/>
       <node ref="PROG1" pin="2"/>
+      <node ref="C23" pin="1"/>
       <node ref="Q4" pin="1"/>
       <node ref="Q8" pin="2"/>
       <node ref="Q4" pin="3"/>
@@ -3363,19 +3364,18 @@
       <node ref="R60" pin="2"/>
       <node ref="LS1" pin="2"/>
       <node ref="U9" pin="3"/>
-      <node ref="C23" pin="1"/>
       <node ref="R61" pin="2"/>
-      <node ref="U3" pin="4"/>
-      <node ref="C6" pin="2"/>
+      <node ref="U3" pin="11"/>
       <node ref="U3" pin="8"/>
-      <node ref="R38" pin="2"/>
+      <node ref="C6" pin="2"/>
       <node ref="U3" pin="15"/>
-      <node ref="U8" pin="1"/>
+      <node ref="R38" pin="2"/>
       <node ref="U3" pin="2"/>
       <node ref="U3" pin="13"/>
+      <node ref="U8" pin="1"/>
       <node ref="R32" pin="2"/>
+      <node ref="U3" pin="4"/>
       <node ref="C26" pin="1"/>
-      <node ref="U3" pin="11"/>
       <node ref="U3" pin="6"/>
       <node ref="C28" pin="1"/>
       <node ref="U3" pin="9"/>
@@ -3399,6 +3399,7 @@
       <node ref="J6" pin="12"/>
       <node ref="J8" pin="4"/>
       <node ref="J6" pin="9"/>
+      <node ref="U5" pin="15"/>
       <node ref="J7" pin="4"/>
       <node ref="J3" pin="4"/>
       <node ref="J1" pin="3"/>
@@ -3410,13 +3411,12 @@
       <node ref="U5" pin="4"/>
       <node ref="U5" pin="13"/>
       <node ref="U5" pin="2"/>
-      <node ref="U5" pin="15"/>
       <node ref="R50" pin="2"/>
     </net>
     <net code="3" name="/REG_POWER">
       <node ref="J6" pin="4"/>
-      <node ref="J6" pin="7"/>
       <node ref="R9" pin="2"/>
+      <node ref="J6" pin="7"/>
       <node ref="J1" pin="4"/>
       <node ref="R37" pin="1"/>
       <node ref="J1" pin="7"/>
@@ -3456,30 +3456,30 @@
       <node ref="R18" pin="2"/>
     </net>
     <net code="9" name="/POWER">
-      <node ref="C17" pin="1"/>
-      <node ref="C13" pin="1"/>
       <node ref="C16" pin="1"/>
-      <node ref="C18" pin="1"/>
+      <node ref="C17" pin="1"/>
       <node ref="C11" pin="1"/>
-      <node ref="J7" pin="1"/>
-      <node ref="C3" pin="1"/>
-      <node ref="C1" pin="1"/>
       <node ref="C12" pin="1"/>
+      <node ref="C1" pin="1"/>
+      <node ref="C3" pin="1"/>
       <node ref="J9" pin="1"/>
+      <node ref="C13" pin="1"/>
+      <node ref="C18" pin="1"/>
+      <node ref="J7" pin="1"/>
       <node ref="U11" pin="12"/>
       <node ref="U7" pin="2"/>
       <node ref="J5" pin="15"/>
       <node ref="U7" pin="1"/>
-      <node ref="D7" pin="1"/>
+      <node ref="J4" pin="1"/>
       <node ref="J10" pin="1"/>
       <node ref="R49" pin="1"/>
-      <node ref="J4" pin="1"/>
       <node ref="U9" pin="2"/>
       <node ref="U9" pin="1"/>
       <node ref="R48" pin="1"/>
       <node ref="J2" pin="1"/>
-      <node ref="D1" pin="1"/>
       <node ref="R34" pin="2"/>
+      <node ref="D1" pin="1"/>
+      <node ref="D7" pin="1"/>
     </net>
     <net code="10" name="/LOCK_OUT1">
       <node ref="Q4" pin="6"/>
@@ -3511,23 +3511,23 @@
       <node ref="U1" pin="20"/>
     </net>
     <net code="17" name="/MOTION_SENSE0">
-      <node ref="U1" pin="25"/>
       <node ref="U3" pin="10"/>
-      <node ref="R15" pin="7"/>
+      <node ref="U1" pin="25"/>
+      <node ref="R15" pin="4"/>
     </net>
     <net code="18" name="/MOTION_SENSE1">
-      <node ref="R25" pin="7"/>
       <node ref="U5" pin="10"/>
+      <node ref="R25" pin="4"/>
       <node ref="U1" pin="5"/>
     </net>
     <net code="19" name="/FOB_SENSE0">
-      <node ref="U3" pin="12"/>
       <node ref="U1" pin="26"/>
-      <node ref="R15" pin="5"/>
+      <node ref="R15" pin="3"/>
+      <node ref="U3" pin="12"/>
     </net>
     <net code="20" name="/FOB_SENSE1">
       <node ref="U5" pin="12"/>
-      <node ref="R25" pin="5"/>
+      <node ref="R25" pin="3"/>
       <node ref="U1" pin="6"/>
     </net>
     <net code="21" name="/AUX_CONTROL0">
@@ -3539,81 +3539,81 @@
       <node ref="R14" pin="2"/>
     </net>
     <net code="23" name="/PUSH0">
-      <node ref="R11" pin="2"/>
       <node ref="J1" pin="5"/>
+      <node ref="R11" pin="2"/>
     </net>
     <net code="24" name="+3V3">
-      <node ref="U8" pin="2"/>
-      <node ref="C20" pin="1"/>
-      <node ref="FET1" pin="2"/>
-      <node ref="R15" pin="8"/>
-      <node ref="R15" pin="6"/>
-      <node ref="U1" pin="18"/>
-      <node ref="R36" pin="1"/>
       <node ref="C30" pin="1"/>
-      <node ref="R20" pin="8"/>
-      <node ref="R25" pin="2"/>
-      <node ref="R20" pin="6"/>
-      <node ref="R25" pin="4"/>
-      <node ref="R25" pin="8"/>
+      <node ref="U1" pin="18"/>
+      <node ref="R15" pin="6"/>
+      <node ref="R36" pin="1"/>
+      <node ref="R25" pin="5"/>
+      <node ref="R15" pin="5"/>
+      <node ref="C20" pin="1"/>
       <node ref="U1" pin="9"/>
-      <node ref="C31" pin="1"/>
-      <node ref="D8" pin="2"/>
       <node ref="D9" pin="2"/>
-      <node ref="R25" pin="6"/>
-      <node ref="R15" pin="4"/>
-      <node ref="R15" pin="2"/>
-      <node ref="R20" pin="2"/>
-      <node ref="R20" pin="4"/>
-      <node ref="D10" pin="2"/>
+      <node ref="FET1" pin="2"/>
+      <node ref="D8" pin="2"/>
+      <node ref="R15" pin="8"/>
+      <node ref="R15" pin="7"/>
+      <node ref="C31" pin="1"/>
+      <node ref="U8" pin="2"/>
+      <node ref="R20" pin="7"/>
+      <node ref="R20" pin="8"/>
+      <node ref="R20" pin="6"/>
+      <node ref="R20" pin="5"/>
+      <node ref="R45" pin="2"/>
+      <node ref="R30" pin="6"/>
+      <node ref="R30" pin="5"/>
+      <node ref="R30" pin="7"/>
+      <node ref="R30" pin="8"/>
       <node ref="U13" pin="2"/>
+      <node ref="R25" pin="8"/>
+      <node ref="R25" pin="7"/>
+      <node ref="R25" pin="6"/>
+      <node ref="R53" pin="2"/>
       <node ref="C5" pin="1"/>
       <node ref="J5" pin="3"/>
       <node ref="J5" pin="9"/>
-      <node ref="R45" pin="2"/>
-      <node ref="R30" pin="8"/>
-      <node ref="R53" pin="2"/>
-      <node ref="R30" pin="6"/>
-      <node ref="R30" pin="4"/>
-      <node ref="R30" pin="2"/>
+      <node ref="D10" pin="2"/>
     </net>
     <net code="25" name="/MOTION0">
       <node ref="J1" pin="8"/>
       <node ref="R12" pin="2"/>
     </net>
     <net code="26" name="/SDA">
-      <node ref="U13" pin="23"/>
       <node ref="U1" pin="13"/>
+      <node ref="U13" pin="23"/>
     </net>
     <net code="27" name="/SCL">
-      <node ref="U13" pin="16"/>
       <node ref="U1" pin="12"/>
+      <node ref="U13" pin="16"/>
     </net>
     <net code="28" name="/FOB0">
-      <node ref="R13" pin="2"/>
       <node ref="J1" pin="11"/>
+      <node ref="R13" pin="2"/>
     </net>
     <net code="29" name="/MDC">
       <node ref="U13" pin="37"/>
       <node ref="U12" pin="13"/>
     </net>
     <net code="30" name="/EMAC_TXD1">
-      <node ref="U13" pin="36"/>
       <node ref="U12" pin="18"/>
+      <node ref="U13" pin="36"/>
     </net>
     <net code="31" name="/EMAC_TX_EN">
-      <node ref="U13" pin="33"/>
       <node ref="U12" pin="16"/>
+      <node ref="U13" pin="33"/>
     </net>
     <net code="32" name="/EMAC_RX_CRS_DV">
-      <node ref="U12" pin="11"/>
       <node ref="RM_2.2K1" pin="4.1"/>
+      <node ref="U12" pin="11"/>
       <node ref="U13" pin="12"/>
     </net>
     <net code="33" name="/EMAC_RXD1">
+      <node ref="U12" pin="7"/>
       <node ref="RM_2.2K2" pin="1.1"/>
       <node ref="U13" pin="11"/>
-      <node ref="U12" pin="7"/>
     </net>
     <net code="34" name="/MDIO">
       <node ref="U12" pin="12"/>
@@ -3623,9 +3623,9 @@
     <net code="35" name="Spare1">
       <node ref="SJ1" pin="2"/>
       <node ref="SJ1" pin="1"/>
+      <node ref="U11" pin="14"/>
       <node ref="J12" pin="9"/>
       <node ref="U11" pin="11"/>
-      <node ref="U11" pin="14"/>
     </net>
     <net code="36" name="Spare2">
       <node ref="U11" pin="13"/>
@@ -3636,8 +3636,8 @@
     </net>
     <net code="37" name="/EMAC_RXD0">
       <node ref="RM_2.2K2" pin="2.1"/>
-      <node ref="U13" pin="10"/>
       <node ref="U12" pin="8"/>
+      <node ref="U13" pin="10"/>
     </net>
     <net code="38" name="/EMAC_TXD0">
       <node ref="U13" pin="31"/>
@@ -3656,8 +3656,8 @@
       <node ref="U13" pin="28"/>
     </net>
     <net code="42" name="/PROG">
-      <node ref="D6" pin="1"/>
       <node ref="PROG1" pin="1"/>
+      <node ref="D6" pin="1"/>
       <node ref="J5" pin="7"/>
       <node ref="U13" pin="25"/>
       <node ref="R64" pin="1"/>
@@ -3705,14 +3705,14 @@
       <node ref="D5" pin="1"/>
     </net>
     <net code="53" name="/WG1_DATA_SENSE0">
-      <node ref="R20" pin="7"/>
+      <node ref="R20" pin="4"/>
       <node ref="U13" pin="8"/>
       <node ref="U4" pin="10"/>
     </net>
     <net code="54" name="/WG1_DATA_SENSE1">
       <node ref="U4" pin="12"/>
       <node ref="U13" pin="29"/>
-      <node ref="R20" pin="5"/>
+      <node ref="R20" pin="3"/>
     </net>
     <net code="55" name="/LOCK_CONTROL0">
       <node ref="R4" pin="2"/>
@@ -3724,7 +3724,7 @@
       <node ref="R20" pin="1"/>
     </net>
     <net code="57" name="/WG0_DATA_SENSE1">
-      <node ref="R20" pin="3"/>
+      <node ref="R20" pin="2"/>
       <node ref="U4" pin="14"/>
       <node ref="U13" pin="26"/>
     </net>
@@ -3734,12 +3734,12 @@
       <node ref="U1" pin="22"/>
     </net>
     <net code="59" name="/LOCK_SENSE1">
-      <node ref="R30" pin="7"/>
       <node ref="U1" pin="2"/>
+      <node ref="R30" pin="4"/>
       <node ref="U6" pin="10"/>
     </net>
     <net code="60" name="/AUX_SENSE0">
-      <node ref="R30" pin="3"/>
+      <node ref="R30" pin="2"/>
       <node ref="U6" pin="14"/>
       <node ref="U1" pin="28"/>
     </net>
@@ -3754,7 +3754,7 @@
     <net code="63" name="/PUSH_SENSE0">
       <node ref="U1" pin="24"/>
       <node ref="U3" pin="14"/>
-      <node ref="R15" pin="3"/>
+      <node ref="R15" pin="2"/>
     </net>
     <net code="64" name="/KEYPAD_SENSE0">
       <node ref="U3" pin="16"/>
@@ -3796,9 +3796,9 @@
       <node ref="R31" pin="1"/>
     </net>
     <net code="70" name="/AUX_SENSE1">
-      <node ref="U6" pin="12"/>
       <node ref="U1" pin="8"/>
-      <node ref="R30" pin="5"/>
+      <node ref="U6" pin="12"/>
+      <node ref="R30" pin="3"/>
     </net>
     <net code="71" name="Net-(U1-Pad11)">
       <node ref="U1" pin="11"/>
@@ -3807,13 +3807,13 @@
       <node ref="U1" pin="14"/>
     </net>
     <net code="73" name="/PUSH_SENSE1">
+      <node ref="R25" pin="2"/>
       <node ref="U5" pin="14"/>
-      <node ref="R25" pin="3"/>
       <node ref="U1" pin="4"/>
     </net>
     <net code="74" name="/KEYPAD_SENSE1">
-      <node ref="U5" pin="16"/>
       <node ref="U1" pin="3"/>
+      <node ref="U5" pin="16"/>
       <node ref="R25" pin="1"/>
     </net>
     <net code="75" name="/LOCK_CONTROL1">
@@ -3842,8 +3842,8 @@
       <node ref="Q1" pin="3"/>
     </net>
     <net code="81" name="Net-(Q1-Pad2)">
-      <node ref="Q1" pin="2"/>
       <node ref="R3" pin="1"/>
+      <node ref="Q1" pin="2"/>
     </net>
     <net code="82" name="Net-(Q1-Pad6)">
       <node ref="Q2" pin="2"/>
