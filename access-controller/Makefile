@@ -3,7 +3,8 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := espnow_example
+PROJECT_NAME := ethernet_basic
+
+EXTRA_COMPONENT_DIRS = $(IDF_PATH)/examples/common_components/protocol_examples_common
 
 include $(IDF_PATH)/make/project.mk
-

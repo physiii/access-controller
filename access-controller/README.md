@@ -1,115 +1,69 @@
-# ESPNOW Example
-
+# Ethernet Example
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This example shows how to use ESPNOW of wifi. Example does the following steps:
+## Overview
 
-* Start WiFi.
-* Initialize ESPNOW.
-* Register ESPNOW sending or receiving callback function.
-* Add ESPNOW peer information.
-* Send and receive ESPNOW data. 
+This example demonstrates basic usage of `Ethernet driver` together with `tcpip_adapter`. The work flow of the example could be as follows:
 
-This example need at least two ESP devices:
+1. Install Ethernet driver
+2. Send DHCP requests and wait for a DHCP lease
+3. If get IP address successfully, then you will be able to ping the device
 
-* In order to get the MAC address of the other device, Device1 firstly send broadcast ESPNOW data with 'state' set as 0. 
-* When Device2 receiving broadcast ESPNOW data from Device1 with 'state' as 0, adds Device1 into the peer list. 
-  Then start sending broadcast ESPNOW data with 'state' set as 1. 
-* When Device1 receiving broadcast ESPNOW data with 'state' as 1, compares the local magic number with that in the data. 
-  If the local one is bigger than that one, stop sending broadcast ESPNOW data and starts sending unicast ESPNOW data to Device2. 
-* If Device2 receives unicast ESPNOW data, also stop sending broadcast ESPNOW data. 
-  
-In practice, if the MAC address of the other device is known, it's not required to send/receive broadcast ESPNOW data first, 
-just add the device into the peer list and send/receive unicast ESPNOW data.
-
-There are a lot of "extras" on top of ESPNOW data, such as type, state, sequence number, CRC and magic in this example. These "extras" are 
-not required to use ESPNOW. They are only used to make this example to run correctly. However, it is recommended that users add some "extras" 
-to make ESPNOW data more safe and more reliable.
+If you have a new Ethernet application to go (for example, connect to IoT cloud via Ethernet), try this as a basic template, then add your own code.
 
 ## How to use example
+
+### Hardware Required
+
+To run this example, it's recommended that you have an official ESP32 Ethernet development board - [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/hw-reference/get-started-ethernet-kit.html). This example should also work for 3rd party ESP32 board as long as it's integrated with a supported Ethernet PHY chip. Up until now, ESP-IDF supports up to four Ethernet PHY: `LAN8720`, `IP101`, `DP83848` and `RTL8201`, additional PHY drivers should be implemented by users themselves.
+
+Besides that, `esp_eth` component can drive third-party Ethernet module which integrates MAC and PHY and provides common communication interface (e.g. SPI, USB, etc). This example will take the **DM9051** as an example, illustrating how to install the Ethernet driver in the same manner.
+
+#### Pin Assignment
+
+See common pin assignments for Ethernet examples from [upper level](../README.md#common-pin-assignments).
 
 ### Configure the project
 
 ```
-make menuconfig
+idf.py menuconfig
 ```
 
-* Set serial port under Serial Flasher Options.
-* Set WiFi mode (station or SoftAP) under Example Configuration Options.
-* Set ESPNOW primary master key under Example Configuration Options. 
-  This parameter must be set to the same value for sending and recving devices.
-* Set ESPNOW local master key under Example Configuration Options.
-  This parameter must be set to the same value for sending and recving devices.
-* Set Channel under Example Configuration Options.
-  The sending device and the recving device must be on the same channel.
-* Set Send count and Send delay under Example Configuration Options.
-* Set Send len under Example Configuration Options.
+See common configurations for Ethernet examples from [upper level](../README.md#common-configurations).
 
-### Build and Flash
+### Build, Flash, and Run
 
 Build the project and flash it to the board, then run monitor tool to view serial output:
 
 ```
-make -j4 flash monitor
+idf.py -p PORT build flash monitor
 ```
+
+(Replace PORT with the name of the serial port to use.)
 
 (To exit the serial monitor, type ``Ctrl-]``.)
 
-See the Getting Started Guide for full steps to configure and use ESP-IDF to build projects.
+See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
 
 ## Example Output
 
-Here is the example of ESPNOW receiving device console output.
-
-```
-I (898) phy: phy_version: 3960, 5211945, Jul 18 2018, 10:40:07, 0, 0
-I (898) wifi: mode : sta (30:ae:a4:80:45:68)
-I (898) espnow_example: WiFi started
-I (898) ESPNOW: espnow [version: 1.0] init
-I (5908) espnow_example: Start sending broadcast data
-I (6908) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (7908) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (52138) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (52138) espnow_example: Receive 0th broadcast data from: 30:ae:a4:0c:34:ec, len: 200
-I (53158) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (53158) espnow_example: Receive 1th broadcast data from: 30:ae:a4:0c:34:ec, len: 200
-I (54168) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (54168) espnow_example: Receive 2th broadcast data from: 30:ae:a4:0c:34:ec, len: 200
-I (54168) espnow_example: Receive 0th unicast data from: 30:ae:a4:0c:34:ec, len: 200
-I (54678) espnow_example: Receive 1th unicast data from: 30:ae:a4:0c:34:ec, len: 200
-I (55668) espnow_example: Receive 2th unicast data from: 30:ae:a4:0c:34:ec, len: 200
+```bash
+I (394) eth_example: Ethernet Started
+I (3934) eth_example: Ethernet Link Up
+I (3934) eth_example: Ethernet HW Addr 30:ae:a4:c6:87:5b
+I (5864) tcpip_adapter: eth ip: 192.168.2.151, mask: 255.255.255.0, gw: 192.168.2.2
+I (5864) eth_example: Ethernet Got IP Address
+I (5864) eth_example: ~~~~~~~~~~~
+I (5864) eth_example: ETHIP:192.168.2.151
+I (5874) eth_example: ETHMASK:255.255.255.0
+I (5874) eth_example: ETHGW:192.168.2.2
+I (5884) eth_example: ~~~~~~~~~~~
 ```
 
-Here is the example of ESPNOW sending device console output.
-
-```
-I (915) phy: phy_version: 3960, 5211945, Jul 18 2018, 10:40:07, 0, 0
-I (915) wifi: mode : sta (30:ae:a4:0c:34:ec)
-I (915) espnow_example: WiFi started
-I (915) ESPNOW: espnow [version: 1.0] init
-I (5915) espnow_example: Start sending broadcast data
-I (5915) espnow_example: Receive 41th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (5915) espnow_example: Receive 42th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (5925) espnow_example: Receive 44th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (5935) espnow_example: Receive 45th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (6965) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (6965) espnow_example: Receive 46th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (7975) espnow_example: send data to ff:ff:ff:ff:ff:ff
-I (7975) espnow_example: Receive 47th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (7975) espnow_example: Start sending unicast data
-I (7975) espnow_example: send data to 30:ae:a4:80:45:68
-I (9015) espnow_example: send data to 30:ae:a4:80:45:68
-I (9015) espnow_example: Receive 48th broadcast data from: 30:ae:a4:80:45:68, len: 200
-I (10015) espnow_example: send data to 30:ae:a4:80:45:68
-I (16075) espnow_example: send data to 30:ae:a4:80:45:68
-I (17075) espnow_example: send data to 30:ae:a4:80:45:68
-I (24125) espnow_example: send data to 30:ae:a4:80:45:68
-```
+Now you can ping your ESP32 in the terminal by entering `ping 192.168.2.151` (it depends on the actual IP address you get).
 
 ## Troubleshooting
 
-If ESPNOW data can not be received from another device, maybe the two devices are not 
-on the same channel or the primary key and local key are different. 
+See common troubleshooting for Ethernet examples from [upper level](../README.md#common-troubleshooting).
 
-In real application, if the receiving device is in station mode only and it connects to an AP, 
-modem sleep should be disabled. Otherwise, it may fail to revceive ESPNOW data from other devices.
+(For any technical queries, please open an [issue](https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you as soon as possible.)

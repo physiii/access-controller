@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Access Controller</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+	<div class="panel top">
+		<h2>Channel 1</h2>
+
+		<h4>Arm or disarm the lock.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="arm_1">
+		  <span class="slider round"></span>
+		</label>
+
+		<br><br>
+
+		<h4>Enable or disable exit button.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="enableExit_1">
+		  <span class="slider round"></span>
+		</label>
+
+		<h4>Alert when exit button is pressed.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="alertExit_1">
+		  <span class="slider round"></span>
+		</label>
+
+		<br><br>
+
+		<h4>Alert when remote FOB is used.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="alertFob_1">
+		  <span class="slider round"></span>
+		</label>
+
+		<h4>Time for system to re-arm after pulsed in seconds.</h4>
+		<input type="number" id="armDelay_1" value=5></input>
+		<button id="relock" type="button" onclick="armDelay(1, document.getElementById('armDelay_1').value)">Save</button>
+	</div>
+
+
+	<div class="panel bottom">
+		<h2>Channel 2</h2>
+
+		<h4>Arm or disarm the lock.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="arm_2">
+		  <span class="slider round"></span>
+		</label>
+
+		<br><br>
+
+		<h4>Enable or disable exit button.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="enableExit_2">
+		  <span class="slider round"></span>
+		</label>
+
+		<h4>Alert when exit button is pressed.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="alertExit_2">
+		  <span class="slider round"></span>
+		</label>
+
+		<br><br>
+
+		<h4>Alert when remote FOB is used.</h4>
+		<label class="switch">
+		  <input type="checkbox" id="alertFob_2">
+		  <span class="slider round"></span>
+		</label>
+
+		<br><br>
+
+		<h4>Time for system to re-arm after pulsed in seconds.</h4>
+		<input type="number" id="armDelay_2" value=5></input>
+		<button id="relock" type="button" onclick="armDelay(2, document.getElementById('armDelay_2').value)">Save</button>
+	</div>
+
+	<script src="/script.js"></script>
+</body>
+</html>

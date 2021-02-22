@@ -1,120 +1,210 @@
-menu "Access Control"
+menu "Power Configuration"
 
-    menu "Locks"
-        config LOCK_A_IO
-            int "Door A IO"
-            range 0 34
-            default 15
-            help
-              GPIO number to control door A.
-
-        config LOCK_B_IO
-            int "Door B IO"
-            range 0 18
-            default 26
-            help
-              GPIO number to control door B.
-    endmenu
-
-    menu "Exit Buttons"
-        config EXIT_BTN_A_IO
-            int "Exit Button A IO"
-            range 0 34
-            default 4
-            help
-              GPIO number to receive the exit signal from button A.
-
-        config EXIT_BTN_B_IO
-            int "Exit Button B IO"
-            range 0 34
-            default 5
-            help
-              GPIO number to receive the exit signal from button B.
-
-        config DISABLE_EXIT_IO
-            int "Disable Exit Button IO"
-            range 0 34
+    config LED_STRIP_FLUSH_TIMEOUT
+            int "makes esp-idf-lib work"
             default 12
             help
-              GPIO number to disable both exit buttons.
-    endmenu
+                This option selects the GPIO pin used for the main power signal.
 
-    menu "FOB Buttons"
-        config FOB_A_IO
-            int "FOB Button A IO"
-            range 0 34
-            default 23
+    config I2CDEV_TIMEOUT
+            int "makes esp-idf-lib work"
+            default 1000
             help
-              GPIO number to receive the exit signal from button A.
+                This option selects the GPIO pin used for the main power signal.
 
-        config FOB_B_IO
-            int "FOB Button B IO"
-            range 0 34
-            default 17
-            help
-              GPIO number to receive the exit signal from button B.
-    endmenu
+    config IGNITION_WIRE_IO
+        int "Ignition power GPIO number"
+        default 32
+        help
+            This option selects the GPIO pin used for the main power signal.
+
+    config MAIN_POWER_IO
+        int "Main power GPIO number"
+        default 18
+        help
+            This option selects the GPIO pin used for the main power signal.
+
+    config DISPLAY_POWER_IO
+        int "Display power GPIO number"
+        default 15
+        help
+            This option selects the GPIO pin used for the display power signal.
+
+    config AUDIO_STBY_IO
+        int "Audio standby power GPIO number"
+        default 19
+        help
+            This option selects the GPIO pin used for the audio power signal.
+
+    config AUDIO_MUTE_IO
+      int "Audio mute power GPIO number"
+      default 23
+      help
+            This option selects the GPIO pin used for the audio power signal.
 
 endmenu
 
-menu "ESPNow Configuration"
+menu "CAN Configuration"
 
-    choice ESPNOW_WIFI_MODE
-        prompt "WiFi mode"
-        default ESPNOW_WIFI_MODE_STATION
+    config CAN_TX_GPIO_NUM
+        int "TX GPIO number"
+        default 5
         help
-            WiFi mode(station or softap).
+            This option selects the GPIO pin used for the TX signal. Connect the
+            TX signal to your transceiver.
 
-        config ESPNOW_WIFI_MODE_STATION
-            bool "Station"
-        config ESPNOW_WIFI_MODE_STATION_SOFTAP
-            bool "Softap"
-    endchoice
-
-    config ESPNOW_PMK
-        string "ESPNOW primary master key"
-        default "pmk1234567890123"
+    config CAN_RX_GPIO_NUM
+        int "RX GPIO number"
+        default 4
         help
-            ESPNOW primary master for the example to use. The length of ESPNOW primary master must be 16 bytes.
+            This option selects the GPIO pin used for the RX signal. Connect the
+            RX signal to your transceiver.
 
-    config ESPNOW_LMK
-        string "ESPNOW local master key"
-        default "lmk1234567890123"
+endmenu
+
+menu "J1850 Configuration"
+
+    config J1850_INPUT_PIN
+        int "Input GPIO number"
+        default 16
         help
-            ESPNOW local master for the example to use. The length of ESPNOW local master must be 16 bytes.
+            This option selects the GPIO pin used for the j1850 input signal.
 
-    config ESPNOW_CHANNEL
-        int "Channel"
-        default 1
+    config J1850_OUTPUT_PIN
+        int "Output GPIO number"
+        default 17
+        help
+            This option selects the GPIO pin used for the j1850 output signal.
+
+endmenu
+
+menu "Wifi Configuration"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+    config ESP_WIFI_CHANNEL
+        int "WiFi Channel"
         range 1 13
+        default 1
         help
-            The channel on which sending and receiving ESPNOW data.
+            WiFi channel (network channel) for the example to use.
 
-    config ESPNOW_SEND_COUNT
-        int "Send count"
-        default 100
-        range 1 65535
+    config ESP_MAX_STA_CONN
+        int "Maximal STA connections"
+        default 4
         help
-            Total count of unicast ESPNOW data to be sent.
+            Max number of the STA connects to AP.
+endmenu
 
-    config ESPNOW_SEND_DELAY
-        int "Send delay"
-        default 1000
-        range 0 65535
+menu "UART Configuration"
+
+    config EXAMPLE_UART_PORT_NUM
+        int "UART port number"
+        range 0 2 if IDF_TARGET_ESP32
+        range 0 1 if IDF_TARGET_ESP32S2
+        default 2 if IDF_TARGET_ESP32
+        default 1 if IDF_TARGET_ESP32S2
         help
-            Delay between sending two ESPNOW data, unit: ms.
+            UART communication port number for the example.
+            See UART documentation for available port numbers.
 
-    config ESPNOW_SEND_LEN
-        int "Send len"
-        range 10 250
-        default 10
+    config EXAMPLE_UART_BAUD_RATE
+        int "UART communication speed"
+        range 1200 115200
+        default 115200
         help
-            Length of ESPNOW data to be sent, unit: byte.
+            UART communication speed for Modbus example.
 
-    config ESPNOW_ENABLE_LONG_RANGE
-        bool "Enable Long Range"
-        default "n"
+    config EXAMPLE_UART_RXD
+        int "UART RXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        range 0 46 if IDF_TARGET_ESP32S2
+        default 5
         help
-            When enable long range, the PHY rate of ESP32 will be 512Kbps or 256Kbps
+            GPIO number for UART RX pin. See UART documentation for more information
+            about available pin numbers for UART.
 
+    config EXAMPLE_UART_TXD
+        int "UART TXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        range 0 46 if IDF_TARGET_ESP32S2
+        default 4
+        help
+            GPIO number for UART TX pin. See UART documentation for more information
+            about available pin numbers for UART.
+
+    config EXAMPLE_TASK_STACK_SIZE
+        int "UART echo example task stack size"
+        range 1024 16384
+        default 2048
+        help
+            Defines stack size for UART echo example. Insufficient stack size can cause crash.
+
+endmenu
+
+menu "Http_File_Serving Example menu"
+
+    config EXAMPLE_MOUNT_SD_CARD
+        bool "Mount the SD card to the filesystem"
+        default n
+        help
+            If this config item is set, the file you upload to server can be chosen to save in the SDcard.
+
+    config EXAMPLE_FORMAT_IF_MOUNT_SDCARD_FAILED
+        bool "The card will be formatted if mount has failed."
+        default n
+        depends on EXAMPLE_MOUNT_SD_CARD
+        help
+            If this config item is set, the card will be formatted if mount has failed.
+
+    config EXAMPLE_USE_SDMMC_HOST
+        bool "Use SDMMC host"
+        default y
+        depends on EXAMPLE_MOUNT_SD_CARD && IDF_TARGET_ESP32
+        help
+            If this config item is set, SDMMC is used to mount the SDcard.
+            Otherwise, will use SPI host to access and mount the SDcard.
+
+    config EXAMPLE_HTTPD_CONN_CLOSE_HEADER
+        bool "Send connection close header from request handlers"
+        default y
+        help
+            If this config item is set, Connection: close header will be set in handlers.
+            This closes HTTP connection and frees the server socket instantly.
+endmenu
+
+menu "Access Point Configuration"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+    config ESP_WIFI_CHANNEL
+        int "WiFi Channel"
+        range 1 13
+        default 1
+        help
+            WiFi channel (network channel) for the example to use.
+
+    config ESP_MAX_STA_CONN
+        int "Maximal STA connections"
+        default 4
+        help
+            Max number of the STA connects to AP.
 endmenu

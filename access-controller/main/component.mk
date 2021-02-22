@@ -3,5 +3,7 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-
-
+COMPONENT_EMBED_FILES := public/favicon.ico
+COMPONENT_EMBED_FILES += public/index.html
+COMPONENT_EMBED_FILES += public/script.js
+COMPONENT_EMBED_FILES += public/style.css

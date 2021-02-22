@@ -1,4 +1,3 @@
-set(COMPONENT_SRCS "espnow_example_main.c")
-set(COMPONENT_ADD_INCLUDEDIRS ".")
-
-register_component()
+idf_component_register(SRCS "main.c"
+                    INCLUDE_DIRS "."
+                    EMBED_FILES "public/favicon.ico" "public/index.html" "public/script.js" "public/style.css")
