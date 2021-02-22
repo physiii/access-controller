@@ -91,6 +91,12 @@ int store_lock_state(cJSON * state)
   return 0;
 }
 
+void enableLock (int ch, bool val)
+{
+	for (int i=0; i < NUM_OF_LOCKS; i++)
+		if (locks[i].channel == ch) locks[i].enable = val;
+}
+
 int load_lock_state_from_flash()
 {
   char *state_str = get_char("lock");
@@ -143,8 +149,8 @@ void lock_init()
     locks[1].controlPin = LOCK_IO_2;
     locks[1].isLocked = true;
 		locks[1].contactPin = LOCK_CONTACT_PIN_2;
-		locks[1].enable = true;
-		locks[0].alert = true;
+		locks[1].enable = false;
+		locks[1].alert = true;
 
 		for (int i=0; i < NUM_OF_LOCKS; i++) {
 			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
@@ -155,6 +161,7 @@ void lock_init()
 void handle_lock_message(cJSON * payload)
 {
 	if (payload == NULL) return;
+	bool tmp;
 
   printf("lock payload: %s\n",cJSON_PrintUnformatted(payload));
 	int ch=0;
@@ -171,6 +178,11 @@ void handle_lock_message(cJSON * payload)
 		} else {
 			arm_lock(ch, false, true);
 		}
+	}
+
+	if (cJSON_GetObjectItem(payload,"enable")) {
+		tmp = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
+		enableLock(ch, tmp);
 	}
 
 	return;

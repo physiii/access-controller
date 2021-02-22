@@ -1,4 +1,4 @@
-#define SERVICE_LOOP 20
+#define SERVICE_LOOP 100
 #define SERVICE_LOOP_SHORT 10
 
 #include "cJSON.h"
@@ -20,7 +20,6 @@
 void app_main(void)
 {
 
-	ESP_ERROR_CHECK(nvs_flash_init());
 	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 
@@ -42,7 +41,7 @@ void app_main(void)
 	exit_main();
 	fob_main();
 	server_main();
-	ap_main();
+	// ap_main();
 
   ESP_ERROR_CHECK(example_connect());
 

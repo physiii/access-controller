@@ -11,6 +11,10 @@ let armDelay = (channel, value) => {
 	console.log("Set alarm delay to ", value);
 }
 
+document.getElementById('enableLock_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+};
+
 document.getElementById('arm_1').onclick = function() {
 			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"arm\": " + this.checked + "}}");
 };
@@ -29,6 +33,10 @@ document.getElementById('alertFob_1').onclick = function() {
 
 document.getElementById('arm_2').onclick = function() {
 			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"arm\": " + this.checked + "}}");
+};
+
+document.getElementById('enableLock_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
 };
 
 document.getElementById('enableExit_2').onclick = function() {

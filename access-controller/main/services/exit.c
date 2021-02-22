@@ -164,8 +164,8 @@ void handle_exit_message(cJSON * payload)
 		enableExit(ch, tmp);
 	}
 
-	if (cJSON_GetObjectItem(payload,"armDelay")) {
-		setArmDelay(ch, cJSON_GetObjectItem(payload,"armDelay")->valueint);
+	if (cJSON_GetObjectItem(payload,"delay")) {
+		setArmDelay(ch, cJSON_GetObjectItem(payload,"delay")->valueint);
 	}
 
 	// storeExitSettings();
@@ -193,8 +193,8 @@ void exit_main()
 	exits[0].pin = EXIT_BUTTON_IO_1;
 	exits[0].delay = 4;
 	exits[0].channel = 1;
-	exits[0].enable = true;
 	exits[0].alert = true;
+	exits[0].enable = true;
 	strcpy(exits[0].type, "exit");
 
 	exits[1].pin = EXIT_BUTTON_IO_2;
