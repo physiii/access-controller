@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 11 12
+Sheet 12 12
 Title ""
 Date ""
 Rev ""
@@ -19,7 +19,8 @@ U 1 1 58211FD0
 P 5400 1500
 AR Path="/60035F16/58211FD0" Ref="#FLG?"  Part="1" 
 AR Path="/60042654/58211FD0" Ref="#FLG?"  Part="1" 
-AR Path="/600457E1/58211FD0" Ref="#FLG04"  Part="1" 
+AR Path="/600457E1/58211FD0" Ref="#FLG?"  Part="1" 
+AR Path="/618D2964/58211FD0" Ref="#FLG04"  Part="1" 
 F 0 "#FLG04" H 5400 1595 50  0001 C CNN
 F 1 "PWR_FLAG" V 5300 1600 31  0000 C CNN
 F 2 "" H 5400 1500 60  0000 C CNN
@@ -33,7 +34,8 @@ U 1 1 582123AC
 P 6800 1950
 AR Path="/60035F16/582123AC" Ref="#FLG?"  Part="1" 
 AR Path="/60042654/582123AC" Ref="#FLG?"  Part="1" 
-AR Path="/600457E1/582123AC" Ref="#FLG05"  Part="1" 
+AR Path="/600457E1/582123AC" Ref="#FLG?"  Part="1" 
+AR Path="/618D2964/582123AC" Ref="#FLG05"  Part="1" 
 F 0 "#FLG05" H 6800 2045 50  0001 C CNN
 F 1 "PWR_FLAG" H 6950 2100 31  0000 C CNN
 F 2 "" H 6800 1950 60  0000 C CNN
@@ -94,7 +96,8 @@ U 1 1 601255B2
 P 4400 950
 AR Path="/60035F16/601255B2" Ref="#FLG?"  Part="1" 
 AR Path="/60042654/601255B2" Ref="#FLG?"  Part="1" 
-AR Path="/600457E1/601255B2" Ref="#FLG03"  Part="1" 
+AR Path="/600457E1/601255B2" Ref="#FLG?"  Part="1" 
+AR Path="/618D2964/601255B2" Ref="#FLG03"  Part="1" 
 F 0 "#FLG03" H 4400 1045 50  0001 C CNN
 F 1 "PWR_FLAG" V 4300 1250 50  0000 C CNN
 F 2 "" H 4400 950 60  0000 C CNN
@@ -140,8 +143,9 @@ U 1 1 5FEB9491
 P 3400 1300
 AR Path="/60035F16/5FEB9491" Ref="R?"  Part="1" 
 AR Path="/60042654/5FEB9491" Ref="R?"  Part="1" 
-AR Path="/600457E1/5FEB9491" Ref="R53"  Part="1" 
-F 0 "R53" V 3400 1250 50  0000 L CNN
+AR Path="/600457E1/5FEB9491" Ref="R?"  Part="1" 
+AR Path="/618D2964/5FEB9491" Ref="R67"  Part="1" 
+F 0 "R67" V 3400 1250 50  0000 L CNN
 F 1 "R_10K_0402" V 3500 1050 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 3330 1300 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf" V 3480 1300 50  0001 C CNN
@@ -172,7 +176,8 @@ U 1 1 5FF0A7D5
 P 3900 1250
 AR Path="/60035F16/5FF0A7D5" Ref="FET?"  Part="1" 
 AR Path="/60042654/5FF0A7D5" Ref="FET?"  Part="1" 
-AR Path="/600457E1/5FF0A7D5" Ref="FET1"  Part="1" 
+AR Path="/600457E1/5FF0A7D5" Ref="FET?"  Part="1" 
+AR Path="/618D2964/5FF0A7D5" Ref="FET1"  Part="1" 
 F 0 "FET1" H 3684 1278 60  0000 R CNN
 F 1 "PFET" H 3684 1172 60  0000 R CNN
 F 2 "Package_TO_SOT_SMD:SOT-23" H 3900 1250 60  0001 C CNN
@@ -188,8 +193,9 @@ U 1 1 5FF49295
 P 3800 2000
 AR Path="/60035F16/5FF49295" Ref="R?"  Part="1" 
 AR Path="/60042654/5FF49295" Ref="R?"  Part="1" 
-AR Path="/600457E1/5FF49295" Ref="R54"  Part="1" 
-F 0 "R54" V 3800 1950 50  0000 L CNN
+AR Path="/600457E1/5FF49295" Ref="R?"  Part="1" 
+AR Path="/618D2964/5FF49295" Ref="R68"  Part="1" 
+F 0 "R68" V 3800 1950 50  0000 L CNN
 F 1 "R_1K_0402" V 3900 1800 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 3730 2000 50  0001 C CNN
 F 3 "https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615" V 3880 2000 50  0001 C CNN
@@ -204,8 +210,9 @@ U 1 1 5FF5CBE7
 P 3900 2550
 AR Path="/60035F16/5FF5CBE7" Ref="Q?"  Part="1" 
 AR Path="/60042654/5FF5CBE7" Ref="Q?"  Part="1" 
-AR Path="/600457E1/5FF5CBE7" Ref="Q8"  Part="1" 
-F 0 "Q8" H 4104 2596 50  0000 L CNN
+AR Path="/600457E1/5FF5CBE7" Ref="Q?"  Part="1" 
+AR Path="/618D2964/5FF5CBE7" Ref="Q9"  Part="1" 
+F 0 "Q9" H 4104 2596 50  0000 L CNN
 F 1 "Q_LMUN2211LT1G" H 4104 2505 50  0000 L CNN
 F 2 "Package_TO_SOT_SMD:SOT-23" H 3930 2700 20  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Leshan-Radio-LMUN2211LT1G_C12775.pdf" H 3900 2550 60  0001 C CNN
@@ -220,8 +227,9 @@ U 1 1 5FF8D914
 P 3100 1300
 AR Path="/60035F16/5FF8D914" Ref="C?"  Part="1" 
 AR Path="/60042654/5FF8D914" Ref="C?"  Part="1" 
-AR Path="/600457E1/5FF8D914" Ref="C20"  Part="1" 
-F 0 "C20" H 3000 1400 50  0000 L CNN
+AR Path="/600457E1/5FF8D914" Ref="C?"  Part="1" 
+AR Path="/618D2964/5FF8D914" Ref="C29"  Part="1" 
+F 0 "C29" H 3000 1400 50  0000 L CNN
 F 1 "C_22uF" H 2800 1200 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" H 3100 1300 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A226MQ8NRNC_C59461.pdf" H 3100 1300 60  0001 C CNN
@@ -236,8 +244,9 @@ U 1 1 5FF92947
 P 4400 1700
 AR Path="/60035F16/5FF92947" Ref="C?"  Part="1" 
 AR Path="/60042654/5FF92947" Ref="C?"  Part="1" 
-AR Path="/600457E1/5FF92947" Ref="C21"  Part="1" 
-F 0 "C21" H 4200 1700 50  0000 L CNN
+AR Path="/600457E1/5FF92947" Ref="C?"  Part="1" 
+AR Path="/618D2964/5FF92947" Ref="C30"  Part="1" 
+F 0 "C30" H 4200 1700 50  0000 L CNN
 F 1 "C_22uF" H 4100 1600 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" H 4400 1700 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A226MQ8NRNC_C59461.pdf" H 4400 1700 60  0001 C CNN
@@ -252,8 +261,9 @@ U 1 1 5FFA0046
 P 5100 1550
 AR Path="/60035F16/5FFA0046" Ref="L?"  Part="1" 
 AR Path="/60042654/5FFA0046" Ref="L?"  Part="1" 
-AR Path="/600457E1/5FFA0046" Ref="L3"  Part="1" 
-F 0 "L3" H 4900 1600 50  0000 C CNN
+AR Path="/600457E1/5FFA0046" Ref="L?"  Part="1" 
+AR Path="/618D2964/5FFA0046" Ref="L2"  Part="1" 
+F 0 "L2" H 4900 1600 50  0000 C CNN
 F 1 "FB" H 5100 1674 50  0000 C CNN
 F 2 "Inductor_SMD:L_1206_3216Metric" H 5050 1550 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/1810231132_Sunlord-PZ3216U300-6R0TF_C316417.pdf" H 5050 1550 60  0001 C CNN
@@ -268,8 +278,9 @@ U 1 1 5FFBCFEF
 P 4600 1750
 AR Path="/60035F16/5FFBCFEF" Ref="C?"  Part="1" 
 AR Path="/60042654/5FFBCFEF" Ref="C?"  Part="1" 
-AR Path="/600457E1/5FFBCFEF" Ref="C22"  Part="1" 
-F 0 "C22" H 4500 1650 50  0000 C CNN
+AR Path="/600457E1/5FFBCFEF" Ref="C?"  Part="1" 
+AR Path="/618D2964/5FFBCFEF" Ref="C31"  Part="1" 
+F 0 "C31" H 4500 1650 50  0000 C CNN
 F 1 "C_100nF_0402" H 4300 1850 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 4700 2050 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" H 4600 1500 50  0001 C CNN
@@ -284,8 +295,9 @@ U 1 1 5FFF6A63
 P 5400 4100
 AR Path="/60035F16/5FFF6A63" Ref="C?"  Part="1" 
 AR Path="/60042654/5FFF6A63" Ref="C?"  Part="1" 
-AR Path="/600457E1/5FFF6A63" Ref="C23"  Part="1" 
-F 0 "C23" H 5450 4000 50  0000 C CNN
+AR Path="/600457E1/5FFF6A63" Ref="C?"  Part="1" 
+AR Path="/618D2964/5FFF6A63" Ref="C32"  Part="1" 
+F 0 "C32" H 5450 4000 50  0000 C CNN
 F 1 "C_100nF_0402" V 5250 4150 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 5500 4400 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" H 5400 3850 50  0001 C CNN
@@ -302,8 +314,9 @@ U 1 1 60017672
 P 5900 4150
 AR Path="/60035F16/60017672" Ref="R?"  Part="1" 
 AR Path="/60042654/60017672" Ref="R?"  Part="1" 
-AR Path="/600457E1/60017672" Ref="R60"  Part="1" 
-F 0 "R60" V 5900 4100 50  0000 L CNN
+AR Path="/600457E1/60017672" Ref="R?"  Part="1" 
+AR Path="/618D2964/60017672" Ref="R75"  Part="1" 
+F 0 "R75" V 5900 4100 50  0000 L CNN
 F 1 "R_2K2_0402" V 6000 3950 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5830 4150 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" V 5980 4150 50  0001 C CNN
@@ -322,8 +335,9 @@ U 1 1 60046093
 P 5500 2100
 AR Path="/60035F16/60046093" Ref="R?"  Part="1" 
 AR Path="/60042654/60046093" Ref="R?"  Part="1" 
-AR Path="/600457E1/60046093" Ref="R55"  Part="1" 
-F 0 "R55" V 5500 2050 50  0000 L CNN
+AR Path="/600457E1/60046093" Ref="R?"  Part="1" 
+AR Path="/618D2964/60046093" Ref="R69"  Part="1" 
+F 0 "R69" V 5500 2050 50  0000 L CNN
 F 1 "R_49.9_0402" V 5450 1500 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5430 2100 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF499JTCE_C25120.pdf" V 5580 2100 50  0001 C CNN
@@ -340,8 +354,9 @@ U 1 1 60052BB5
 P 5600 2100
 AR Path="/60035F16/60052BB5" Ref="R?"  Part="1" 
 AR Path="/60042654/60052BB5" Ref="R?"  Part="1" 
-AR Path="/600457E1/60052BB5" Ref="R56"  Part="1" 
-F 0 "R56" V 5600 2050 50  0000 L CNN
+AR Path="/600457E1/60052BB5" Ref="R?"  Part="1" 
+AR Path="/618D2964/60052BB5" Ref="R71"  Part="1" 
+F 0 "R71" V 5600 2050 50  0000 L CNN
 F 1 "R_49.9_0402" V 5550 1500 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5530 2100 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF499JTCE_C25120.pdf" V 5680 2100 50  0001 C CNN
@@ -356,8 +371,9 @@ U 1 1 600534D8
 P 5700 2100
 AR Path="/60035F16/600534D8" Ref="R?"  Part="1" 
 AR Path="/60042654/600534D8" Ref="R?"  Part="1" 
-AR Path="/600457E1/600534D8" Ref="R57"  Part="1" 
-F 0 "R57" V 5700 2050 50  0000 L CNN
+AR Path="/600457E1/600534D8" Ref="R?"  Part="1" 
+AR Path="/618D2964/600534D8" Ref="R72"  Part="1" 
+F 0 "R72" V 5700 2050 50  0000 L CNN
 F 1 "R_49.9_0402" V 5650 1500 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5630 2100 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF499JTCE_C25120.pdf" V 5780 2100 50  0001 C CNN
@@ -372,8 +388,9 @@ U 1 1 60053AF8
 P 5800 2100
 AR Path="/60035F16/60053AF8" Ref="R?"  Part="1" 
 AR Path="/60042654/60053AF8" Ref="R?"  Part="1" 
-AR Path="/600457E1/60053AF8" Ref="R58"  Part="1" 
-F 0 "R58" V 5800 2050 50  0000 L CNN
+AR Path="/600457E1/60053AF8" Ref="R?"  Part="1" 
+AR Path="/618D2964/60053AF8" Ref="R73"  Part="1" 
+F 0 "R73" V 5800 2050 50  0000 L CNN
 F 1 "R_49.9_0402" V 5750 1500 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5730 2100 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF499JTCE_C25120.pdf" V 5880 2100 50  0001 C CNN
@@ -406,8 +423,9 @@ U 1 1 6007908A
 P 5900 2100
 AR Path="/60035F16/6007908A" Ref="R?"  Part="1" 
 AR Path="/60042654/6007908A" Ref="R?"  Part="1" 
-AR Path="/600457E1/6007908A" Ref="R59"  Part="1" 
-F 0 "R59" V 5900 2050 50  0000 L CNN
+AR Path="/600457E1/6007908A" Ref="R?"  Part="1" 
+AR Path="/618D2964/6007908A" Ref="R74"  Part="1" 
+F 0 "R74" V 5900 2050 50  0000 L CNN
 F 1 "R_2K2_0402" V 5850 1500 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5830 2100 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" V 5980 2100 50  0001 C CNN
@@ -429,8 +447,9 @@ U 1 1 600924F0
 P 6000 1950
 AR Path="/60035F16/600924F0" Ref="C?"  Part="1" 
 AR Path="/60042654/600924F0" Ref="C?"  Part="1" 
-AR Path="/600457E1/600924F0" Ref="C24"  Part="1" 
-F 0 "C24" V 6050 2000 50  0000 L CNN
+AR Path="/600457E1/600924F0" Ref="C?"  Part="1" 
+AR Path="/618D2964/600924F0" Ref="C33"  Part="1" 
+F 0 "C33" V 6050 2000 50  0000 L CNN
 F 1 "C_22uF" V 6050 1650 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" H 6000 1950 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A226MQ8NRNC_C59461.pdf" H 6000 1950 60  0001 C CNN
@@ -452,8 +471,9 @@ U 1 1 600988ED
 P 6200 1900
 AR Path="/60035F16/600988ED" Ref="C?"  Part="1" 
 AR Path="/60042654/600988ED" Ref="C?"  Part="1" 
-AR Path="/600457E1/600988ED" Ref="C25"  Part="1" 
-F 0 "C25" H 6250 1800 50  0000 C CNN
+AR Path="/600457E1/600988ED" Ref="C?"  Part="1" 
+AR Path="/618D2964/600988ED" Ref="C35"  Part="1" 
+F 0 "C35" H 6250 1800 50  0000 C CNN
 F 1 "C_100nF_0402" V 6150 2250 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 6300 2200 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" H 6200 1650 50  0001 C CNN
@@ -468,8 +488,9 @@ U 1 1 600A78A9
 P 6400 1900
 AR Path="/60035F16/600A78A9" Ref="C?"  Part="1" 
 AR Path="/60042654/600A78A9" Ref="C?"  Part="1" 
-AR Path="/600457E1/600A78A9" Ref="C26"  Part="1" 
-F 0 "C26" H 6300 1800 50  0000 C CNN
+AR Path="/600457E1/600A78A9" Ref="C?"  Part="1" 
+AR Path="/618D2964/600A78A9" Ref="C36"  Part="1" 
+F 0 "C36" H 6300 1800 50  0000 C CNN
 F 1 "C_100nF_0402" V 6350 2250 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 6500 2200 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" H 6400 1650 50  0001 C CNN
@@ -486,8 +507,9 @@ U 1 1 600AA948
 P 6800 2200
 AR Path="/60035F16/600AA948" Ref="C?"  Part="1" 
 AR Path="/60042654/600AA948" Ref="C?"  Part="1" 
-AR Path="/600457E1/600AA948" Ref="C28"  Part="1" 
-F 0 "C28" H 6700 2100 50  0000 C CNN
+AR Path="/600457E1/600AA948" Ref="C?"  Part="1" 
+AR Path="/618D2964/600AA948" Ref="C38"  Part="1" 
+F 0 "C38" H 6700 2100 50  0000 C CNN
 F 1 "C_100nF_0402" V 6750 2550 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 6900 2500 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" H 6800 1950 50  0001 C CNN
@@ -504,8 +526,9 @@ U 1 1 600C20AA
 P 6600 2150
 AR Path="/60035F16/600C20AA" Ref="C?"  Part="1" 
 AR Path="/60042654/600C20AA" Ref="C?"  Part="1" 
-AR Path="/600457E1/600C20AA" Ref="C27"  Part="1" 
-F 0 "C27" H 6600 2250 50  0000 L CNN
+AR Path="/600457E1/600C20AA" Ref="C?"  Part="1" 
+AR Path="/618D2964/600C20AA" Ref="C37"  Part="1" 
+F 0 "C37" H 6600 2250 50  0000 L CNN
 F 1 "C_2.2uF_0402" V 6650 1600 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 6600 2150 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05A225MQ5NSNC_C12530.pdf" H 6600 2150 60  0001 C CNN
@@ -520,8 +543,9 @@ U 1 1 5FE5B873
 P 6050 5600
 AR Path="/60035F16/5FE5B873" Ref="R?"  Part="1" 
 AR Path="/60042654/5FE5B873" Ref="R?"  Part="1" 
-AR Path="/600457E1/5FE5B873" Ref="R62"  Part="1" 
-F 0 "R62" V 6050 5600 50  0000 C CNN
+AR Path="/600457E1/5FE5B873" Ref="R?"  Part="1" 
+AR Path="/618D2964/5FE5B873" Ref="R76"  Part="1" 
+F 0 "R76" V 6050 5600 50  0000 C CNN
 F 1 "R_10K_0402" V 5950 5600 50  0000 C CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5980 5600 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf" V 6130 5600 50  0001 C CNN
@@ -536,8 +560,9 @@ U 1 1 5FE83977
 P 6050 6100
 AR Path="/60035F16/5FE83977" Ref="C?"  Part="1" 
 AR Path="/60042654/5FE83977" Ref="C?"  Part="1" 
-AR Path="/600457E1/5FE83977" Ref="C29"  Part="1" 
-F 0 "C29" H 5950 6000 50  0000 C CNN
+AR Path="/600457E1/5FE83977" Ref="C?"  Part="1" 
+AR Path="/618D2964/5FE83977" Ref="C34"  Part="1" 
+F 0 "C34" H 5950 6000 50  0000 C CNN
 F 1 "C_10uF" H 6000 6200 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" H 6300 6550 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A106MA8NRNC_C96446.pdf" H 6050 5850 50  0001 C CNN
@@ -552,8 +577,9 @@ U 1 1 5FEA0D11
 P 5500 5750
 AR Path="/60035F16/5FEA0D11" Ref="R?"  Part="1" 
 AR Path="/60042654/5FEA0D11" Ref="R?"  Part="1" 
-AR Path="/600457E1/5FEA0D11" Ref="R61"  Part="1" 
-F 0 "R61" V 5500 5750 50  0000 C CNN
+AR Path="/600457E1/5FEA0D11" Ref="R?"  Part="1" 
+AR Path="/618D2964/5FEA0D11" Ref="R70"  Part="1" 
+F 0 "R70" V 5500 5750 50  0000 C CNN
 F 1 "R_12.1K_0402" V 5600 5800 50  0000 C CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5430 5750 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1212TCE_C25852.pdf" V 5580 5750 50  0001 C CNN
@@ -616,18 +642,6 @@ Wire Wire Line
 	1650 1800 1600 1800
 Wire Wire Line
 	1600 1700 1650 1700
-Text HLabel 1600 2050 0    60   Input ~ 0
-SP1
-Wire Wire Line
-	1650 2050 1600 2050
-Text Label 1650 2050 0    50   ~ 0
-SP1
-Text HLabel 1600 2150 0    60   Input ~ 0
-SP2
-Wire Wire Line
-	1650 2150 1600 2150
-Text Label 1650 2150 0    50   ~ 0
-SP2
 $Comp
 L power:GND #PWR?
 U 1 1 603F5D1A
@@ -635,8 +649,9 @@ P 3800 2850
 AR Path="/5ABD187E/603F5D1A" Ref="#PWR?"  Part="1" 
 AR Path="/603F5D1A" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/603F5D1A" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/603F5D1A" Ref="#PWR088"  Part="1" 
-F 0 "#PWR088" H 3800 2600 50  0001 C CNN
+AR Path="/600457E1/603F5D1A" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/603F5D1A" Ref="#PWR0108"  Part="1" 
+F 0 "#PWR0108" H 3800 2600 50  0001 C CNN
 F 1 "GND" H 3800 2700 50  0000 C CNN
 F 2 "" H 3800 2850 50  0001 C CNN
 F 3 "" H 3800 2850 50  0001 C CNN
@@ -650,8 +665,9 @@ P 4600 1950
 AR Path="/5ABD187E/60406505" Ref="#PWR?"  Part="1" 
 AR Path="/60406505" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/60406505" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/60406505" Ref="#PWR089"  Part="1" 
-F 0 "#PWR089" H 4600 1700 50  0001 C CNN
+AR Path="/600457E1/60406505" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/60406505" Ref="#PWR0109"  Part="1" 
+F 0 "#PWR0109" H 4600 1700 50  0001 C CNN
 F 1 "GND" H 4600 1800 50  0000 C CNN
 F 2 "" H 4600 1950 50  0001 C CNN
 F 3 "" H 4600 1950 50  0001 C CNN
@@ -665,8 +681,9 @@ P 6000 2650
 AR Path="/5ABD187E/60406C0D" Ref="#PWR?"  Part="1" 
 AR Path="/60406C0D" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/60406C0D" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/60406C0D" Ref="#PWR092"  Part="1" 
-F 0 "#PWR092" H 6000 2400 50  0001 C CNN
+AR Path="/600457E1/60406C0D" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/60406C0D" Ref="#PWR0114"  Part="1" 
+F 0 "#PWR0114" H 6000 2400 50  0001 C CNN
 F 1 "GND" H 6000 2500 50  0000 C CNN
 F 2 "" H 6000 2650 50  0001 C CNN
 F 3 "" H 6000 2650 50  0001 C CNN
@@ -680,8 +697,9 @@ P 5400 4550
 AR Path="/5ABD187E/60408359" Ref="#PWR?"  Part="1" 
 AR Path="/60408359" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/60408359" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/60408359" Ref="#PWR090"  Part="1" 
-F 0 "#PWR090" H 5400 4300 50  0001 C CNN
+AR Path="/600457E1/60408359" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/60408359" Ref="#PWR0111"  Part="1" 
+F 0 "#PWR0111" H 5400 4300 50  0001 C CNN
 F 1 "GND" H 5400 4400 50  0000 C CNN
 F 2 "" H 5400 4550 50  0001 C CNN
 F 3 "" H 5400 4550 50  0001 C CNN
@@ -695,86 +713,15 @@ P 5900 4550
 AR Path="/5ABD187E/60408A74" Ref="#PWR?"  Part="1" 
 AR Path="/60408A74" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/60408A74" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/60408A74" Ref="#PWR091"  Part="1" 
-F 0 "#PWR091" H 5900 4300 50  0001 C CNN
+AR Path="/600457E1/60408A74" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/60408A74" Ref="#PWR0113"  Part="1" 
+F 0 "#PWR0113" H 5900 4300 50  0001 C CNN
 F 1 "GND" H 5900 4400 50  0000 C CNN
 F 2 "" H 5900 4550 50  0001 C CNN
 F 3 "" H 5900 4550 50  0001 C CNN
 	1    5900 4550
 	1    0    0    -1  
 $EndComp
-Text Label 2350 4800 0    50   ~ 0
-SP1
-Wire Wire Line
-	2350 4800 2300 4800
-Text Label 2350 5000 0    50   ~ 0
-SP2
-Wire Wire Line
-	2300 5000 2350 5000
-$Comp
-L Open_Automation:C_1nF_1206 C?
-U 1 1 5FF5B279
-P 850 3150
-AR Path="/60035F16/5FF5B279" Ref="C?"  Part="1" 
-AR Path="/60042654/5FF5B279" Ref="C?"  Part="1" 
-AR Path="/600457E1/5FF5B279" Ref="C19"  Part="1" 
-F 0 "C19" H 900 3250 50  0000 C CNN
-F 1 "C_1nF_1206" H 850 3100 50  0001 C CNN
-F 2 "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder" H 850 3150 60  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/YAGEO-CC1206KKX7RDBB102_C23631.pdf" H 850 3150 60  0001 C CNN
-F 4 "CC1206KKX7RDBB102" H 850 3150 50  0001 C CNN "Part Number"
-F 5 "C23631" H 850 3150 50  0001 C CNN "LCSC"
-	1    850  3150
-	-1   0    0    1   
-$EndComp
-Wire Wire Line
-	850  3300 850  3250
-Wire Wire Line
-	850  3050 850  3000
-Wire Wire Line
-	850  3000 900  3000
-Wire Wire Line
-	2350 4400 2300 4400
-Text Label 2350 3300 0    50   ~ 0
-TD+
-Text Label 2350 3500 0    50   ~ 0
-CT
-Text Label 2350 3700 0    50   ~ 0
-TD-
-Text Label 2350 3800 0    50   ~ 0
-RD+
-Text Label 2350 4000 0    50   ~ 0
-CT
-Text Label 2350 4200 0    50   ~ 0
-RD-
-Wire Wire Line
-	2350 4200 2300 4200
-Wire Wire Line
-	2300 4000 2350 4000
-Wire Wire Line
-	2350 3800 2300 3800
-Wire Wire Line
-	2300 3700 2350 3700
-Wire Wire Line
-	2350 3500 2300 3500
-Wire Wire Line
-	2300 3300 2350 3300
-Text Label 2350 3100 0    50   ~ 0
-LL+
-Text Label 2350 3000 0    50   ~ 0
-LL-
-Text Label 2350 2900 0    50   ~ 0
-RL+
-Text Label 2350 2800 0    50   ~ 0
-RL-
-Wire Wire Line
-	2300 2800 2350 2800
-Wire Wire Line
-	2350 2900 2300 2900
-Wire Wire Line
-	2300 3000 2350 3000
-Wire Wire Line
-	2350 3100 2300 3100
 Text Label 5900 3350 0    50   ~ 0
 LL-
 Text Label 5900 3250 0    50   ~ 0
@@ -795,17 +742,6 @@ Text Label 6050 5350 2    50   ~ 0
 3V3_LAN
 Text Label 7000 6150 0    50   ~ 0
 EMAC_RXD0
-$Comp
-L Open_Automation:RJ45_LED J12
-U 1 1 603C1468
-P 1600 4100
-F 0 "J12" H 1600 2575 50  0000 C CNN
-F 1 "RJ45_LED" H 1600 2666 50  0000 C CNN
-F 2 "Connector_RJ:RJ45_Abracon_ARJP11A-MA_Horizontal" H 1600 5500 50  0001 C CNN
-F 3 "https://abracon.com/Magnetics/lan/ARJP11A.PDF" H 1450 3250 50  0001 C CNN
-	1    1600 4100
-	-1   0    0    1   
-$EndComp
 Text Label 5500 3850 0    50   ~ 0
 RD-
 Text Label 5600 3750 0    50   ~ 0
@@ -825,75 +761,87 @@ Wire Wire Line
 Text Label 5700 3650 0    50   ~ 0
 TD-
 $Comp
-L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K2
-U 1 1 5FE9CD81
+L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K?
+U 4 1 5FE9CD81
 P 7050 5900
-F 0 "RM_2.2K2" H 7150 6150 60  0000 C CNN
+AR Path="/600457E1/5FE9CD81" Ref="RM_2.2K?"  Part="1" 
+AR Path="/618D2964/5FE9CD81" Ref="RM_2.2K1"  Part="4" 
+F 0 "RM_2.2K1" H 7150 6150 60  0000 C CNN
 F 1 "RA_2.2K_(4x0603)_4B8_Smashed" H 7058 5940 60  0001 C CNN
 F 2 "Open_Automation:R_0603_MATRIX_4" H 7100 5800 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D03WGJ0222T5E_C12001.pdf" H 7100 5800 60  0001 C CNN
 F 4 "4D03WGJ0222T5E" H 7050 5900 50  0001 C CNN "Part Number"
 F 5 "C12001" H 7050 5900 50  0001 C CNN "LCSC"
-	1    7050 5900
+	4    7050 5900
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K2
-U 2 1 5FE9DB49
+L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K?
+U 1 1 5FE9DB49
 P 7150 5900
+AR Path="/600457E1/5FE9DB49" Ref="RM_2.2K?"  Part="2" 
+AR Path="/618D2964/5FE9DB49" Ref="RM_2.2K2"  Part="1" 
 F 0 "RM_2.2K2" H 7250 5950 60  0000 C CNN
 F 1 "RA_2.2K_(4x0603)_4B8_Smashed" H 7158 5940 60  0001 C CNN
 F 2 "Open_Automation:R_0603_MATRIX_4" H 7200 5800 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D03WGJ0222T5E_C12001.pdf" H 7200 5800 60  0001 C CNN
 F 4 "4D03WGJ0222T5E" H 7150 5900 50  0001 C CNN "Part Number"
 F 5 "C12001" H 7150 5900 50  0001 C CNN "LCSC"
-	2    7150 5900
+	1    7150 5900
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K1
-U 2 1 5FEA4579
+L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K?
+U 1 1 5FEA4579
 P 4350 5700
+AR Path="/600457E1/5FEA4579" Ref="RM_2.2K?"  Part="2" 
+AR Path="/618D2964/5FEA4579" Ref="RM_2.2K1"  Part="1" 
 F 0 "RM_2.2K1" H 4350 5750 60  0000 C CNN
 F 1 "RA_2.2K_(4x0603)_4B8_Smashed" H 4358 5740 60  0001 C CNN
 F 2 "Open_Automation:R_0603_MATRIX_4" H 4400 5600 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D03WGJ0222T5E_C12001.pdf" H 4400 5600 60  0001 C CNN
 F 4 "4D03WGJ0222T5E" H 4350 5700 50  0001 C CNN "Part Number"
 F 5 "C12001" H 4350 5700 50  0001 C CNN "LCSC"
-	2    4350 5700
+	1    4350 5700
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K1
-U 3 1 5FEA4D2C
+L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K?
+U 2 1 5FEA4D2C
 P 4350 6100
+AR Path="/600457E1/5FEA4D2C" Ref="RM_2.2K?"  Part="3" 
+AR Path="/618D2964/5FEA4D2C" Ref="RM_2.2K1"  Part="2" 
 F 0 "RM_2.2K1" H 4350 6350 60  0000 C CNN
 F 1 "RA_2.2K_(4x0603)_4B8_Smashed" H 4358 6140 60  0001 C CNN
 F 2 "Open_Automation:R_0603_MATRIX_4" H 4400 6000 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D03WGJ0222T5E_C12001.pdf" H 4400 6000 60  0001 C CNN
 F 4 "4D03WGJ0222T5E" H 4350 6100 50  0001 C CNN "Part Number"
 F 5 "C12001" H 4350 6100 50  0001 C CNN "LCSC"
-	3    4350 6100
+	2    4350 6100
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K1
-U 4 1 5FEA598A
+L Open_Automation:RA_2.2K_(4x0603)_4B8_Smashed RM_2.2K?
+U 3 1 5FEA598A
 P 4350 6200
+AR Path="/600457E1/5FEA598A" Ref="RM_2.2K?"  Part="4" 
+AR Path="/618D2964/5FEA598A" Ref="RM_2.2K1"  Part="3" 
 F 0 "RM_2.2K1" H 4350 6250 60  0000 C CNN
 F 1 "RA_2.2K_(4x0603)_4B8_Smashed" H 4358 6240 60  0001 C CNN
 F 2 "Open_Automation:R_0603_MATRIX_4" H 4400 6100 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D03WGJ0222T5E_C12001.pdf" H 4400 6100 60  0001 C CNN
 F 4 "4D03WGJ0222T5E" H 4350 6200 50  0001 C CNN "Part Number"
 F 5 "C12001" H 4350 6200 50  0001 C CNN "LCSC"
-	4    4350 6200
+	3    4350 6200
 	1    0    0    -1  
 $EndComp
 $Comp
-L Interface_Ethernet:LAN8720A U12
+L Interface_Ethernet:LAN8720A U?
 U 1 1 5FE9DCA3
 P 9450 3800
-F 0 "U12" H 10000 2750 50  0000 C CNN
+AR Path="/600457E1/5FE9DCA3" Ref="U?"  Part="1" 
+AR Path="/618D2964/5FE9DCA3" Ref="U15"  Part="1" 
+F 0 "U15" H 10000 2750 50  0000 C CNN
 F 1 "LAN8720A" H 8950 2750 50  0000 C CNN
 F 2 "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm" H 9500 2750 50  0001 L CNN
 F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/8720a.pdf" H 9250 2850 50  0001 C CNN
@@ -931,8 +879,9 @@ P 9450 4950
 AR Path="/5ABD187E/5FEEE8E0" Ref="#PWR?"  Part="1" 
 AR Path="/5FEEE8E0" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/5FEEE8E0" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/5FEEE8E0" Ref="#PWR095"  Part="1" 
-F 0 "#PWR095" H 9450 4700 50  0001 C CNN
+AR Path="/600457E1/5FEEE8E0" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/5FEEE8E0" Ref="#PWR0116"  Part="1" 
+F 0 "#PWR0116" H 9450 4700 50  0001 C CNN
 F 1 "GND" H 9450 4800 50  0000 C CNN
 F 2 "" H 9450 4950 50  0001 C CNN
 F 3 "" H 9450 4950 50  0001 C CNN
@@ -1044,8 +993,9 @@ P 6050 6300
 AR Path="/5ABD187E/6022F6EC" Ref="#PWR?"  Part="1" 
 AR Path="/6022F6EC" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/6022F6EC" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/6022F6EC" Ref="#PWR096"  Part="1" 
-F 0 "#PWR096" H 6050 6050 50  0001 C CNN
+AR Path="/600457E1/6022F6EC" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/6022F6EC" Ref="#PWR0115"  Part="1" 
+F 0 "#PWR0115" H 6050 6050 50  0001 C CNN
 F 1 "GND" H 6050 6150 50  0000 C CNN
 F 2 "" H 6050 6300 50  0001 C CNN
 F 3 "" H 6050 6300 50  0001 C CNN
@@ -1068,8 +1018,9 @@ U 1 1 602D8C15
 P 4600 5550
 AR Path="/60035F16/602D8C15" Ref="#PWR?"  Part="1" 
 AR Path="/60042654/602D8C15" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/602D8C15" Ref="#PWR094"  Part="1" 
-F 0 "#PWR094" H 4600 5300 50  0001 C CNN
+AR Path="/600457E1/602D8C15" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/602D8C15" Ref="#PWR0110"  Part="1" 
+F 0 "#PWR0110" H 4600 5300 50  0001 C CNN
 F 1 "GND" V 4600 5350 50  0000 C CNN
 F 2 "" H 4600 5550 60  0000 C CNN
 F 3 "" H 4600 5550 60  0000 C CNN
@@ -1102,8 +1053,9 @@ P 5500 6000
 AR Path="/5ABD187E/5FF8A7A6" Ref="#PWR?"  Part="1" 
 AR Path="/5FF8A7A6" Ref="#PWR?"  Part="1" 
 AR Path="/5A7BADB8/5FF8A7A6" Ref="#PWR?"  Part="1" 
-AR Path="/600457E1/5FF8A7A6" Ref="#PWR0103"  Part="1" 
-F 0 "#PWR0103" H 5500 5750 50  0001 C CNN
+AR Path="/600457E1/5FF8A7A6" Ref="#PWR?"  Part="1" 
+AR Path="/618D2964/5FF8A7A6" Ref="#PWR0112"  Part="1" 
+F 0 "#PWR0112" H 5500 5750 50  0001 C CNN
 F 1 "GND" H 5500 5850 50  0000 C CNN
 F 2 "" H 5500 6000 50  0001 C CNN
 F 3 "" H 5500 6000 50  0001 C CNN
@@ -1123,26 +1075,64 @@ Wire Wire Line
 Wire Wire Line
 	7000 5600 7000 5700
 Connection ~ 6950 5600
-$Comp
-L power:Earth #PWR0105
-U 1 1 6021019E
-P 2350 4400
-F 0 "#PWR0105" H 2350 4150 50  0001 C CNN
-F 1 "Earth" H 2350 4250 50  0001 C CNN
-F 2 "" H 2350 4400 50  0001 C CNN
-F 3 "~" H 2350 4400 50  0001 C CNN
-	1    2350 4400
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:Earth #PWR0106
-U 1 1 60218C8C
-P 850 3300
-F 0 "#PWR0106" H 850 3050 50  0001 C CNN
-F 1 "Earth" H 850 3150 50  0001 C CNN
-F 2 "" H 850 3300 50  0001 C CNN
-F 3 "~" H 850 3300 50  0001 C CNN
-	1    850  3300
-	1    0    0    -1  
-$EndComp
+Text Label 1750 3050 0    50   ~ 0
+TD+
+Text Label 1750 3150 0    50   ~ 0
+CT
+Text Label 1750 3250 0    50   ~ 0
+TD-
+Text Label 1750 3400 0    50   ~ 0
+RD+
+Text Label 1750 3500 0    50   ~ 0
+CT
+Text Label 1750 3600 0    50   ~ 0
+RD-
+Text Label 1750 2900 0    50   ~ 0
+LL+
+Text Label 1750 2800 0    50   ~ 0
+LL-
+Text Label 1750 2700 0    50   ~ 0
+RL+
+Text Label 1750 2600 0    50   ~ 0
+RL-
+Text HLabel 1700 2600 0    60   Input ~ 0
+RL-
+Wire Wire Line
+	1750 2600 1700 2600
+Text HLabel 1700 2700 0    60   Input ~ 0
+RL+
+Wire Wire Line
+	1750 2700 1700 2700
+Text HLabel 1700 2800 0    60   Input ~ 0
+LL-
+Wire Wire Line
+	1750 2800 1700 2800
+Text HLabel 1700 2900 0    60   Input ~ 0
+LL+
+Wire Wire Line
+	1700 2900 1750 2900
+Text HLabel 1700 3050 0    60   Input ~ 0
+TD+
+Wire Wire Line
+	1750 3050 1700 3050
+Text HLabel 1700 3150 0    60   Input ~ 0
+MDCT1
+Wire Wire Line
+	1750 3150 1700 3150
+Text HLabel 1700 3250 0    60   Input ~ 0
+TD-
+Wire Wire Line
+	1750 3250 1700 3250
+Text HLabel 1700 3400 0    60   Input ~ 0
+RD+
+Wire Wire Line
+	1750 3400 1700 3400
+Text HLabel 1700 3500 0    60   Input ~ 0
+MDCT2
+Wire Wire Line
+	1750 3500 1700 3500
+Text HLabel 1700 3600 0    60   Input ~ 0
+RD-
+Wire Wire Line
+	1750 3600 1700 3600
 $EndSCHEMATC
