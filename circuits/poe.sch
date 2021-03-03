@@ -45,18 +45,6 @@ F 5 "C202179" H 5500 3750 50  0001 C CNN "LCSC"
 	-1   0    0    1   
 $EndComp
 $Comp
-L Open_Automation:TPS23754-TRANSFORMER TR1
-U 1 1 6042E6B6
-P 9200 3250
-F 0 "TR1" H 9200 3775 50  0000 C CNN
-F 1 "TPS23754-TRANSFORMER" H 9200 3684 50  0000 C CNN
-F 2 "Open_Automation:TPS23754" H 9200 3250 50  0001 C CNN
-F 3 "https://www.coilcraft.com/getmedia/82697be8-7a7c-4b54-a33e-3e538a882584/ja4372.pdf" H 9200 3250 50  0001 C CNN
-F 4 "JA4387-AL" H 9200 2550 50  0001 C CNN "Part Number"
-	1    9200 3250
-	1    0    0    -1  
-$EndComp
-$Comp
 L Open_Automation:C_100nF_1206 C12
 U 1 1 60438F96
 P 5750 1450
@@ -83,8 +71,6 @@ Text Label 3900 3400 2    50   ~ 0
 APD
 Text Label 3900 3500 2    50   ~ 0
 BLNK
-Text Label 3900 3800 2    50   ~ 0
-EPAD
 Text Label 3900 3100 2    50   ~ 0
 PPD
 Text Label 3900 3200 2    50   ~ 0
@@ -95,8 +81,6 @@ Text Label 3900 3000 2    50   ~ 0
 DEN
 Text Label 3900 3300 2    50   ~ 0
 DT
-Text Label 5550 3050 0    50   ~ 0
-ARTN
 Text Label 5550 3250 0    50   ~ 0
 VC
 Text Label 5550 3150 0    50   ~ 0
@@ -105,8 +89,6 @@ Text Label 5550 2850 0    50   ~ 0
 VSS
 Text Label 5550 3550 0    50   ~ 0
 CS
-Text Label 5550 3450 0    50   ~ 0
-COM
 Text Label 5550 3750 0    50   ~ 0
 CTL
 Text Label 5550 3650 0    50   ~ 0
@@ -129,8 +111,6 @@ Wire Wire Line
 	5550 3150 5500 3150
 Wire Wire Line
 	5500 3050 5550 3050
-Wire Wire Line
-	5550 2950 5500 2950
 Wire Wire Line
 	5550 2850 5500 2850
 Wire Wire Line
@@ -233,14 +213,14 @@ $EndComp
 $Comp
 L power:Earth #PWR089
 U 1 1 605ECE0C
-P 5550 2950
+P 5600 2950
 AR Path="/60124B38/605ECE0C" Ref="#PWR089"  Part="1" 
 AR Path="/603C306C/605ECE0C" Ref="#PWR?"  Part="1" 
-F 0 "#PWR089" H 5550 2700 50  0001 C CNN
-F 1 "Earth" H 5550 2800 50  0001 C CNN
-F 2 "" H 5550 2950 50  0001 C CNN
-F 3 "~" H 5550 2950 50  0001 C CNN
-	1    5550 2950
+F 0 "#PWR089" H 5600 2700 50  0001 C CNN
+F 1 "Earth" H 5600 2800 50  0001 C CNN
+F 2 "" H 5600 2950 50  0001 C CNN
+F 3 "~" H 5600 2950 50  0001 C CNN
+	1    5600 2950
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -298,8 +278,6 @@ Text Label 2700 2850 2    50   ~ 0
 DEN
 Wire Wire Line
 	2750 2850 2700 2850
-Text Label 3100 2850 0    50   ~ 0
-B_POS
 Wire Wire Line
 	3100 2850 3050 2850
 $Comp
@@ -371,17 +349,6 @@ APD
 Wire Wire Line
 	1300 3400 1100 3400
 Connection ~ 1100 3400
-$Comp
-L Connector_Generic:Conn_02x02_Counter_Clockwise J20
-U 1 1 6073A3C4
-P 1150 2450
-F 0 "J20" H 1200 2667 50  0000 C CNN
-F 1 "Conn_02x02_Counter_Clockwise" H 1200 2576 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical_SMD" H 1150 2450 50  0001 C CNN
-F 3 "~" H 1150 2450 50  0001 C CNN
-	1    1150 2450
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:Earth #PWR085
 U 1 1 6074575A
@@ -1308,5 +1275,52 @@ F 4 "CL10B473KB8NNNC" H 7275 5600 60  0001 C CNN "Part Number"
 F 5 "C1622" H 7150 5400 50  0001 C CNN "LCSC"
 	1    7150 5400
 	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_02x02_Odd_Even J19
+U 1 1 6242130D
+P 1150 2450
+F 0 "J19" H 1200 2667 50  0000 C CNN
+F 1 "Conn_02x02_Odd_Even" H 1200 2576 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical_SMD" H 1150 2450 50  0001 C CNN
+F 3 "~" H 1150 2450 50  0001 C CNN
+	1    1150 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:TPS23754-TRANSFORMER TR1
+U 1 1 6042E6B6
+P 9200 3250
+F 0 "TR1" H 9200 3775 50  0000 C CNN
+F 1 "TPS23754-TRANSFORMER" H 9200 3684 50  0000 C CNN
+F 2 "Open_Automation:TPS23754" H 9200 3250 50  0001 C CNN
+F 3 "https://www.coilcraft.com/getmedia/82697be8-7a7c-4b54-a33e-3e538a882584/ja4372.pdf" H 9200 3250 50  0001 C CNN
+F 4 "JA4387-AL" H 9200 2550 50  0001 C CNN "Part Number"
+	1    9200 3250
+	1    0    0    -1  
+$EndComp
+Text Label 3100 2850 0    50   ~ 0
+VDD
+Text Label 3900 3800 2    50   ~ 0
+VSS
+Wire Wire Line
+	5500 2950 5550 2950
+Wire Wire Line
+	5550 3050 5550 2950
+Connection ~ 5550 2950
+Wire Wire Line
+	5550 2950 5600 2950
+$Comp
+L power:Earth #PWR?
+U 1 1 6275A8E7
+P 5550 3450
+AR Path="/60124B38/6275A8E7" Ref="#PWR?"  Part="1" 
+AR Path="/603C306C/6275A8E7" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 5550 3200 50  0001 C CNN
+F 1 "Earth" H 5550 3300 50  0001 C CNN
+F 2 "" H 5550 3450 50  0001 C CNN
+F 3 "~" H 5550 3450 50  0001 C CNN
+	1    5550 3450
+	0    -1   -1   0   
 $EndComp
 $EndSCHEMATC

@@ -620,27 +620,27 @@ F 5 "C8689" H 4850 3500 50  0001 C CNN "LCSC"
 	1    4850 3500
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	4050 4000 4350 4000
+Wire Wire Line
+	3350 4000 4050 4000
+Connection ~ 4050 4000
+Wire Wire Line
+	4050 3800 4350 3800
+Wire Wire Line
+	3350 3800 4050 3800
+Connection ~ 4050 3800
 $Comp
 L Open_Automation:Crystal_12Mhz Q5
-U 1 1 613C96CC
+U 1 1 6045824B
 P 4050 3900
-F 0 "Q5" V 4004 3982 50  0000 L CNN
-F 1 "Crystal_12Mhz" V 4095 3982 50  0000 L CNN
-F 2 "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm_HandSoldering" H 4050 4200 60  0001 C CNN
+F 0 "Q5" V 4050 3950 50  0000 L CNN
+F 1 "Crystal_12Mhz" V 4200 3600 50  0000 L CNN
+F 2 "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm_HandSoldering" H 4050 3900 60  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Yangxing-Tech-X322512MSB4SI_C9002.pdf" H 4050 3900 60  0001 C CNN
-F 4 "X322512MSB4SI" H 4050 4100 50  0001 C CNN "Part Number"
-F 5 "C9002" H 4050 4300 50  0001 C CNN "LCSC"
+F 4 "X322512MSB4SI" H 4050 3900 50  0001 C CNN "Part Number"
+F 5 "C9002" H 4050 3900 50  0001 C CNN "LCSC"
 	1    4050 3900
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	3350 3800 4050 3800
-Wire Wire Line
-	3350 4000 4050 4000
-Connection ~ 4050 3800
-Wire Wire Line
-	4050 3800 4350 3800
-Connection ~ 4050 4000
-Wire Wire Line
-	4050 4000 4350 4000
 $EndSCHEMATC

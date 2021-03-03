@@ -269,17 +269,6 @@ F 4 "AI-3035-TWT-3V-R" H 15450 1800 50  0001 C CNN "Part Number"
 $EndComp
 Text Label 13700 2750 0    50   ~ 0
 REG_POWER
-$Comp
-L Open_Automation:housing-mounts U2
-U 1 1 605B420C
-P 14600 1550
-F 0 "U2" H 14878 1603 60  0000 L CNN
-F 1 "housing-mounts" H 14878 1497 60  0000 L CNN
-F 2 "Open_Automation:housing-mounts" H 14600 1600 60  0001 C CNN
-F 3 "" H 14600 1600 60  0001 C CNN
-	1    14600 1550
-	1    0    0    -1  
-$EndComp
 Text Label 13700 3950 0    50   ~ 0
 AUX_OUT1
 Text Label 12650 2750 2    50   ~ 0
@@ -610,9 +599,10 @@ U 60124B38
 F0 "PoE" 50
 F1 "poe.sch" 50
 F2 "12V" I L 14000 5200 50 
-F3 "SP1" I L 14000 5350 50 
-F4 "SP2" I L 14000 5450 50 
-F5 "CT" I L 14000 5550 50 
+F3 "VDC1+" I R 14750 5200 50 
+F4 "VDC1-" I R 14750 5300 50 
+F5 "VDC2+" I R 14750 5400 50 
+F6 "VDC2-" I R 14750 5500 50 
 $EndSheet
 Wire Wire Line
 	12550 8500 12600 8500
@@ -622,14 +612,6 @@ Wire Wire Line
 	12550 8400 12600 8400
 Wire Wire Line
 	12550 8600 12600 8600
-Text Label 13950 5350 2    50   ~ 0
-SP1
-Wire Wire Line
-	13950 5350 14000 5350
-Text Label 13950 5450 2    50   ~ 0
-SP2
-Wire Wire Line
-	13950 5450 14000 5450
 Text Label 13950 5200 2    50   ~ 0
 POWER
 Wire Wire Line
@@ -702,10 +684,6 @@ Text Label 7750 7950 2    50   ~ 0
 3V3
 Wire Wire Line
 	7750 7950 7800 7950
-Text Label 13950 5550 2    50   ~ 0
-CT
-Wire Wire Line
-	13950 5550 14000 5550
 $Comp
 L Open_Automation:R_10K_0402 R2
 U 1 1 616523AB
@@ -1538,17 +1516,6 @@ Wire Wire Line
 	4250 2550 4200 2550
 Wire Wire Line
 	4800 2350 4750 2350
-$Comp
-L Connector_Generic:Conn_02x09_Odd_Even J10
-U 1 1 600AFE56
-P 4450 2550
-F 0 "J10" H 4500 3167 50  0000 C CNN
-F 1 "Conn_02x09_Odd_Even" H 4500 3076 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x09_P2.54mm_Vertical_SMD" H 4450 2550 50  0001 C CNN
-F 3 "~" H 4450 2550 50  0001 C CNN
-	1    4450 2550
-	1    0    0    -1  
-$EndComp
 Text Label 4200 2150 2    50   ~ 0
 REG_POWER
 Wire Wire Line
@@ -1556,14 +1523,107 @@ Wire Wire Line
 Wire Wire Line
 	4800 2650 4750 2650
 $Comp
-L Connector_Generic:Conn_02x06_Odd_Even J?
+L Connector_Generic:Conn_02x06_Odd_Even J10
 U 1 1 621F037F
-P 5800 3300
-F 0 "J?" H 5850 3717 50  0000 C CNN
-F 1 "Conn_02x06_Odd_Even" H 5850 3626 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD" H 5800 3300 50  0001 C CNN
-F 3 "~" H 5800 3300 50  0001 C CNN
-	1    5800 3300
+P 4450 2350
+F 0 "J10" H 4500 2767 50  0000 C CNN
+F 1 "Conn_02x06_Odd_Even" H 4500 2676 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD" H 4450 2350 50  0001 C CNN
+F 3 "~" H 4450 2350 50  0001 C CNN
+	1    4450 2350
 	1    0    0    -1  
 $EndComp
+Text Label 14800 5300 0    50   ~ 0
+VDC1-
+Text Label 14800 5200 0    50   ~ 0
+VDC1+
+Text Label 14800 5400 0    50   ~ 0
+VDC2+
+Text Label 14800 5500 0    50   ~ 0
+VDC2-
+Wire Wire Line
+	14750 5200 14800 5200
+Wire Wire Line
+	14800 5300 14750 5300
+Wire Wire Line
+	14800 5400 14750 5400
+Wire Wire Line
+	14750 5500 14800 5500
+$Comp
+L Connector:Conn_01x01_Female J20
+U 1 1 62533331
+P 1350 800
+F 0 "J20" H 1378 826 50  0000 L CNN
+F 1 "Conn_01x01_Female" H 1378 735 50  0000 L CNN
+F 2 "Open_Automation:Mount_Hole" H 1378 689 50  0001 L CNN
+F 3 "~" H 1350 800 50  0001 C CNN
+	1    1350 800 
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x01_Female J21
+U 1 1 6253A5DC
+P 1350 1000
+F 0 "J21" H 1378 1026 50  0000 L CNN
+F 1 "Conn_01x01_Female" H 1378 935 50  0000 L CNN
+F 2 "Open_Automation:Mount_Hole" H 1378 889 50  0001 L CNN
+F 3 "~" H 1350 1000 50  0001 C CNN
+	1    1350 1000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x01_Female J22
+U 1 1 62555B84
+P 1350 1200
+F 0 "J22" H 1378 1226 50  0000 L CNN
+F 1 "Conn_01x01_Female" H 1378 1135 50  0000 L CNN
+F 2 "Open_Automation:Mount_Hole" H 1378 1089 50  0001 L CNN
+F 3 "~" H 1350 1200 50  0001 C CNN
+	1    1350 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x01_Female J23
+U 1 1 62555BDC
+P 1350 1400
+F 0 "J23" H 1378 1426 50  0000 L CNN
+F 1 "Conn_01x01_Female" H 1378 1335 50  0000 L CNN
+F 2 "Open_Automation:Mount_Hole" H 1378 1289 50  0001 L CNN
+F 3 "~" H 1350 1400 50  0001 C CNN
+	1    1350 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 625E6B73
+P 1100 1450
+AR Path="/5A7BADB8/625E6B73" Ref="#PWR?"  Part="1" 
+AR Path="/6045445B/625E6B73" Ref="#PWR?"  Part="1" 
+AR Path="/625E6B73" Ref="#PWR0105"  Part="1" 
+F 0 "#PWR0105" H 1100 1200 50  0001 C CNN
+F 1 "GND" H 1150 1300 50  0000 R CNN
+F 2 "" H 1100 1450 50  0001 C CNN
+F 3 "" H 1100 1450 50  0001 C CNN
+	1    1100 1450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1100 1450 1100 1400
+Wire Wire Line
+	1100 1400 1150 1400
+Wire Wire Line
+	1150 800  1100 800 
+Wire Wire Line
+	1100 800  1100 1000
+Connection ~ 1100 1400
+Wire Wire Line
+	1150 1200 1100 1200
+Connection ~ 1100 1200
+Wire Wire Line
+	1100 1200 1100 1400
+Wire Wire Line
+	1150 1000 1100 1000
+Connection ~ 1100 1000
+Wire Wire Line
+	1100 1000 1100 1200
 $EndSCHEMATC
