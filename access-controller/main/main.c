@@ -41,9 +41,9 @@ void app_main(void)
 	exit_main();
 	fob_main();
 	server_main();
-	// ap_main();
+	ap_main();
 
-  ESP_ERROR_CHECK(example_connect());
+  // ESP_ERROR_CHECK(example_connect());
 
 	// turn_buzzer_on(false);
 	int cnt = 0;

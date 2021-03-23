@@ -420,36 +420,6 @@ F 5 " C21190" H 2300 -1400 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:R_20K R?
-U 1 1 5FFACB63
-P 8550 4350
-AR Path="/5A7BADB8/5FFACB63" Ref="R?"  Part="1" 
-AR Path="/6045445B/5FFACB63" Ref="R38"  Part="1" 
-F 0 "R38" H 8600 4300 50  0000 L CNN
-F 1 "R_20K" H 8550 4200 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 8480 4350 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF2002T5E_C4184.pdf" V 8630 4350 50  0001 C CNN
-F 4 "0603WAF2002T5E" V 8730 4450 60  0001 C CNN "Part Number"
-F 5 "C4184" H -1250 -1150 50  0001 C CNN "LCSC"
-	1    8550 4350
-	1    0    0    -1  
-$EndComp
-$Comp
-L Open_Automation:R_20K R?
-U 1 1 5FFACB61
-P 4600 4150
-AR Path="/5A7BADB8/5FFACB61" Ref="R?"  Part="1" 
-AR Path="/6045445B/5FFACB61" Ref="R32"  Part="1" 
-F 0 "R32" V 4600 4050 50  0000 L CNN
-F 1 "R_20K" V 4700 4050 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 4530 4150 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF2002T5E_C4184.pdf" V 4680 4150 50  0001 C CNN
-F 4 "0603WAF2002T5E" V 4780 4250 60  0001 C CNN "Part Number"
-F 5 "C4184" H -5100 2200 50  0001 C CNN "LCSC"
-	1    4600 4150
-	1    0    0    -1  
-$EndComp
-$Comp
 L Open_Automation:C_10uF C?
 U 1 1 5FFACB57
 P 7700 1850
@@ -524,21 +494,6 @@ F 5 "C116748" H -1250 -1150 50  0001 C CNN "LCSC"
 	1    8100 4350
 	1    0    0    -1  
 $EndComp
-$Comp
-L Open_Automation:R_2.2K R?
-U 1 1 5CC27388
-P 8550 4750
-AR Path="/5A7BADB8/5CC27388" Ref="R?"  Part="1" 
-AR Path="/6045445B/5CC27388" Ref="R39"  Part="1" 
-F 0 "R39" H 8600 4700 50  0000 L CNN
-F 1 "R_2.2K" H 8550 4600 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 8480 4750 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF2201T5E_C4190.pdf" V 8630 4750 50  0001 C CNN
-F 4 "0603WAF2201T5E" V 8730 4850 60  0001 C CNN "Part Number"
-F 5 "C4190" H -1250 -1150 50  0001 C CNN "LCSC"
-	1    8550 4750
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6950 4150 6900 4150
 Wire Wire Line
@@ -552,19 +507,6 @@ Wire Wire Line
 	1650 1300 1700 1300
 Text HLabel 1650 1300 0    60   Input ~ 0
 REG_POWER
-$Comp
-L Open_Automation:R_10K R36
-U 1 1 60405BCA
-P 5350 1950
-F 0 "R36" H 5420 1996 50  0000 L CNN
-F 1 "R_10K" H 5420 1905 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 5280 1950 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" V 5430 1950 50  0001 C CNN
-F 4 "0603WAF1002T5E" V 5530 2050 60  0001 C CNN "Part Number"
-F 5 "C25804" V 5600 1950 50  0001 C CNN "LCSC"
-	1    5350 1950
-	1    0    0    -1  
-$EndComp
 $Comp
 L Open_Automation:R_70K R35
 U 1 1 6040A6C9
@@ -698,6 +640,57 @@ F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF6801T5E_C23212.pdf" 
 F 4 "0603WAF6801T5E" V 4780 4650 60  0001 C CNN "Part Number"
 F 5 "C23212" V 4450 4550 50  0001 C CNN "LCSC"
 	1    4600 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_2.2K R?
+U 1 1 60456F03
+P 8550 4750
+F 0 "R?" V 8550 4700 50  0000 L CNN
+F 1 "R_2.2K" V 8450 4600 50  0000 L CNN
+F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 8480 4750 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF2201TCE_C25879.pdf" V 8630 4750 50  0001 C CNN
+F 4 "C4190" V 8400 4750 50  0001 C CNN "LCSC"
+	1    8550 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_20K R?
+U 1 1 60459E2E
+P 8550 4350
+F 0 "R?" H 8620 4396 50  0000 L CNN
+F 1 "R_20K" H 8620 4305 50  0000 L CNN
+F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 8480 4350 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF2002TCE_C25765.pdf" V 8630 4350 50  0001 C CNN
+F 4 "0402WGF2002TCE" V 8730 4450 60  0001 C CNN "Part Number"
+F 5 "C25765" V 8400 4350 50  0001 C CNN "LCSC"
+	1    8550 4350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_20K R?
+U 1 1 6045B596
+P 4600 4150
+F 0 "R?" V 4600 4100 50  0000 L CNN
+F 1 "R_20K" V 4700 4050 50  0000 L CNN
+F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 4530 4150 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF2002TCE_C25765.pdf" V 4680 4150 50  0001 C CNN
+F 4 "0402WGF2002TCE" V 4780 4250 60  0001 C CNN "Part Number"
+F 5 "C25765" V 4450 4150 50  0001 C CNN "LCSC"
+	1    4600 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Open_Automation:R_10K_0402 R?
+U 1 1 60460A51
+P 5350 1950
+F 0 "R?" V 5350 1900 50  0000 L CNN
+F 1 "R_10K_0402" V 5450 1700 50  0000 L CNN
+F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5280 1950 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf" V 5430 1950 50  0001 C CNN
+F 4 "0402WGF1002TCE" V 5530 2050 60  0001 C CNN "Part Number"
+F 5 "C25744" V 5600 1950 50  0001 C CNN "LCSC"
+	1    5350 1950
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
