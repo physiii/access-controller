@@ -10,16 +10,17 @@
 
 #define MCP_INTA_GPIO 	34
 #define MCP_INTB_GPIO 	35
+
 #define BUZZER_IO 			14
+
+#define WG0_DATA0_IO		16
+#define WG0_DATA1_IO		4
+#define WG1_DATA0_IO		32
+#define WG1_DATA1_IO		5
 
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<BUZZER_IO))
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<MCP_INTA_GPIO) | (1ULL<<MCP_INTB_GPIO))
 #define ESP_INTR_FLAG_DEFAULT 0
-
-static void IRAM_ATTR intr_handler(void *arg)
-{
-    printf("Interrupt!\n");
-}
 
 void gpio_main(void)
 {

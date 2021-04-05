@@ -61,7 +61,7 @@ int storeExitSettings()
 	for (uint8_t i=0; i < NUM_OF_EXITS; i++) {
 		sprintf(exits[i].settings,
 			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": \"%s\", \"alert\": \"%s\", \"delay\": %d}}",
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"delay\": %d}}",
 			exits[i].type,
 			i+1,
 			(exits[i].enable) ? "true" : "false",
@@ -70,34 +70,40 @@ int storeExitSettings()
 
 		sprintf(exits[i].key, "%s%d", exits[i].type, i);
 		storeSetting(exits[i].key, cJSON_Parse(exits[i].settings));
-		printf("storeExitSettings\t%s\n", exits[i].settings);
+		// printf("storeExitSettings\t%s\n", exits[i].settings);
 	}
   return 0;
 }
+
 
 int restoreExitSettings()
 {
 	for (uint8_t i=0; i < NUM_OF_EXITS; i++) {
-	  vTaskDelay(100 / portTICK_PERIOD_MS);
 		sprintf(exits[i].key, "%s%d", exits[i].type, i);
 		restoreSetting(exits[i].key);
+    vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
 	}
 	return 0;
 }
 
-int load_exit_state_from_flash()
+int sendExitState()
 {
-  char *state_str = get_char("exit");
-  if (strcmp(state_str,"")==0) {
-    printf("Lock state not found in flash.\n");
-    return 1;
-  }
+	for (uint8_t i=0; i < NUM_OF_EXITS; i++) {
+		sprintf(exits[i].settings,
+			"{\"eventType\":\"%s\", "
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"delay\": %d}}",
+			exits[i].type,
+			i+1,
+			(exits[i].enable) ? "true" : "false",
+			(exits[i].alert) ? "true" : "false",
+			exits[i].delay);
 
-  // Need JSON validation
-  cJSON *exit_payload = cJSON_Parse(state_str);
-  printf("Loaded exit state from flash. %s\n", state_str);
+		addClientMessageToQueue(exits[i].settings);
+		// printf("sendExitState: %s\n", exits[i].settings);
+	}
   return 0;
 }
+
 
 int handle_exit_property (char * prop)
 {
@@ -127,7 +133,7 @@ void setArmDelay (int ch, int val)
 		if (exits[i].channel == ch) exits[i].delay = val;
 }
 
-void check_exits (struct exitButton *ext)
+void check_exit (struct exitButton *ext)
 {
 	if (!ext->enable) return;
 
@@ -145,41 +151,40 @@ void handle_exit_message(cJSON * payload)
 {
 	int ch=0;
 	bool tmp;
+	char state[250];
 
 	if (payload == NULL) return;
 
+	if (cJSON_GetObjectItem(payload,"getState")) {
+		sendExitState();
+	}
+
 	if (cJSON_GetObjectItem(payload,"channel")) {
 		 ch = cJSON_GetObjectItem(payload,"channel")->valueint;
-	} else {
-		return;
-	}
 
-	if (cJSON_GetObjectItem(payload,"alert")) {
-		tmp = cJSON_IsTrue(cJSON_GetObjectItem(payload,"alert"));
-		alertOnExit(ch, tmp);
-	}
+		 if (cJSON_GetObjectItem(payload,"alert")) {
+	 		tmp = cJSON_IsTrue(cJSON_GetObjectItem(payload,"alert"));
+	 		alertOnExit(ch, tmp);
+	 	}
 
-	if (cJSON_GetObjectItem(payload,"enable")) {
-		tmp = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
-		enableExit(ch, tmp);
-	}
+	 	if (cJSON_GetObjectItem(payload,"enable")) {
+	 		tmp = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
+	 		enableExit(ch, tmp);
+	 	}
 
-	if (cJSON_GetObjectItem(payload,"delay")) {
-		setArmDelay(ch, cJSON_GetObjectItem(payload,"delay")->valueint);
+	 	if (cJSON_GetObjectItem(payload,"delay")) {
+	 		setArmDelay(ch, cJSON_GetObjectItem(payload,"delay")->valueint);
+	 	}
+		storeExitSettings();
 	}
-
-	// storeExitSettings();
-	return;
 }
 
 static void
 exit_service (void *pvParameter)
 {
-  // load_lock_state_from_flash();
-
   while (1) {
 		for (int i=0; i < NUM_OF_EXITS; i++)
-			check_exits(&exits[i]);
+			check_exit(&exits[i]);
 
 		handle_exit_message(checkServiceMessage("exit"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
@@ -193,22 +198,22 @@ void exit_main()
 	exits[0].pin = EXIT_BUTTON_IO_1;
 	exits[0].delay = 4;
 	exits[0].channel = 1;
-	exits[0].alert = true;
-	exits[0].enable = true;
+	exits[0].alert = false;
+	exits[0].enable = false;
 	strcpy(exits[0].type, "exit");
 
 	exits[1].pin = EXIT_BUTTON_IO_2;
 	exits[1].delay = 4;
 	exits[1].channel = 2;
-	exits[1].enable = true;
-	exits[1].alert = true;
+	exits[1].enable = false;
+	exits[1].alert = false;
 	strcpy(exits[1].type, "exit");
+
+	restoreExitSettings();
 
 	set_mcp_io_dir(exits[0].pin, MCP_INPUT);
 	set_mcp_io_dir(exits[1].pin, MCP_INPUT);
 
   xTaskCreate(exit_timer, "exit_timer", 2048, NULL, 10, NULL);
-	xTaskCreate(exit_service, "exit_service", 2048, NULL, 10, NULL);
-
-	// restoreExitSettings();
+	xTaskCreate(exit_service, "exit_service", 5000, NULL, 10, NULL);
 }

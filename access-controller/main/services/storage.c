@@ -64,12 +64,12 @@ void store_char(char * key, char * value) {
 
     err = nvs_set_str(my_handle, key, value);
     if (err == ESP_OK) {
-	     printf("%s nvs_set_str for %s\n", tag, key);
+	     // printf("%s nvs_set_str for %s\n", tag, key);
 	  } else printf("%s write to flash failed\n", tag);
 
     err = nvs_commit(my_handle);
     if (err == ESP_OK) {
-	     printf("%s nvs_commit %s:%s\n", tag, key, value);
+	     // printf("%s nvs_commit %s:%s\n", tag, key, value);
 	  } else printf("%s commiting to flash failed!\n", tag);
 
     nvs_close(my_handle);

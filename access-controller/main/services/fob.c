@@ -19,6 +19,9 @@ struct fob
 	int delay;
 	int channel;
 	cJSON *payload;
+	char settings[1000];
+	char key[50];
+	char type[40];
 };
 
 struct fob fobs[NUM_OF_FOBS];
@@ -36,7 +39,7 @@ void start_fob_timer (struct fob *fb, bool val)
 void check_fob_timer (struct fob *fb)
 {
   if (fb->count >= fb->delay && !fb->expired) {
-		printf("Re-arming lock from button %d service.\n", fb->channel);
+		printf("Re-arming lock from fob %d service.\n", fb->channel);
 		arm_lock(fb->channel, true, fb->alert);
 		fb->expired = true;
   } else fb->count++;
@@ -53,27 +56,6 @@ fob_timer (void *pvParameter)
   }
 }
 
-int store_fob_state(cJSON * state)
-{
-  printf("Storing fob state: %s\n",cJSON_PrintUnformatted(state));
-  store_char("fob", cJSON_PrintUnformatted(state));
-  return 0;
-}
-
-int load_fob_state_from_flash()
-{
-  char *state_str = get_char("fob");
-  if (strcmp(state_str,"")==0) {
-    printf("Lock state not found in flash.\n");
-    return 1;
-  }
-
-  // Need JSON validation
-  cJSON *fob_payload = cJSON_Parse(state_str);
-  printf("Loaded fob state from flash. %s\n", state_str);
-  return 0;
-}
-
 int handle_fob_property (char * prop)
 {
   printf("fob property: %s\n",prop);
@@ -88,7 +70,7 @@ void check_fobs (struct fob *fb)
 {
 	if (!fb->enable) return;
 
-	fb->isPressed = !get_mcp_io(fb->pin);
+	fb->isPressed = get_mcp_io(fb->pin);
 
 	if (fb->isPressed != fb->prevPress) {
 		arm_lock(fb->channel, fb->isPressed, fb->alert);
@@ -104,33 +86,82 @@ void alertOnFob (int ch, bool val)
 		if (fobs[i].channel == ch) fobs[i].alert = val;
 }
 
+
+int storeFobSettings()
+{
+
+	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+		sprintf(fobs[i].settings,
+			"{\"eventType\":\"%s\", "
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s}}",
+			fobs[i].type,
+			i+1,
+			(fobs[i].enable) ? "true" : "false",
+			(fobs[i].alert) ? "true" : "false");
+
+		sprintf(fobs[i].key, "%s%d", fobs[i].type, i);
+		storeSetting(fobs[i].key, cJSON_Parse(fobs[i].settings));
+		// printf("storeFobSettings\t%s\n", fobs[i].settings);
+	}
+  return 0;
+}
+
+int restoreFobSettings()
+{
+	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+		sprintf(fobs[i].key, "%s%d", fobs[i].type, i);
+		restoreSetting(fobs[i].key);
+	}
+	return 0;
+}
+
+int sendFobState()
+{
+	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+		sprintf(fobs[i].settings,
+			"{\"eventType\":\"%s\", "
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s}}",
+			fobs[i].type,
+			i+1,
+			(fobs[i].enable) ? "true" : "false",
+			(fobs[i].alert) ? "true" : "false");
+		addClientMessageToQueue(fobs[i].settings);
+		// printf("sendFobSettings: %s\n", fobs[i].settings);
+	}
+  return 0;
+}
+
 void handle_fob_message(cJSON * payload)
 {
 	if (payload == NULL) return;
 
-	int ch=0;
+	int ch = 0;
+	bool val = false;
+
+	if (cJSON_GetObjectItem(payload,"getState")) {
+		sendFobState();
+	}
 
 	if (cJSON_GetObjectItem(payload,"channel")) {
-		 ch = cJSON_GetObjectItem(payload,"channel")->valueint;
-	} else {
-		return;
-	}
+		ch = cJSON_GetObjectItem(payload,"channel")->valueint;
 
-	if (cJSON_GetObjectItem(payload,"alert")) {
-		if (cJSON_IsTrue(cJSON_GetObjectItem(payload,"alert"))) {
-			alertOnFob(ch, true);
-		} else {
-			alertOnFob(ch, false);
+		if (cJSON_GetObjectItem(payload,"enable")) {
+			val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
+			fobs[ch - 1].enable = val;
 		}
-	}
 
-	return;
+		if (cJSON_GetObjectItem(payload,"alert")) {
+			val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"alert"));
+			fobs[ch - 1].alert = val;
+		}
+		storeFobSettings();
+	}
 }
 
 static void
 fob_service (void *pvParameter)
 {
-  // load_lock_state_from_flash();
+  // load_fob_state_from_flash();
 
   while (1) {
 		for (int i=0; i < NUM_OF_FOBS; i++)
@@ -148,18 +179,22 @@ void fob_main()
 	fobs[0].pin = FOB_IO_1;
 	fobs[0].delay = 4;
 	fobs[0].channel = 1;
-	fobs[0].enable = true;
-	fobs[0].alert = true;
+	fobs[0].enable = false;
+	fobs[0].alert = false;
+	strcpy(fobs[0].type, "fob");
 
 	fobs[1].pin = FOB_IO_2;
 	fobs[1].delay = 4;
 	fobs[1].channel = 2;
 	fobs[1].enable = false;
-	fobs[1].alert = true;
+	fobs[1].alert = false;
+	strcpy(fobs[1].type, "fob");
 
 	set_mcp_io_dir(fobs[0].pin, MCP_INPUT);
 	set_mcp_io_dir(fobs[1].pin, MCP_INPUT);
 
-  xTaskCreate(fob_timer, "fob_timer", 2048, NULL, 10, NULL);
+  // xTaskCreate(fob_timer, "fob_timer", 2048, NULL, 10, NULL);
 	xTaskCreate(fob_service, "fob_service", 2048, NULL, 10, NULL);
+
+	restoreFobSettings();
 }

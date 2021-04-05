@@ -34,6 +34,8 @@
 /* Scratch buffer size */
 #define SCRATCH_BUFSIZE  8192
 
+httpd_handle_t server = NULL;
+
 struct file_server_data {
     /* Base path of file storage */
     char base_path[ESP_VFS_PATH_MAX + 1];
@@ -428,7 +430,6 @@ esp_err_t start_file_server(const char *base_path)
     strlcpy(server_data->base_path, base_path,
             sizeof(server_data->base_path));
 
-    httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
     /* Use the URI wildcard matching function in order to

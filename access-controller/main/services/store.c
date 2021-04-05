@@ -24,8 +24,8 @@ int storeSetting(char *key, cJSON *payload)
 {
 	// snprintf(setting.str, "%s", cJSON_PrintUnformatted(payload));
   store_char(key, cJSON_PrintUnformatted(payload));
-
-	printf("storeSetting\t%s\n", cJSON_PrintUnformatted(payload));
+	// printf("storeSetting\t%s\n", cJSON_PrintUnformatted(payload));
+	vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   return 0;
 }
 
@@ -34,7 +34,10 @@ int restoreSetting (char *key) {
 	printf("restoreSetting\t%s\n", setting.str);
 	if (strcmp(setting.str, "")==0) return 1;
 
-	serviceMessage.message = cJSON_Parse(setting.str);
+	// serviceMessage.message = cJSON_Parse(setting.str);
+	cJSON *msg;
+	msg = cJSON_Parse(setting.str);
+	if (msg) addServiceMessageToQueue(msg);
 
 	return 0;
 }

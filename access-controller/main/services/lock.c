@@ -27,10 +27,15 @@ struct lock
   bool pulse;
 	bool expired;
 	bool enable;
+	bool enableContactAlert;
+	bool arm;
 	int delay;
 	int count;
 	bool alert;
 	cJSON *payload;
+	char settings[1000];
+	char key[50];
+	char type[40];
 };
 
 struct lock locks[NUM_OF_LOCKS];
@@ -49,6 +54,7 @@ start_lock_contact_timer(struct lock *lck, bool val)
 void check_lock_contact_timer (struct lock *lck)
 {
 	if (lck >= lck->delay
+		&& lck->enableContactAlert
 		&& !lck->isContact
 		&& lck->isLocked
 		&& lck->enable
@@ -84,31 +90,10 @@ void createLockServiceMessage(bool value)
   lock_service_message_ready = true;
 }
 
-int store_lock_state(cJSON * state)
-{
-  printf("Storing lock state: %s\n",cJSON_PrintUnformatted(state));
-  store_char("lock", cJSON_PrintUnformatted(state));
-  return 0;
-}
-
 void enableLock (int ch, bool val)
 {
 	for (int i=0; i < NUM_OF_LOCKS; i++)
 		if (locks[i].channel == ch) locks[i].enable = val;
-}
-
-int load_lock_state_from_flash()
-{
-  char *state_str = get_char("lock");
-  if (strcmp(state_str,"")==0) {
-    printf("Lock state not found in flash.\n");
-    return 1;
-  }
-
-  // Need JSON validation
-  cJSON *lock_payload = cJSON_Parse(state_str);
-  printf("Loaded lock state from flash. %s\n", state_str);
-  return 0;
 }
 
 void _arm_lock (struct lock *lck, bool val)
@@ -144,55 +129,111 @@ void lock_init()
 		locks[0].contactPin = LOCK_CONTACT_PIN_1;
 		locks[0].enable = true;
 		locks[0].alert = true;
+		locks[0].enableContactAlert = false;
+		strcpy(locks[0].type, "lock");
 
     locks[1].channel = 2;
     locks[1].controlPin = LOCK_IO_2;
     locks[1].isLocked = true;
 		locks[1].contactPin = LOCK_CONTACT_PIN_2;
-		locks[1].enable = false;
+		locks[1].enable = true;
 		locks[1].alert = true;
+		locks[1].enableContactAlert = false;
+		strcpy(locks[1].type, "lock");
 
 		for (int i=0; i < NUM_OF_LOCKS; i++) {
 			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
-			arm_lock(locks[i].channel, true, true);
+			// arm_lock(locks[i].channel, true, true);
 		}
+}
+
+int storeLockSettings()
+{
+
+	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+		sprintf(locks[i].settings,
+			"{\"eventType\":\"%s\", "
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"arm\": %s, \"enableContactAlert\": %s}}",
+			locks[i].type,
+			i+1,
+			(locks[i].enable) ? "true" : "false",
+			(locks[i].isLocked) ? "true" : "false",
+			(locks[i].enableContactAlert) ? "true" : "false");
+
+		sprintf(locks[i].key, "%s%d", locks[i].type, i);
+		storeSetting(locks[i].key, cJSON_Parse(locks[i].settings));
+		printf("storeLockSettings\t%s\n", locks[i].settings);
+	}
+  return 0;
+}
+
+int restoreLockSettings()
+{
+	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+		sprintf(locks[i].key, "%s%d", locks[i].type, i);
+		restoreSetting(locks[i].key);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+	return 0;
+}
+
+int sendLockState()
+{
+
+	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+		sprintf(locks[i].settings,
+			"{\"eventType\":\"%s\", "
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"arm\": %s, \"enableContactAlert\": %s}}",
+			locks[i].type,
+			i+1,
+			(locks[i].enable) ? "true" : "false",
+			(locks[i].isLocked) ? "true" : "false",
+			(locks[i].enableContactAlert) ? "true" : "false");
+
+		addClientMessageToQueue(locks[i].settings);
+		// printf("sendLockSettings: %s\n", locks[i].settings);
+	}
+  return 0;
 }
 
 void handle_lock_message(cJSON * payload)
 {
-	if (payload == NULL) return;
-	bool tmp;
-
-  printf("lock payload: %s\n",cJSON_PrintUnformatted(payload));
 	int ch=0;
+	bool val;
+
+	if (payload == NULL) return;
+
+	if (cJSON_GetObjectItem(payload,"getState")) {
+		sendLockState();
+	}
 
 	if (cJSON_GetObjectItem(payload,"channel")) {
-		 ch = cJSON_GetObjectItem(payload,"channel")->valueint;
-	} else {
-		return;
-	}
+	 	ch = cJSON_GetObjectItem(payload,"channel")->valueint;
 
-	if (cJSON_GetObjectItem(payload,"arm")) {
-		if (cJSON_IsTrue(cJSON_GetObjectItem(payload,"arm"))) {
-			arm_lock(ch, true, true);
-		} else {
-			arm_lock(ch, false, true);
-		}
-	}
+	 	if (cJSON_GetObjectItem(payload,"arm")) {
+	 		val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"arm"));
+	 		arm_lock(ch, val, true);
+	 	}
 
-	if (cJSON_GetObjectItem(payload,"enable")) {
-		tmp = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
-		enableLock(ch, tmp);
-	}
+	 	if (cJSON_GetObjectItem(payload,"enable")) {
+	 		val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
+	 		enableLock(ch, val);
+	 	}
 
+		if (cJSON_GetObjectItem(payload,"enableContactAlert")) {
+	 		val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enableContactAlert"));
+			locks[ch - 1].enableContactAlert = val;
+	 	}
+
+		// printf("lock payload: %s\n",cJSON_PrintUnformatted(payload));
+		storeLockSettings();
+	}
 	return;
 }
 
 static void
 lock_service(void *pvParameter)
 {
-  // load_lock_state_from_flash();
-
   int cnt = 0;
 
   while (1) {
@@ -208,8 +249,10 @@ lock_service(void *pvParameter)
 void lock_main()
 {
   printf("Starting lock service.\n");
-  lock_init();
   TaskHandle_t lock_service_task;
+
+	lock_init();
+	restoreLockSettings();
 
   xTaskCreate(&lock_service, "lock_service_task", 5000, NULL, 5, NULL);
   xTaskCreate(lock_contact_timer, "lock_contact_timer", 2048, NULL, 10, NULL);
