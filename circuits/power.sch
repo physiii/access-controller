@@ -643,10 +643,10 @@ F 5 "C23212" V 4450 4550 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:R_2.2K R?
+L Open_Automation:R_2.2K R39
 U 1 1 60456F03
 P 8550 4750
-F 0 "R?" V 8550 4700 50  0000 L CNN
+F 0 "R39" V 8550 4700 50  0000 L CNN
 F 1 "R_2.2K" V 8450 4600 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 8480 4750 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF2201TCE_C25879.pdf" V 8630 4750 50  0001 C CNN
@@ -655,10 +655,10 @@ F 4 "C4190" V 8400 4750 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:R_20K R?
+L Open_Automation:R_20K R38
 U 1 1 60459E2E
 P 8550 4350
-F 0 "R?" H 8620 4396 50  0000 L CNN
+F 0 "R38" H 8620 4396 50  0000 L CNN
 F 1 "R_20K" H 8620 4305 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 8480 4350 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF2002TCE_C25765.pdf" V 8630 4350 50  0001 C CNN
@@ -668,10 +668,10 @@ F 5 "C25765" V 8400 4350 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:R_20K R?
+L Open_Automation:R_20K R32
 U 1 1 6045B596
 P 4600 4150
-F 0 "R?" V 4600 4100 50  0000 L CNN
+F 0 "R32" V 4600 4100 50  0000 L CNN
 F 1 "R_20K" V 4700 4050 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 4530 4150 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF2002TCE_C25765.pdf" V 4680 4150 50  0001 C CNN
@@ -681,10 +681,10 @@ F 5 "C25765" V 4450 4150 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Open_Automation:R_10K_0402 R?
+L Open_Automation:R_10K_0402 R36
 U 1 1 60460A51
 P 5350 1950
-F 0 "R?" V 5350 1900 50  0000 L CNN
+F 0 "R36" V 5350 1900 50  0000 L CNN
 F 1 "R_10K_0402" V 5450 1700 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5280 1950 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf" V 5430 1950 50  0001 C CNN
