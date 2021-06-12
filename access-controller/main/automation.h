@@ -45,8 +45,8 @@ cJSON * checkServiceMessage(char *eventType)
 void addServiceMessageToQueue (cJSON *message)
 {
 	serviceMessage.queueCount++;
-	printf("addServiceMessageToQueue (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(message));
 	serviceMessage.messageQueue[serviceMessage.queueCount] = *message;
+	printf("addServiceMessageToQueue (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(message));
 }
 
 static void
@@ -58,6 +58,7 @@ serviceMessageTask (void *pvParameter)
 			cnt = 0;
 			if (serviceMessage.queueCount > 0) {
 				serviceMessage.message = &serviceMessage.messageQueue[serviceMessage.queueCount];
+				printf("serviceMessageTask (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(serviceMessage.message));
 				serviceMessage.read = false;
 				serviceMessage.queueCount--;
 			}
@@ -75,8 +76,8 @@ serviceMessageTask (void *pvParameter)
 void addClientMessageToQueue (char *message)
 {
 	clientMessage.queueCount++;
-	printf("addClientMessageToQueue (%d) %s\n", clientMessage.queueCount, message);
 	strcpy(clientMessage.messageQueue[clientMessage.queueCount], message);
+	printf("addClientMessageToQueue (%d) %s\n", clientMessage.queueCount, message);
 }
 
 static void
@@ -89,6 +90,7 @@ clientMessageTask (void *pvParameter)
 				strcpy(clientMessage.message, clientMessage.messageQueue[clientMessage.queueCount]);
 				clientMessage.readyToSend = true;
 				clientMessage.queueCount--;
+				printf("clientMessageTask (%d)\n", clientMessage.queueCount);
 			}
 		}
 

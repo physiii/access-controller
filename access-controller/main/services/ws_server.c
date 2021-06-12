@@ -81,8 +81,8 @@ static esp_err_t echo_handler(httpd_req_t *req)
     msg = cJSON_Parse((char *)ws_pkt.payload);
 		if (msg)
 		{
-			addServiceMessageToQueue(msg);
 			ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
+			addServiceMessageToQueue(msg);
 			return trigger_async_send(req->handle, req);
 		} else {
 			const char *error_ptr = cJSON_GetErrorPtr();
@@ -124,7 +124,7 @@ ws_service (void *pvParameter)
 {
   while (1) {
 		if (clientMessage.readyToSend) {
-			printf("Sending: %s\n", clientMessage.message);
+			printf("Sending (%d): %s\n", clientMessage.queueCount, clientMessage.message);
 			char * data = clientMessage.message;
 			httpd_handle_t hd = resp_arg->hd;
 			int fd = resp_arg->fd;

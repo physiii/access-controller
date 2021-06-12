@@ -25,23 +25,23 @@ struct keypadButton
 
 struct keypadButton keypads[NUM_OF_KEYPADS];
 
-void start_keypad_timer (struct keypadButton *ext, bool val)
+void start_keypad_timer (struct keypadButton *pad, bool val)
 {
   if (val) {
-    ext->expired = false;
-    ext->count = 0;
+    pad->expired = false;
+    pad->count = 0;
   } else {
-    ext->expired = true;
+    pad->expired = true;
   }
 }
 
-void check_keypad_timer (struct keypadButton *ext)
+void check_keypad_timer (struct keypadButton *pad)
 {
-  if (ext->count >= ext->delay && !ext->expired) {
-		printf("Re-arming lock from button %d service.\n", ext->channel);
-		arm_lock(ext->channel, true, ext->alert);
-		ext->expired = true;
-  } else ext->count++;
+  if (pad->count >= pad->delay && !pad->expired) {
+		printf("Re-arming lock from lock %d service. Alert %d\n", pad->channel, pad->alert);
+		arm_lock(pad->channel, true, pad->alert);
+		pad->expired = true;
+  } else pad->count++;
 }
 
 static void
@@ -57,7 +57,6 @@ keypad_timer (void *pvParameter)
 
 int storeKeypadSettings()
 {
-
 	for (uint8_t i=0; i < NUM_OF_KEYPADS; i++) {
 		sprintf(keypads[i].settings,
 			"{\"eventType\":\"%s\", "
@@ -117,6 +116,7 @@ void enableKeypad (int ch, bool val)
 
 void alertOnKeypad (int ch, bool val)
 {
+	printf("alertOnKeypad\tch: %d alert: %d.\n", ch, val);
 	for (int i=0; i < NUM_OF_KEYPADS; i++)
 		if (keypads[i].channel == ch) keypads[i].alert = val;
 }
@@ -127,18 +127,19 @@ void setKeypadArmDelay (int ch, int val)
 		if (keypads[i].channel == ch) keypads[i].delay = val;
 }
 
-void check_keypads (struct keypadButton *ext)
+void check_keypads (struct keypadButton *pad)
 {
-	if (!ext->enable) return;
+	if (!pad->enable) return;
 
-	ext->isPressed = !get_mcp_io(ext->pin);
+	pad->isPressed = !get_mcp_io(pad->pin);
 
-	if (ext->isPressed && !ext->prevPress) {
-		arm_lock(ext->channel, false, ext->alert);
-		start_keypad_timer(ext, true);
+	if (pad->isPressed && !pad->prevPress) {
+		printf("Disarming lock from lock %d service. Alert %d\n", pad->channel, pad->alert);
+		arm_lock(pad->channel, false, pad->alert);
+		start_keypad_timer(pad, true);
 	}
 
-	ext->prevPress = ext->isPressed;
+	pad->prevPress = pad->isPressed;
 }
 
 void handle_keypad_message(cJSON * payload)
@@ -196,15 +197,15 @@ void keypad_main()
 	keypads[0].pin = KEYPAD_IO_1;
 	keypads[0].delay = 4;
 	keypads[0].channel = 1;
-	keypads[0].alert = false;
-	keypads[0].enable = false;
+	keypads[0].alert = true;
+	keypads[0].enable = true;
 	strcpy(keypads[0].type, "keypad");
 
 	keypads[1].pin = KEYPAD_IO_2;
 	keypads[1].delay = 4;
 	keypads[1].channel = 2;
-	keypads[1].enable = false;
-	keypads[1].alert = false;
+	keypads[1].enable = true;
+	keypads[1].alert = true;
 	strcpy(keypads[1].type, "keypad");
 
 	set_mcp_io_dir(keypads[0].pin, MCP_INPUT);

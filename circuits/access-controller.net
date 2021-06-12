@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/andy/devices/access-controller/circuits/access-controller.sch)
-    (date "Thu 06 May 2021 08:35:49 AM CDT")
+    (date "Mon 17 May 2021 05:49:06 AM CDT")
     (tool "Eeschema 5.1.7-a382d34a8~88~ubuntu20.04.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -1171,7 +1171,7 @@
       (tstamp 606BD6F0))
     (comp (ref R47)
       (value R_3.01K)
-      (footprint Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder)
+      (footprint Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder)
       (datasheet https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF3011TCE_C25889.pdf)
       (fields
         (field (name LCSC) C25889)
@@ -1181,7 +1181,7 @@
       (tstamp 606DE927))
     (comp (ref R48)
       (value R_69.8K)
-      (footprint Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder)
+      (footprint Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder)
       (datasheet https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF6982TCE_C26985.pdf)
       (fields
         (field (name LCSC) C26985)
@@ -1251,12 +1251,12 @@
       (tstamp 60B7DAE8))
     (comp (ref C17)
       (value C_220nF)
-      (footprint Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder)
-      (datasheet https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B224KO5NNNC_C16772.pdf)
+      (footprint Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder)
+      (datasheet https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10B224KA8NNNC_C21120.pdf)
       (fields
-        (field (name LCSC) C16772)
-        (field (name "Part Number") CL05B224KO5NNNC))
-      (libsource (lib Open_Automation) (part C_220nF) (description "1µF ±10% 16V Ceramic Capacitor X7R 0603 (1608 Metric)"))
+        (field (name LCSC) C21120)
+        (field (name "Part Number") CL10B224KA8NNNC))
+      (libsource (lib Open_Automation) (part C_220nF) (description "Multilayer Ceramic Capacitors MLCC - SMD/SMT 220nF 25V 0603 RoHS"))
       (sheetpath (names /PoE/) (tstamps /60124B38/))
       (tstamp 60BAA45E))
     (comp (ref U12)
@@ -2255,8 +2255,8 @@
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive))))
     (libpart (lib Open_Automation) (part C_220nF)
-      (description "1µF ±10% 16V Ceramic Capacitor X7R 0603 (1608 Metric)")
-      (docs https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B224KO5NNNC_C16772.pdf)
+      (description "Multilayer Ceramic Capacitors MLCC - SMD/SMT 220nF 25V 0603 RoHS")
+      (docs https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10B224KA8NNNC_C21120.pdf)
       (footprints
         (fp C?)
         (fp C_????_*)
@@ -2266,9 +2266,9 @@
       (fields
         (field (name Reference) C)
         (field (name Value) C_220nF)
-        (field (name Footprint) Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder)
-        (field (name LCSC) C16772)
-        (field (name "Part Number") CL05B224KO5NNNC))
+        (field (name Footprint) Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder)
+        (field (name LCSC) C21120)
+        (field (name "Part Number") CL10B224KA8NNNC))
       (pins
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive))))
@@ -3044,7 +3044,7 @@
       (fields
         (field (name Reference) R)
         (field (name Value) R_3.01K)
-        (field (name Footprint) Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder)
+        (field (name Footprint) Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder)
         (field (name "Part Number") 0402WGF3011TCE)
         (field (name LCSC) C25889))
       (pins
@@ -3130,7 +3130,7 @@
       (fields
         (field (name Reference) R)
         (field (name Value) R_69.8K)
-        (field (name Footprint) Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder)
+        (field (name Footprint) Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder)
         (field (name "Part Number") 0402WGF6982TCE)
         (field (name LCSC) C26985))
       (pins

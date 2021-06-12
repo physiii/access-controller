@@ -319,9 +319,9 @@ AR Path="/618D2964/60017672" Ref="R75"  Part="1"
 F 0 "R75" V 5900 4100 50  0000 L CNN
 F 1 "R_2K2_0402" V 6000 3950 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5830 4150 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" V 5980 4150 50  0001 C CNN
-F 4 "CL05B104KO5NNNC" V 6080 4250 60  0001 C CNN "Part Number"
-F 5 "C1525" V 5750 4150 50  0001 C CNN "LCSC"
+F 3 "https://datasheet.lcsc.com/lcsc/1811022110_UNI-ROYAL-Uniroyal-Elec-0402WGF2201TCE_C25879.pdf" V 5980 4150 50  0001 C CNN
+F 4 "0402WGF2201TCE" V 6080 4250 60  0001 C CNN "Part Number"
+F 5 "C25879" V 5750 4150 50  0001 C CNN "LCSC"
 	1    5900 4150
 	1    0    0    -1  
 $EndComp
@@ -428,9 +428,9 @@ AR Path="/618D2964/6007908A" Ref="R74"  Part="1"
 F 0 "R74" V 5900 2050 50  0000 L CNN
 F 1 "R_2K2_0402" V 5850 1500 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" V 5830 2100 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf" V 5980 2100 50  0001 C CNN
-F 4 "CL05B104KO5NNNC" V 6080 2200 60  0001 C CNN "Part Number"
-F 5 "C1525" V 5750 2100 50  0001 C CNN "LCSC"
+F 3 "https://datasheet.lcsc.com/lcsc/1811022110_UNI-ROYAL-Uniroyal-Elec-0402WGF2201TCE_C25879.pdf" V 5980 2100 50  0001 C CNN
+F 4 "0402WGF2201TCE" V 6080 2200 60  0001 C CNN "Part Number"
+F 5 "C25879" V 5750 2100 50  0001 C CNN "LCSC"
 	1    5900 2100
 	1    0    0    -1  
 $EndComp
@@ -564,10 +564,10 @@ AR Path="/600457E1/5FE83977" Ref="C?"  Part="1"
 AR Path="/618D2964/5FE83977" Ref="C34"  Part="1" 
 F 0 "C34" H 5950 6000 50  0000 C CNN
 F 1 "C_10uF" H 6000 6200 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" H 6300 6550 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A106MA8NRNC_C96446.pdf" H 6050 5850 50  0001 C CNN
-F 4 "CL10A106MA8NRNC" H 6100 6650 60  0001 C CNN "Part Number"
-F 5 "C96446" H 6050 6750 50  0001 C CNN "LCSC"
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder" H 6300 6550 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf" H 6050 5850 50  0001 C CNN
+F 4 "CL21A106KAYNNNE" H 6100 6650 60  0001 C CNN "Part Number"
+F 5 "C15850" H 6050 6750 50  0001 C CNN "LCSC"
 	1    6050 6100
 	-1   0    0    1   
 $EndComp

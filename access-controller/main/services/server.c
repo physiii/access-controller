@@ -224,9 +224,9 @@ void server_main(void)
 {
 
     /*Mount the SDcard first if needed.*/
-#ifdef CONFIG_EXAMPLE_MOUNT_SD_CARD
-    sdcard_mount();
-#endif
+// #ifdef CONFIG_EXAMPLE_MOUNT_SD_CARD
+//     sdcard_mount();
+// #endif
 
     // ESP_ERROR_CHECK(nvs_flash_init());
     // ESP_ERROR_CHECK(esp_netif_init());
@@ -239,13 +239,13 @@ void server_main(void)
     // ESP_ERROR_CHECK(example_connect());
 
     /* Initialize file storage */
-    ESP_ERROR_CHECK(init_spiffs());
+    // ESP_ERROR_CHECK(init_spiffs());
 
     /* Start the file server */
     ESP_ERROR_CHECK(start_file_server("/spiffs"));
 
-#ifdef CONFIG_EXAMPLE_MOUNT_SD_CARD
-    //deinitialize the bus after all devices are removed
-    ESP_ERROR_CHECK(unmount_card(mount_base_path, mount_card));
-#endif
+// #ifdef CONFIG_EXAMPLE_MOUNT_SD_CARD
+//     //deinitialize the bus after all devices are removed
+//     ESP_ERROR_CHECK(unmount_card(mount_base_path, mount_card));
+// #endif
 }

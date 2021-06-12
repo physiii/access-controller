@@ -18,7 +18,6 @@
 
 void app_main(void)
 {
-
 	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 
@@ -55,6 +54,6 @@ void app_main(void)
 	while(1) {
 		printf("count %d\n", cnt++);
 		vTaskDelay(60 * 1000 / portTICK_RATE_MS);
-		// printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+		printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 	}
 }

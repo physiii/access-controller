@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/andy/devices/access-controller/circuits/access-controller.sch</source>
-    <date>Thu 06 May 2021 05:01:37 PM CDT</date>
+    <date>Mon 17 May 2021 05:54:44 AM CDT</date>
     <tool>Eeschema 5.1.7-a382d34a8~88~ubuntu20.04.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -1398,7 +1398,7 @@
     </comp>
     <comp ref="R47">
       <value>R_3.01K</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
       <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF3011TCE_C25889.pdf</datasheet>
       <fields>
         <field name="LCSC">C25889</field>
@@ -1410,7 +1410,7 @@
     </comp>
     <comp ref="R48">
       <value>R_69.8K</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
       <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF6982TCE_C26985.pdf</datasheet>
       <fields>
         <field name="LCSC">C26985</field>
@@ -1494,13 +1494,13 @@
     </comp>
     <comp ref="C17">
       <value>C_220nF</value>
-      <footprint>Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder</footprint>
-      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B224KO5NNNC_C16772.pdf</datasheet>
+      <footprint>Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10B224KA8NNNC_C21120.pdf</datasheet>
       <fields>
-        <field name="LCSC">C16772</field>
-        <field name="Part Number">CL05B224KO5NNNC</field>
+        <field name="LCSC">C21120</field>
+        <field name="Part Number">CL10B224KA8NNNC</field>
       </fields>
-      <libsource lib="Open_Automation" part="C_220nF" description="1µF ±10% 16V Ceramic Capacitor X7R 0603 (1608 Metric)"/>
+      <libsource lib="Open_Automation" part="C_220nF" description="Multilayer Ceramic Capacitors MLCC - SMD/SMT 220nF 25V 0603 RoHS"/>
       <sheetpath names="/PoE/" tstamps="/60124B38/"/>
       <tstamp>60BAA45E</tstamp>
     </comp>
@@ -2708,8 +2708,8 @@
       </pins>
     </libpart>
     <libpart lib="Open_Automation" part="C_220nF">
-      <description>1µF ±10% 16V Ceramic Capacitor X7R 0603 (1608 Metric)</description>
-      <docs>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B224KO5NNNC_C16772.pdf</docs>
+      <description>Multilayer Ceramic Capacitors MLCC - SMD/SMT 220nF 25V 0603 RoHS</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10B224KA8NNNC_C21120.pdf</docs>
       <footprints>
         <fp>C?</fp>
         <fp>C_????_*</fp>
@@ -2720,9 +2720,9 @@
       <fields>
         <field name="Reference">C</field>
         <field name="Value">C_220nF</field>
-        <field name="Footprint">Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder</field>
-        <field name="LCSC">C16772</field>
-        <field name="Part Number">CL05B224KO5NNNC</field>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</field>
+        <field name="LCSC">C21120</field>
+        <field name="Part Number">CL10B224KA8NNNC</field>
       </fields>
       <pins>
         <pin num="1" name="~" type="passive"/>
@@ -3670,7 +3670,7 @@
       <fields>
         <field name="Reference">R</field>
         <field name="Value">R_3.01K</field>
-        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</field>
         <field name="Part Number">0402WGF3011TCE</field>
         <field name="LCSC">C25889</field>
       </fields>
@@ -3780,7 +3780,7 @@
       <fields>
         <field name="Reference">R</field>
         <field name="Value">R_69.8K</field>
-        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</field>
         <field name="Part Number">0402WGF6982TCE</field>
         <field name="LCSC">C26985</field>
       </fields>

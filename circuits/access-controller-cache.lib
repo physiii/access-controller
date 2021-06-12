@@ -536,10 +536,10 @@ ENDDEF
 DEF Open_Automation_C_220nF C 0 10 N Y 1 F N
 F0 "C" 25 100 50 H V L CNN
 F1 "Open_Automation_C_220nF" -225 -100 50 H V L CNN
-F2 "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder" 100 300 50 H I C CNN
+F2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" 100 300 50 H I C CNN
 F3 "" 0 -250 50 H I C CNN
-F4 "C16772" 0 400 50 H I C CNN "LCSC"
-F5 "CL05B224KO5NNNC" 125 200 60 H I C CNN "Part Number"
+F4 "C21120" 0 400 50 H I C CNN "LCSC"
+F5 "CL10B224KA8NNNC" 125 200 60 H I C CNN "Part Number"
 $FPLIST
  C?
  C_????_*
@@ -1994,8 +1994,8 @@ F0 "R" 0 0 50 V V C CNN
 F1 "Open_Automation_R_2K2_0402" -75 0 50 V V C CNN
 F2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" -70 0 50 V I C CNN
 F3 "" 80 0 50 V I C CNN
-F4 "CL05B104KO5NNNC" 180 100 60 V I C CNN "Part Number"
-F5 "C1525" -150 0 50 V I C CNN "LCSC"
+F4 "0402WGF2201TCE" 180 100 60 V I C CNN "Part Number"
+F5 "C25879" -150 0 50 V I C CNN "LCSC"
 $FPLIST
  R_*
  R_*
@@ -2012,7 +2012,7 @@ ENDDEF
 DEF Open_Automation_R_3.01K R 0 0 N Y 1 F N
 F0 "R" 0 0 50 V V C CNN
 F1 "Open_Automation_R_3.01K" -75 0 50 V V C CNN
-F2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" -70 0 50 V I C CNN
+F2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" -70 0 50 V I C CNN
 F3 "" 80 0 50 V I C CNN
 F4 "0402WGF3011TCE" 180 100 60 V I C CNN "Part Number"
 F5 "C25889" 0 0 50 H I C CNN "LCSC"
@@ -2132,7 +2132,7 @@ ENDDEF
 DEF Open_Automation_R_69.8K R 0 0 N Y 1 F N
 F0 "R" 0 0 50 V V C CNN
 F1 "Open_Automation_R_69.8K" -75 0 50 V V C CNN
-F2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" -70 0 50 V I C CNN
+F2 "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder" -70 0 50 V I C CNN
 F3 "" 80 0 50 V I C CNN
 F4 "0402WGF6982TCE" 180 100 60 V I C CNN "Part Number"
 F5 "C26985" 0 0 50 H I C CNN "LCSC"

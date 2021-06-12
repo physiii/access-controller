@@ -75,6 +75,7 @@ void check_fobs (struct fob *fb)
 	if (fb->isPressed != fb->prevPress) {
 		arm_lock(fb->channel, fb->isPressed, fb->alert);
 		enableExit(fb->channel, fb->isPressed);
+		enableKeypad(fb->channel, fb->isPressed);
 	}
 
 	fb->prevPress = fb->isPressed;
@@ -82,7 +83,7 @@ void check_fobs (struct fob *fb)
 
 void alertOnFob (int ch, bool val)
 {
-	for (int i=0; i < NUM_OF_EXITS; i++)
+	for (int i=0; i < NUM_OF_FOBS; i++)
 		if (fobs[i].channel == ch) fobs[i].alert = val;
 }
 
