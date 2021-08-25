@@ -17,8 +17,6 @@
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 
-static const char *TAG = "eth_example";
-
 /** Event handler for Ethernet events */
 static void eth_event_handler(void *arg, esp_event_base_t event_base,
                               int32_t event_id, void *event_data)
@@ -64,7 +62,7 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base,
 }
 
 #define	PIN_PHY_POWER	12
-void app_main()
+void ethernet_main()
 {
     tcpip_adapter_init();
 
@@ -75,7 +73,7 @@ void app_main()
 
     eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
     eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
-    phy_config.phy_addr = CONFIG_EXAMPLE_ETH_PHY_ADDR;
+    phy_config.phy_addr = 1;
     phy_config.reset_gpio_num = CONFIG_EXAMPLE_ETH_PHY_RST_GPIO;
     gpio_pad_select_gpio(PIN_PHY_POWER);
     gpio_set_direction(PIN_PHY_POWER,GPIO_MODE_OUTPUT);
