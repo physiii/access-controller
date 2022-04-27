@@ -2,7 +2,7 @@
 <export version="E">
   <design>
     <source>/home/andy/devices/access-controller/circuits/access-controller.kicad_sch</source>
-    <date>Tue 26 Apr 2022 06:56:26 PM CDT</date>
+    <date>Wed 27 Apr 2022 01:25:06 PM CDT</date>
     <tool>Eeschema 6.0.4-6f826c9f35~116~ubuntu20.04.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -824,6 +824,70 @@
       <sheetpath names="/Power/" tstamps="/00000000-0000-0000-0000-00006045445b/"/>
       <tstamps>00000000-0000-0000-0000-00005ffacb5b</tstamps>
     </comp>
+    <comp ref="R8">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Push / Motion"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
+      <tstamps>914a1f33-d949-4037-b6ab-7ccfe94be2df</tstamps>
+    </comp>
+    <comp ref="R9">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Push / Motion"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
+      <tstamps>aec4d929-2bfa-4e9c-946a-3a0d33e389ea</tstamps>
+    </comp>
+    <comp ref="R10">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Push / Motion"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
+      <tstamps>756470c6-8226-4d79-8826-198287fb1fa4</tstamps>
+    </comp>
+    <comp ref="R11">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Push / Motion"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
+      <tstamps>8408d05b-21f5-4ab2-ab28-f0e996f89af0</tstamps>
+    </comp>
     <comp ref="R12">
       <value>R_1K</value>
       <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
@@ -888,22 +952,6 @@
       <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
       <tstamps>00000000-0000-0000-0000-00005fddee05</tstamps>
     </comp>
-    <comp ref="R16">
-      <value>R_10K_QUAD</value>
-      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
-      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
-      <fields>
-        <field name="LCSC">C25725</field>
-        <field name="Part Number">4D02WGJ0103TCE</field>
-      </fields>
-      <libsource lib="Open_Automation" part="R_10K_QUAD" description=""/>
-      <property name="Part Number" value="4D02WGJ0103TCE"/>
-      <property name="LCSC" value="C25725"/>
-      <property name="Sheetname" value="Push / Motion"/>
-      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
-      <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
-      <tstamps>00000000-0000-0000-0000-00005ff8c5a1</tstamps>
-    </comp>
     <comp ref="U3">
       <value>TLP291-4</value>
       <footprint>Package_SO:SOP-16_4.4x10.4mm_P1.27mm</footprint>
@@ -918,7 +966,7 @@
       <property name="Sheetname" value="Push / Motion"/>
       <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
       <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
-      <tstamps>00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc68f</tstamps>
+      <tstamps>00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
     </comp>
     <comp ref="C7">
       <value>C_27pF_0402</value>
@@ -1175,6 +1223,22 @@
       <sheetpath names="/USB/" tstamps="/00000000-0000-0000-0000-000060ddd162/"/>
       <tstamps>00000000-0000-0000-0000-0000605022ce</tstamps>
     </comp>
+    <comp ref="R16">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Keypad / FOB"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Keypad / FOB/" tstamps="/00000000-0000-0000-0000-0000601a4f03/"/>
+      <tstamps>914a1f33-d949-4037-b6ab-7ccfe94be2df</tstamps>
+    </comp>
     <comp ref="R22">
       <value>R_1K</value>
       <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
@@ -1240,20 +1304,52 @@
       <tstamps>00000000-0000-0000-0000-00005fddee05</tstamps>
     </comp>
     <comp ref="R26">
-      <value>R_10K_QUAD</value>
-      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
-      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
       <fields>
-        <field name="LCSC">C25725</field>
-        <field name="Part Number">4D02WGJ0103TCE</field>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
       </fields>
-      <libsource lib="Open_Automation" part="R_10K_QUAD" description=""/>
-      <property name="Part Number" value="4D02WGJ0103TCE"/>
-      <property name="LCSC" value="C25725"/>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
       <property name="Sheetname" value="Keypad / FOB"/>
       <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
       <sheetpath names="/Keypad / FOB/" tstamps="/00000000-0000-0000-0000-0000601a4f03/"/>
-      <tstamps>00000000-0000-0000-0000-00005ff8c5a1</tstamps>
+      <tstamps>aec4d929-2bfa-4e9c-946a-3a0d33e389ea</tstamps>
+    </comp>
+    <comp ref="R31">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Keypad / FOB"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Keypad / FOB/" tstamps="/00000000-0000-0000-0000-0000601a4f03/"/>
+      <tstamps>756470c6-8226-4d79-8826-198287fb1fa4</tstamps>
+    </comp>
+    <comp ref="R94">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Keypad / FOB"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Keypad / FOB/" tstamps="/00000000-0000-0000-0000-0000601a4f03/"/>
+      <tstamps>8408d05b-21f5-4ab2-ab28-f0e996f89af0</tstamps>
     </comp>
     <comp ref="U5">
       <value>TLP291-4</value>
@@ -1269,7 +1365,7 @@
       <property name="Sheetname" value="Keypad / FOB"/>
       <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
       <sheetpath names="/Keypad / FOB/" tstamps="/00000000-0000-0000-0000-0000601a4f03/"/>
-      <tstamps>00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc68f</tstamps>
+      <tstamps>00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
     </comp>
     <comp ref="R27">
       <value>R_1K</value>
@@ -1335,21 +1431,69 @@
       <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
       <tstamps>00000000-0000-0000-0000-00005fddee05</tstamps>
     </comp>
-    <comp ref="R31">
-      <value>R_10K_QUAD</value>
-      <footprint>Resistor_SMD:R_Array_Concave_4x0402</footprint>
-      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</datasheet>
+    <comp ref="R95">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
       <fields>
-        <field name="LCSC">C25725</field>
-        <field name="Part Number">4D02WGJ0103TCE</field>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
       </fields>
-      <libsource lib="Open_Automation" part="R_10K_QUAD" description=""/>
-      <property name="Part Number" value="4D02WGJ0103TCE"/>
-      <property name="LCSC" value="C25725"/>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
       <property name="Sheetname" value="Lock / Aux"/>
       <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
       <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
-      <tstamps>00000000-0000-0000-0000-00005ff8c5a1</tstamps>
+      <tstamps>914a1f33-d949-4037-b6ab-7ccfe94be2df</tstamps>
+    </comp>
+    <comp ref="R96">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Lock / Aux"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
+      <tstamps>aec4d929-2bfa-4e9c-946a-3a0d33e389ea</tstamps>
+    </comp>
+    <comp ref="R97">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Lock / Aux"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
+      <tstamps>756470c6-8226-4d79-8826-198287fb1fa4</tstamps>
+    </comp>
+    <comp ref="R98">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open Automation" part="R_10K_0402" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value="Lock / Aux"/>
+      <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
+      <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
+      <tstamps>8408d05b-21f5-4ab2-ab28-f0e996f89af0</tstamps>
     </comp>
     <comp ref="U6">
       <value>TLP291-4</value>
@@ -1365,7 +1509,7 @@
       <property name="Sheetname" value="Lock / Aux"/>
       <property name="Sheetfile" value="quad-optocoupler.kicad_sch"/>
       <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
-      <tstamps>00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc68f</tstamps>
+      <tstamps>00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
     </comp>
     <comp ref="C29">
       <value>C_22uF</value>
@@ -3828,7 +3972,7 @@
     </comp>
     <comp ref="U11">
       <value>TL431</value>
-      <footprint>Package_SO:SOIC-8_3.9x4.9mm_P1.27mm</footprint>
+      <footprint>Package_TO_SOT_SMD:SOT-23-5</footprint>
       <datasheet>https://datasheet.lcsc.com/lcsc/1912111437_Texas-Instruments-TL431ACDBVR_C352987.pdf</datasheet>
       <fields>
         <field name="LCSC">C352987</field>
@@ -5440,20 +5584,17 @@
       <fields>
         <field name="Reference">U?</field>
         <field name="Value">Q_TL431</field>
-        <field name="Footprint">Package_SO:SOIC-8_3.9x4.9mm_P1.27mm</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-23-5</field>
         <field name="Datasheet">https://datasheet.lcsc.com/lcsc/1912111437_Texas-Instruments-TL431ACDBVR_C352987.pdf</field>
         <field name="Part Number">TL431ACDBVR</field>
         <field name="LCSC">C352987</field>
       </fields>
       <pins>
-        <pin num="1" name="K" type="passive"/>
-        <pin num="2" name="A" type="passive"/>
-        <pin num="3" name="A" type="passive"/>
-        <pin num="4" name="NC" type="passive"/>
-        <pin num="5" name="NC" type="passive"/>
-        <pin num="6" name="A" type="passive"/>
-        <pin num="7" name="A" type="passive"/>
-        <pin num="8" name="REF" type="passive"/>
+        <pin num="1" name="NC" type="passive"/>
+        <pin num="2" name="NC" type="passive"/>
+        <pin num="3" name="K" type="passive"/>
+        <pin num="4" name="REF" type="passive"/>
+        <pin num="5" name="A" type="passive"/>
       </pins>
     </libpart>
     <libpart lib="Open Automation" part="R_0">
@@ -6572,31 +6713,6 @@
         <pin num="2" name="" type="passive"/>
       </pins>
     </libpart>
-    <libpart lib="Open_Automation" part="R_10K_QUAD">
-      <docs>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</docs>
-      <footprints>
-        <fp>R_*</fp>
-        <fp>R_*</fp>
-      </footprints>
-      <fields>
-        <field name="Reference">R</field>
-        <field name="Value">R_10K_QUAD</field>
-        <field name="Footprint">Resistor_SMD:R_Array_Concave_4x0402</field>
-        <field name="Datasheet">https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-4D02WGJ0103TCE_C25725.pdf</field>
-        <field name="Part Number">4D02WGJ0103TCE</field>
-        <field name="LCSC">C25725</field>
-      </fields>
-      <pins>
-        <pin num="1" name="" type="passive"/>
-        <pin num="2" name="" type="passive"/>
-        <pin num="3" name="" type="passive"/>
-        <pin num="4" name="" type="passive"/>
-        <pin num="5" name="" type="passive"/>
-        <pin num="6" name="" type="passive"/>
-        <pin num="7" name="" type="passive"/>
-        <pin num="8" name="" type="passive"/>
-      </pins>
-    </libpart>
     <libpart lib="Open_Automation" part="R_12.1K_0402">
       <docs>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1212TCE_C25852.pdf</docs>
       <footprints>
@@ -6988,25 +7104,25 @@
       <node ref="J10" pin="5" pinfunction="Pin_5" pintype="passive"/>
       <node ref="J10" pin="6" pinfunction="Pin_6" pintype="passive"/>
       <node ref="R1" pin="2" pintype="passive"/>
-      <node ref="R16" pin="5" pintype="passive"/>
-      <node ref="R16" pin="6" pintype="passive"/>
-      <node ref="R16" pin="7" pintype="passive"/>
-      <node ref="R16" pin="8" pintype="passive"/>
+      <node ref="R10" pin="1" pintype="passive"/>
+      <node ref="R11" pin="1" pintype="passive"/>
+      <node ref="R16" pin="1" pintype="passive"/>
       <node ref="R2" pin="2" pintype="passive"/>
       <node ref="R21" pin="2" pintype="passive"/>
-      <node ref="R26" pin="5" pintype="passive"/>
-      <node ref="R26" pin="6" pintype="passive"/>
-      <node ref="R26" pin="7" pintype="passive"/>
-      <node ref="R26" pin="8" pintype="passive"/>
-      <node ref="R31" pin="5" pintype="passive"/>
-      <node ref="R31" pin="6" pintype="passive"/>
-      <node ref="R31" pin="7" pintype="passive"/>
-      <node ref="R31" pin="8" pintype="passive"/>
+      <node ref="R26" pin="1" pintype="passive"/>
+      <node ref="R31" pin="1" pintype="passive"/>
       <node ref="R40" pin="2" pintype="passive"/>
       <node ref="R46" pin="2" pintype="passive"/>
       <node ref="R49" pin="2" pintype="passive"/>
       <node ref="R51" pin="2" pintype="passive"/>
       <node ref="R67" pin="2" pintype="passive"/>
+      <node ref="R8" pin="1" pintype="passive"/>
+      <node ref="R9" pin="1" pintype="passive"/>
+      <node ref="R94" pin="1" pintype="passive"/>
+      <node ref="R95" pin="1" pintype="passive"/>
+      <node ref="R96" pin="1" pintype="passive"/>
+      <node ref="R97" pin="1" pintype="passive"/>
+      <node ref="R98" pin="1" pintype="passive"/>
       <node ref="U1" pin="18" pinfunction="~{RESET}" pintype="input"/>
       <node ref="U1" pin="9" pinfunction="VDD" pintype="power_in"/>
       <node ref="U14" pin="2" pinfunction="VDD" pintype="power_in"/>
@@ -7085,7 +7201,7 @@
       <node ref="R12" pin="2" pintype="passive"/>
     </net>
     <net code="13" name="/EXIT0_SENSE">
-      <node ref="R16" pin="2" pintype="passive"/>
+      <node ref="R9" pin="2" pintype="passive"/>
       <node ref="U1" pin="26" pinfunction="GPA5" pintype="bidirectional"/>
       <node ref="U3" pin="14" pintype="passive"/>
     </net>
@@ -7133,7 +7249,7 @@
       <node ref="R14" pin="2" pintype="passive"/>
     </net>
     <net code="22" name="/FOB0_SENSE">
-      <node ref="R16" pin="3" pintype="passive"/>
+      <node ref="R10" pin="2" pintype="passive"/>
       <node ref="U1" pin="28" pinfunction="GPA7" pintype="bidirectional"/>
       <node ref="U3" pin="12" pintype="passive"/>
     </net>
@@ -7142,7 +7258,7 @@
       <node ref="R24" pin="2" pintype="passive"/>
     </net>
     <net code="24" name="/FOB1_SENSE">
-      <node ref="R26" pin="3" pintype="passive"/>
+      <node ref="R31" pin="2" pintype="passive"/>
       <node ref="U1" pin="8" pinfunction="GPB7" pintype="bidirectional"/>
       <node ref="U5" pin="12" pintype="passive"/>
     </net>
@@ -7163,7 +7279,7 @@
       <node ref="R15" pin="2" pintype="passive"/>
     </net>
     <net code="29" name="/KEYPAD0_SENSE">
-      <node ref="R16" pin="1" pintype="passive"/>
+      <node ref="R8" pin="2" pintype="passive"/>
       <node ref="U1" pin="24" pinfunction="GPA3" pintype="bidirectional"/>
       <node ref="U3" pin="16" pintype="passive"/>
     </net>
@@ -7172,7 +7288,7 @@
       <node ref="R25" pin="2" pintype="passive"/>
     </net>
     <net code="31" name="/KEYPAD1_SENSE">
-      <node ref="R26" pin="1" pintype="passive"/>
+      <node ref="R16" pin="2" pintype="passive"/>
       <node ref="U1" pin="4" pinfunction="GPB3" pintype="bidirectional"/>
       <node ref="U5" pin="16" pintype="passive"/>
     </net>
@@ -7189,7 +7305,7 @@
       <node ref="R27" pin="2" pintype="passive"/>
     </net>
     <net code="35" name="/LOCK0_CLOSE_IO">
-      <node ref="R31" pin="2" pintype="passive"/>
+      <node ref="R96" pin="2" pintype="passive"/>
       <node ref="U1" pin="23" pinfunction="GPA2" pintype="bidirectional"/>
       <node ref="U6" pin="14" pintype="passive"/>
     </net>
@@ -7202,7 +7318,7 @@
       <node ref="Q2" pin="3" pinfunction="D" pintype="passive"/>
     </net>
     <net code="38" name="/LOCK0_SENSE">
-      <node ref="R31" pin="1" pintype="passive"/>
+      <node ref="R95" pin="2" pintype="passive"/>
       <node ref="U1" pin="22" pinfunction="GPA1" pintype="bidirectional"/>
       <node ref="U6" pin="16" pintype="passive"/>
     </net>
@@ -7215,7 +7331,7 @@
       <node ref="R29" pin="2" pintype="passive"/>
     </net>
     <net code="41" name="/LOCK1_CLOSE_IO">
-      <node ref="R31" pin="3" pintype="passive"/>
+      <node ref="R97" pin="2" pintype="passive"/>
       <node ref="U1" pin="3" pinfunction="GPB2" pintype="bidirectional"/>
       <node ref="U6" pin="12" pintype="passive"/>
     </net>
@@ -7228,7 +7344,7 @@
       <node ref="Q4" pin="3" pinfunction="D" pintype="passive"/>
     </net>
     <net code="44" name="/LOCK1_SENSE">
-      <node ref="R31" pin="4" pintype="passive"/>
+      <node ref="R98" pin="2" pintype="passive"/>
       <node ref="U1" pin="2" pinfunction="GPB1" pintype="bidirectional"/>
       <node ref="U6" pin="10" pintype="passive"/>
     </net>
@@ -7250,7 +7366,7 @@
       <node ref="R13" pin="2" pintype="passive"/>
     </net>
     <net code="49" name="/MOTION0_SENSE">
-      <node ref="R16" pin="4" pintype="passive"/>
+      <node ref="R11" pin="2" pintype="passive"/>
       <node ref="U1" pin="27" pinfunction="GPA6" pintype="bidirectional"/>
       <node ref="U3" pin="10" pintype="passive"/>
     </net>
@@ -7262,7 +7378,7 @@
       <node ref="U1" pin="7" pinfunction="GPB6" pintype="bidirectional"/>
     </net>
     <net code="52" name="/MOTION1_SENSE1">
-      <node ref="R26" pin="4" pintype="passive"/>
+      <node ref="R94" pin="2" pintype="passive"/>
       <node ref="U5" pin="10" pintype="passive"/>
     </net>
     <net code="53" name="/Microcontroller/FACT">
@@ -7706,10 +7822,7 @@
       <node ref="U1" pin="16" pinfunction="A1" pintype="input"/>
       <node ref="U1" pin="17" pinfunction="A2" pintype="input"/>
       <node ref="U10" pin="8" pinfunction="GND" pintype="power_in"/>
-      <node ref="U11" pin="2" pinfunction="A" pintype="passive"/>
-      <node ref="U11" pin="3" pinfunction="A" pintype="passive"/>
-      <node ref="U11" pin="6" pinfunction="A" pintype="passive"/>
-      <node ref="U11" pin="7" pinfunction="A" pintype="passive"/>
+      <node ref="U11" pin="5" pinfunction="A" pintype="passive"/>
       <node ref="U14" pin="1" pinfunction="GND" pintype="power_in"/>
       <node ref="U14" pin="15" pinfunction="GND" pintype="passive"/>
       <node ref="U14" pin="38" pinfunction="GND" pintype="passive"/>
@@ -7845,7 +7958,7 @@
       <node ref="C44" pin="1" pintype="passive"/>
       <node ref="D31" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R85" pin="2" pintype="passive"/>
-      <node ref="U11" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="U11" pin="3" pinfunction="K" pintype="passive"/>
       <node ref="U4" pin="2" pintype="passive"/>
     </net>
     <net code="129" name="Net-(C44-Pad2)">
@@ -7853,7 +7966,7 @@
       <node ref="C45" pin="2" pintype="passive"/>
       <node ref="R86" pin="2" pintype="passive"/>
       <node ref="R87" pin="1" pintype="passive"/>
-      <node ref="U11" pin="8" pinfunction="REF" pintype="passive"/>
+      <node ref="U11" pin="4" pinfunction="REF" pintype="passive"/>
     </net>
     <net code="130" name="Net-(C45-Pad1)">
       <node ref="C45" pin="1" pintype="passive"/>
@@ -8159,11 +8272,11 @@
     <net code="206" name="unconnected-(U10-Pad20)">
       <node ref="U10" pin="20" pinfunction="NOS#" pintype="input+no_connect"/>
     </net>
-    <net code="207" name="unconnected-(U11-Pad4)">
-      <node ref="U11" pin="4" pinfunction="NC" pintype="passive"/>
+    <net code="207" name="unconnected-(U11-Pad1)">
+      <node ref="U11" pin="1" pinfunction="NC" pintype="passive"/>
     </net>
-    <net code="208" name="unconnected-(U11-Pad5)">
-      <node ref="U11" pin="5" pinfunction="NC" pintype="passive"/>
+    <net code="208" name="unconnected-(U11-Pad2)">
+      <node ref="U11" pin="2" pinfunction="NC" pintype="passive"/>
     </net>
     <net code="209" name="unconnected-(U14-Pad5)">
       <node ref="U14" pin="5" pinfunction="SENSOR_VN" pintype="input"/>

@@ -3190,7 +3190,6 @@
     )
   )
 
-
   (junction (at 198.12 219.71) (diameter 0) (color 0 0 0 0)
     (uuid 3273ec61-4a33-41c2-82bf-cde7c8587c1b)
   )
@@ -7099,6 +7098,18 @@
     (path "/00000000-0000-0000-0000-000060030996/44a7bbd1-f075-4568-9b89-680a1dc2401c"
       (reference "R7") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
     )
+    (path "/00000000-0000-0000-0000-00005ffe7b4a/914a1f33-d949-4037-b6ab-7ccfe94be2df"
+      (reference "R8") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00005ffe7b4a/aec4d929-2bfa-4e9c-946a-3a0d33e389ea"
+      (reference "R9") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00005ffe7b4a/756470c6-8226-4d79-8826-198287fb1fa4"
+      (reference "R10") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00005ffe7b4a/8408d05b-21f5-4ab2-ab28-f0e996f89af0"
+      (reference "R11") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
     (path "/00000000-0000-0000-0000-00005ffe7b4a/00000000-0000-0000-0000-00005fdd0a2d"
       (reference "R12") (unit 1) (value "R_1K") (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder")
     )
@@ -7111,8 +7122,8 @@
     (path "/00000000-0000-0000-0000-00005ffe7b4a/00000000-0000-0000-0000-00005fddee05"
       (reference "R15") (unit 1) (value "R_1K") (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder")
     )
-    (path "/00000000-0000-0000-0000-00005ffe7b4a/00000000-0000-0000-0000-00005ff8c5a1"
-      (reference "R16") (unit 1) (value "R_10K_QUAD") (footprint "Resistor_SMD:R_Array_Concave_4x0402")
+    (path "/00000000-0000-0000-0000-0000601a4f03/914a1f33-d949-4037-b6ab-7ccfe94be2df"
+      (reference "R16") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
     )
     (path "/00000000-0000-0000-0000-00006045445b/00000000-0000-0000-0000-000061f8e630"
       (reference "R17") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
@@ -7141,8 +7152,8 @@
     (path "/00000000-0000-0000-0000-0000601a4f03/00000000-0000-0000-0000-00005fddee05"
       (reference "R25") (unit 1) (value "R_1K") (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder")
     )
-    (path "/00000000-0000-0000-0000-0000601a4f03/00000000-0000-0000-0000-00005ff8c5a1"
-      (reference "R26") (unit 1) (value "R_10K_QUAD") (footprint "Resistor_SMD:R_Array_Concave_4x0402")
+    (path "/00000000-0000-0000-0000-0000601a4f03/aec4d929-2bfa-4e9c-946a-3a0d33e389ea"
+      (reference "R26") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
     )
     (path "/00000000-0000-0000-0000-00006021992a/00000000-0000-0000-0000-00005fdd0a2d"
       (reference "R27") (unit 1) (value "R_1K") (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder")
@@ -7156,8 +7167,8 @@
     (path "/00000000-0000-0000-0000-00006021992a/00000000-0000-0000-0000-00005fddee05"
       (reference "R30") (unit 1) (value "R_1K") (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder")
     )
-    (path "/00000000-0000-0000-0000-00006021992a/00000000-0000-0000-0000-00005ff8c5a1"
-      (reference "R31") (unit 1) (value "R_10K_QUAD") (footprint "Resistor_SMD:R_Array_Concave_4x0402")
+    (path "/00000000-0000-0000-0000-0000601a4f03/756470c6-8226-4d79-8826-198287fb1fa4"
+      (reference "R31") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
     )
     (path "/00000000-0000-0000-0000-00006045445b/00000000-0000-0000-0000-00006045b596"
       (reference "R32") (unit 1) (value "R_20K") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
@@ -7345,6 +7356,21 @@
     (path "/00000000-0000-0000-0000-0000618d2964/f79d3d06-bc0e-4e9f-a17b-d0dbdad3cd40"
       (reference "R93") (unit 1) (value "2.2K") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
     )
+    (path "/00000000-0000-0000-0000-0000601a4f03/8408d05b-21f5-4ab2-ab28-f0e996f89af0"
+      (reference "R94") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00006021992a/914a1f33-d949-4037-b6ab-7ccfe94be2df"
+      (reference "R95") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00006021992a/aec4d929-2bfa-4e9c-946a-3a0d33e389ea"
+      (reference "R96") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00006021992a/756470c6-8226-4d79-8826-198287fb1fa4"
+      (reference "R97") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
+    (path "/00000000-0000-0000-0000-00006021992a/8408d05b-21f5-4ab2-ab28-f0e996f89af0"
+      (reference "R98") (unit 1) (value "R_10K_0402") (footprint "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder")
+    )
     (path "/77ceb087-6d99-4591-bb95-b8b0e98617b2/3c781a87-7ed4-4532-88e6-b89a623d5a72"
       (reference "SJ1") (unit 1) (value "SJ") (footprint "Open_Automation:SJUMP")
     )
@@ -7409,7 +7435,7 @@
       (reference "U10") (unit 1) (value "CH340T(SSOP20W)") (footprint "Open_Automation:SSOP-20W")
     )
     (path "/77ceb087-6d99-4591-bb95-b8b0e98617b2/fead8bc0-4379-42e2-a8c5-60f2a5652a3a"
-      (reference "U11") (unit 1) (value "TL431") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
+      (reference "U11") (unit 1) (value "TL431") (footprint "Package_TO_SOT_SMD:SOT-23-5")
     )
     (path "/00000000-0000-0000-0000-00006077d777/00000000-0000-0000-0000-0000601c2110"
       (reference "U14") (unit 1) (value "ESP32-WROOM-32") (footprint "RF_Module:ESP32-WROOM-32")
