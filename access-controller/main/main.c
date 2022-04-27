@@ -34,8 +34,12 @@ void app_main(void)
 	clientMessage.readyToSend = false;
 
 	gpio_main();
-	i2c_main();
-	mcp23x17_main();
+
+	if (USE_MCP23017) {
+		i2c_main();
+		mcp23x17_main();
+	}
+
 	lock_main();
 	buzzer_main();
 	// wiegand_main();

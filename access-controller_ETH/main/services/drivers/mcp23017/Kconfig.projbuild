@@ -1,0 +1,152 @@
+menu "Power Configuration"
+
+    config LED_STRIP_FLUSH_TIMEOUT
+            int "makes esp-idf-lib work"
+            default 12
+            help
+                This option selects the GPIO pin used for the main power signal.
+
+    config I2CDEV_TIMEOUT
+            int "makes esp-idf-lib work"
+            default 1000
+            help
+                This option selects the GPIO pin used for the main power signal.
+
+    config IGNITION_WIRE_IO
+        int "Ignition power GPIO number"
+        default 32
+        help
+            This option selects the GPIO pin used for the main power signal.
+
+    config MAIN_POWER_IO
+        int "Main power GPIO number"
+        default 18
+        help
+            This option selects the GPIO pin used for the main power signal.
+
+    config DISPLAY_POWER_IO
+        int "Display power GPIO number"
+        default 15
+        help
+            This option selects the GPIO pin used for the display power signal.
+
+    config AUDIO_STBY_IO
+        int "Audio standby power GPIO number"
+        default 19
+        help
+            This option selects the GPIO pin used for the audio power signal.
+
+    config AUDIO_MUTE_IO
+      int "Audio mute power GPIO number"
+      default 23
+      help
+            This option selects the GPIO pin used for the audio power signal.
+
+endmenu
+
+menu "CAN Configuration"
+
+    config CAN_TX_GPIO_NUM
+        int "TX GPIO number"
+        default 5
+        help
+            This option selects the GPIO pin used for the TX signal. Connect the
+            TX signal to your transceiver.
+
+    config CAN_RX_GPIO_NUM
+        int "RX GPIO number"
+        default 4
+        help
+            This option selects the GPIO pin used for the RX signal. Connect the
+            RX signal to your transceiver.
+
+endmenu
+
+menu "J1850 Configuration"
+
+    config J1850_INPUT_PIN
+        int "Input GPIO number"
+        default 16
+        help
+            This option selects the GPIO pin used for the j1850 input signal.
+
+    config J1850_OUTPUT_PIN
+        int "Output GPIO number"
+        default 17
+        help
+            This option selects the GPIO pin used for the j1850 output signal.
+
+endmenu
+
+menu "Wifi Configuration"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+    config ESP_WIFI_CHANNEL
+        int "WiFi Channel"
+        range 1 13
+        default 1
+        help
+            WiFi channel (network channel) for the example to use.
+
+    config ESP_MAX_STA_CONN
+        int "Maximal STA connections"
+        default 4
+        help
+            Max number of the STA connects to AP.
+endmenu
+
+menu "UART Configuration"
+
+    config EXAMPLE_UART_PORT_NUM
+        int "UART port number"
+        range 0 2 if IDF_TARGET_ESP32
+        range 0 1 if IDF_TARGET_ESP32S2
+        default 2 if IDF_TARGET_ESP32
+        default 1 if IDF_TARGET_ESP32S2
+        help
+            UART communication port number for the example.
+            See UART documentation for available port numbers.
+
+    config EXAMPLE_UART_BAUD_RATE
+        int "UART communication speed"
+        range 1200 115200
+        default 115200
+        help
+            UART communication speed for Modbus example.
+
+    config EXAMPLE_UART_RXD
+        int "UART RXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        range 0 46 if IDF_TARGET_ESP32S2
+        default 5
+        help
+            GPIO number for UART RX pin. See UART documentation for more information
+            about available pin numbers for UART.
+
+    config EXAMPLE_UART_TXD
+        int "UART TXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        range 0 46 if IDF_TARGET_ESP32S2
+        default 4
+        help
+            GPIO number for UART TX pin. See UART documentation for more information
+            about available pin numbers for UART.
+
+    config EXAMPLE_TASK_STACK_SIZE
+        int "UART echo example task stack size"
+        range 1024 16384
+        default 2048
+        help
+            Defines stack size for UART echo example. Insufficient stack size can cause crash.
+
+endmenu

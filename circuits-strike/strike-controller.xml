@@ -1,0 +1,1760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/andy/devices/access-controller/circuits-strike/strike-controller.sch</source>
+    <date>Fri 21 Jan 2022 06:14:51 PM CST</date>
+    <tool>Eeschema 5.1.7-a382d34a88~90~ubuntu20.04.1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>strike-controller.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="2" name="/Microcontroller/" tstamps="/61E4D8AE/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>microcontroller.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="3" name="/USB/" tstamps="/61E5B8A5/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>usb.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="4" name="/Power/" tstamps="/61E5C138/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>power.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="5" name="/Transistor Array/" tstamps="/61E73398/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>transistor_array.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="J1">
+      <value>Conn_02x09_Odd_Even</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_2x09_P2.54mm_Vertical_SMD</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector_Generic" part="Conn_02x09_Odd_Even" description="Generic connector, double row, 02x09, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61EBE0AA</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>Molex_Blade_6pin</value>
+      <footprint>Connector_Molex:Molex_PicoBlade_53261-0671_1x06-1MP_P1.25mm_Horizontal</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1912111437_MOLEX-533980671_C277393.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C395347</field>
+        <field name="Part Number">533980671</field>
+      </fields>
+      <libsource lib="strike-controller-rescue" part="Molex_Blade_6pin-Open_Automation" description="6 Header - 0.049&quot;(1.25mm) Male Blade,P=1.25mm Wire To Board / Wire To Wire Connector ROHS"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61FCE742</tstamp>
+    </comp>
+    <comp ref="J4">
+      <value>Molex_Blade_6pin</value>
+      <footprint>Connector_Molex:Molex_PicoBlade_53261-0671_1x06-1MP_P1.25mm_Horizontal</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1912111437_MOLEX-533980671_C277393.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C395347</field>
+        <field name="Part Number">533980671</field>
+      </fields>
+      <libsource lib="strike-controller-rescue" part="Molex_Blade_6pin-Open_Automation" description="6 Header - 0.049&quot;(1.25mm) Male Blade,P=1.25mm Wire To Board / Wire To Wire Connector ROHS"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61FCFF19</tstamp>
+    </comp>
+    <comp ref="J5">
+      <value>Molex_Blade_6pin</value>
+      <footprint>Connector_Molex:Molex_PicoBlade_53261-0671_1x06-1MP_P1.25mm_Horizontal</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1912111437_MOLEX-533980671_C277393.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C395347</field>
+        <field name="Part Number">533980671</field>
+      </fields>
+      <libsource lib="strike-controller-rescue" part="Molex_Blade_6pin-Open_Automation" description="6 Header - 0.049&quot;(1.25mm) Male Blade,P=1.25mm Wire To Board / Wire To Wire Connector ROHS"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61FD3DFA</tstamp>
+    </comp>
+    <comp ref="J6">
+      <value>Molex_Blade_6pin</value>
+      <footprint>Connector_Molex:Molex_PicoBlade_53261-0671_1x06-1MP_P1.25mm_Horizontal</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1912111437_MOLEX-533980671_C277393.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C395347</field>
+        <field name="Part Number">533980671</field>
+      </fields>
+      <libsource lib="strike-controller-rescue" part="Molex_Blade_6pin-Open_Automation" description="6 Header - 0.049&quot;(1.25mm) Male Blade,P=1.25mm Wire To Board / Wire To Wire Connector ROHS"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61FD3EF6</tstamp>
+    </comp>
+    <comp ref="J7">
+      <value>Conn_01x01_Female</value>
+      <footprint>Open_Automation:Mount_Hole_1p5</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Female" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61ED43DD</tstamp>
+    </comp>
+    <comp ref="J8">
+      <value>Conn_01x01_Female</value>
+      <footprint>Open_Automation:Mount_Hole_1p5</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Female" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61EE04A4</tstamp>
+    </comp>
+    <comp ref="J9">
+      <value>Conn_01x01_Female</value>
+      <footprint>Open_Automation:Mount_Hole_1p5</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Female" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61EE465A</tstamp>
+    </comp>
+    <comp ref="J10">
+      <value>Conn_01x01_Female</value>
+      <footprint>Open_Automation:Mount_Hole_1p5</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Female" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>61EE4664</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>C_10uF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A106MA8NRNC_C96446.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C96446</field>
+        <field name="Part Number">CL10A106MA8NRNC</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_10uF" description="MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 10UF 25V 0805 ROHS"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>5B2706A8</tstamp>
+    </comp>
+    <comp ref="U1">
+      <value>ESP32-WROOM-32</value>
+      <footprint>RF_Module:ESP32-WROOM-32</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/2007061615_Espressif-Systems-ESP32-WROOM-32_C82899.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C82899</field>
+      </fields>
+      <libsource lib="Open_Automation" part="ESP32-WROOM-32" description="RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>601C2110</tstamp>
+    </comp>
+    <comp ref="D1">
+      <value>LED_G</value>
+      <footprint>Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C72041</field>
+        <field name="Part Number">19-217/BHC-ZL1M2RY/3T</field>
+      </fields>
+      <libsource lib="Open_Automation" part="LED_G" description="Green 570nm LED Indication - Discrete 2V 0603 (1608 Metric)"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>5CC255BE</tstamp>
+    </comp>
+    <comp ref="D2">
+      <value>LED_G</value>
+      <footprint>Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C72041</field>
+        <field name="Part Number">19-217/BHC-ZL1M2RY/3T</field>
+      </fields>
+      <libsource lib="Open_Automation" part="LED_G" description="Green 570nm LED Indication - Discrete 2V 0603 (1608 Metric)"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>5CC26ACF</tstamp>
+    </comp>
+    <comp ref="EN1">
+      <value>SW_PUSH_SM</value>
+      <footprint>Button_Switch_SMD:SW_SPST_TL3342</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/2002271431_XKB-Connectivity-TS-1187A-B-A-B_C318884.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C318884</field>
+        <field name="Part Number">TS-1187A-B-A-B</field>
+      </fields>
+      <libsource lib="Open_Automation" part="SW_PUSH_SM" description="Tactile Switch SPST-NO Top Actuated Surface Mount"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>61F22C20</tstamp>
+    </comp>
+    <comp ref="PROG1">
+      <value>SW_PUSH_SM</value>
+      <footprint>Button_Switch_SMD:SW_SPST_TL3342</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/2002271431_XKB-Connectivity-TS-1187A-B-A-B_C318884.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C318884</field>
+        <field name="Part Number">TS-1187A-B-A-B</field>
+      </fields>
+      <libsource lib="Open_Automation" part="SW_PUSH_SM" description="Tactile Switch SPST-NO Top Actuated Surface Mount"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>61F24274</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_10K_0402" description=""/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>61F38F2E</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_10K_0402" description=""/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>61F3DA6C</tstamp>
+    </comp>
+    <comp ref="C3">
+      <value>C_1uF</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05A105KA5NQNC_C52923.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C52923</field>
+        <field name="Part Number">CL05A105KA5NQNC</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_1uF" description="MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 1UF 25V 0402 ROHS"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>61F52FBE</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>C_1uF</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05A105KA5NQNC_C52923.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C52923</field>
+        <field name="Part Number">CL05A105KA5NQNC</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_1uF" description="MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 1UF 25V 0402 ROHS"/>
+      <sheetpath names="/Microcontroller/" tstamps="/61E4D8AE/"/>
+      <tstamp>61F55F9B</tstamp>
+    </comp>
+    <comp ref="C7">
+      <value>C_100nF_0402</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C1525</field>
+        <field name="Part Number">CL05B104KO5NNNC</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_100nF_0402" description="100NF 16V 0402"/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>60432E92</tstamp>
+    </comp>
+    <comp ref="C6">
+      <value>C_22uF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A226MQ8NRNC_C59461.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C59461</field>
+        <field name="Part Number">CL10A226MQ8NRNC</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_22uF" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>60430DBE</tstamp>
+    </comp>
+    <comp ref="R4">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_10K_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>6043D0F4</tstamp>
+    </comp>
+    <comp ref="R5">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_10K_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>60446CBF</tstamp>
+    </comp>
+    <comp ref="C4">
+      <value>C_27pF_0402</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Guangdong-Fenghua-Advanced-Tech-0402CG270J500NTN_C1557.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C1557</field>
+        <field name="Part Number">0402CG270J500NTN</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_27pF_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>60450786</tstamp>
+    </comp>
+    <comp ref="C5">
+      <value>C_27pF_0402</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Guangdong-Fenghua-Advanced-Tech-0402CG270J500NTN_C1557.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C1557</field>
+        <field name="Part Number">0402CG270J500NTN</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_27pF_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>604515C0</tstamp>
+    </comp>
+    <comp ref="R8">
+      <value>R_10K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_10K_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>6045B2FE</tstamp>
+    </comp>
+    <comp ref="R7">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>6045ED26</tstamp>
+    </comp>
+    <comp ref="R6">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>60460EF6</tstamp>
+    </comp>
+    <comp ref="Q2">
+      <value>Q_SS8050</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2150</field>
+        <field name="Part Number">SS8050</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_SS8050" description="NPN 1.5A"/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>60477658</tstamp>
+    </comp>
+    <comp ref="Q3">
+      <value>Q_SS8550</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8550_C8542.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C8542</field>
+        <field name="Part Number">SS8550</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_SS8550" description="0.025A Ic, 15V Vce, 5GHz Wideband PNP Transistor, SOT-23"/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>6047FF44</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>CH340T(SSOP20W)</value>
+      <footprint>Open_Automation:SSOP-20W</footprint>
+      <fields>
+        <field name="LCSC">C8689</field>
+        <field name="Part Number">CH340T</field>
+      </fields>
+      <libsource lib="Open_Automation" part="CH340T(SSOP20W)" description="USB 2MBPS 3.3V, 5V SSOP-20_208MIL ROHS"/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>605022CE</tstamp>
+    </comp>
+    <comp ref="Q1">
+      <value>Crystal_12Mhz</value>
+      <footprint>Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm_HandSoldering</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Yangxing-Tech-X322512MSB4SI_C9002.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C9002</field>
+        <field name="Part Number">X322512MSB4SI</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Crystal_12Mhz" description=""/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>6045824B</tstamp>
+    </comp>
+    <comp ref="J2">
+      <value>USB_B_Micro</value>
+      <footprint>Connector_USB:USB_Micro-B_Amphenol_10118194_Horizontal</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C132563</field>
+        <field name="Part Number">10118194-0001LF</field>
+      </fields>
+      <libsource lib="Open_Automation" part="USB_B_Micro" description="USB Micro Type B connector"/>
+      <sheetpath names="/USB/" tstamps="/61E5B8A5/"/>
+      <tstamp>61EAB842</tstamp>
+    </comp>
+    <comp ref="C8">
+      <value>C_10uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C15850</field>
+        <field name="Part Number">CL21A106KAYNNNE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_10uF" description="MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 10UF 25V 0805 ROHS"/>
+      <sheetpath names="/Power/" tstamps="/61E5C138/"/>
+      <tstamp>5FFACB78</tstamp>
+    </comp>
+    <comp ref="C9">
+      <value>C_10uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C15850</field>
+        <field name="Part Number">CL21A106KAYNNNE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="C_10uF" description="MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 10UF 25V 0805 ROHS"/>
+      <sheetpath names="/Power/" tstamps="/61E5C138/"/>
+      <tstamp>5FFACB57</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>REG_AMS1117-3.3</value>
+      <footprint>Package_TO_SOT_SMD:SOT-223-3_TabPin2</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/1811201117_Advanced-Monolithic-Systems-AMS-AMS1117-3-3_C6186.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C347222</field>
+        <field name="Part Number">AMS1117-3.3</field>
+      </fields>
+      <libsource lib="Open_Automation" part="REG_AMS1117-3.3" description="LOW DROPOUT REGULATORS(LDO) POSITIVE FIXED 1.3V @ 800MA 15V 3.3V 1A SOT-223 ROHS"/>
+      <sheetpath names="/Power/" tstamps="/61E5C138/"/>
+      <tstamp>61E2B9EA</tstamp>
+    </comp>
+    <comp ref="D4">
+      <value>LED_G</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C72041</field>
+        <field name="Part Number">19-217/BHC-ZL1M2RY/3T</field>
+      </fields>
+      <libsource lib="Open_Automation" part="LED_G" description="Green 570nm LED Indication - Discrete 2V 0603 (1608 Metric)"/>
+      <sheetpath names="/Power/" tstamps="/61E5C138/"/>
+      <tstamp>61E385A9</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Power/" tstamps="/61E5C138/"/>
+      <tstamp>61F4CAE7</tstamp>
+    </comp>
+    <comp ref="Q5">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E799E1</tstamp>
+    </comp>
+    <comp ref="R11">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E79DBA</tstamp>
+    </comp>
+    <comp ref="R12">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E7B073</tstamp>
+    </comp>
+    <comp ref="Q7">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E82A1E</tstamp>
+    </comp>
+    <comp ref="R14">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E82A2A</tstamp>
+    </comp>
+    <comp ref="R15">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E82A36</tstamp>
+    </comp>
+    <comp ref="Q8">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E83670</tstamp>
+    </comp>
+    <comp ref="R16">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E8367C</tstamp>
+    </comp>
+    <comp ref="R18">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E83688</tstamp>
+    </comp>
+    <comp ref="Q10">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E836A5</tstamp>
+    </comp>
+    <comp ref="R19">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E836B1</tstamp>
+    </comp>
+    <comp ref="R21">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E836BD</tstamp>
+    </comp>
+    <comp ref="R10">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E8658D</tstamp>
+    </comp>
+    <comp ref="Q6">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E865B6</tstamp>
+    </comp>
+    <comp ref="R13">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E865C2</tstamp>
+    </comp>
+    <comp ref="Q9">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E865EB</tstamp>
+    </comp>
+    <comp ref="R17">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E865F7</tstamp>
+    </comp>
+    <comp ref="Q12">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61ED0BDA</tstamp>
+    </comp>
+    <comp ref="R22">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61ED0DAC</tstamp>
+    </comp>
+    <comp ref="R24">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61ED0DB8</tstamp>
+    </comp>
+    <comp ref="Q13">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61ED0DD3</tstamp>
+    </comp>
+    <comp ref="R23">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61ED0DDF</tstamp>
+    </comp>
+    <comp ref="Q4">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E86493</tstamp>
+    </comp>
+    <comp ref="R20">
+      <value>R_1K_0402</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</datasheet>
+      <fields>
+        <field name="LCSC">C11702</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+      </fields>
+      <libsource lib="Open_Automation" part="R_1K_0402" description=""/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E8662C</tstamp>
+    </comp>
+    <comp ref="Q11">
+      <value>Q_MMBT5551</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C2145</field>
+        <field name="Part Number">MMBT5551</field>
+      </fields>
+      <libsource lib="Open_Automation" part="Q_MMBT5551" description="160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E86620</tstamp>
+    </comp>
+    <comp ref="D5">
+      <value>D_SM4007PL</value>
+      <footprint>Diode_SMD:D_SOD-123F</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C64898</field>
+        <field name="Part Number">SM4007PL</field>
+      </fields>
+      <libsource lib="Open_Automation" part="D_SM4007PL" description="40V 1A 600mV @ 1A SOD-123 Schottky Barrier Diodes (SBD) RoHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E674AA</tstamp>
+    </comp>
+    <comp ref="D6">
+      <value>D_SM4007PL</value>
+      <footprint>Diode_SMD:D_SOD-123F</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C64898</field>
+        <field name="Part Number">SM4007PL</field>
+      </fields>
+      <libsource lib="Open_Automation" part="D_SM4007PL" description="40V 1A 600mV @ 1A SOD-123 Schottky Barrier Diodes (SBD) RoHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E6F86C</tstamp>
+    </comp>
+    <comp ref="D7">
+      <value>D_SM4007PL</value>
+      <footprint>Diode_SMD:D_SOD-123F</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C64898</field>
+        <field name="Part Number">SM4007PL</field>
+      </fields>
+      <libsource lib="Open_Automation" part="D_SM4007PL" description="40V 1A 600mV @ 1A SOD-123 Schottky Barrier Diodes (SBD) RoHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E7492A</tstamp>
+    </comp>
+    <comp ref="D8">
+      <value>D_SM4007PL</value>
+      <footprint>Diode_SMD:D_SOD-123F</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C64898</field>
+        <field name="Part Number">SM4007PL</field>
+      </fields>
+      <libsource lib="Open_Automation" part="D_SM4007PL" description="40V 1A 600mV @ 1A SOD-123 Schottky Barrier Diodes (SBD) RoHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E7A92E</tstamp>
+    </comp>
+    <comp ref="D9">
+      <value>D_SM4007PL</value>
+      <footprint>Diode_SMD:D_SOD-123F</footprint>
+      <datasheet>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C64898</field>
+        <field name="Part Number">SM4007PL</field>
+      </fields>
+      <libsource lib="Open_Automation" part="D_SM4007PL" description="40V 1A 600mV @ 1A SOD-123 Schottky Barrier Diodes (SBD) RoHS"/>
+      <sheetpath names="/Transistor Array/" tstamps="/61E73398/"/>
+      <tstamp>61E7EBEB</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="Conn_01x01_Female">
+      <description>Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x01_Female</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Connector_Generic" part="Conn_02x09_Odd_Even">
+      <description>Generic connector, double row, 02x09, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_2x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_02x09_Odd_Even</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+        <pin num="5" name="Pin_5" type="passive"/>
+        <pin num="6" name="Pin_6" type="passive"/>
+        <pin num="7" name="Pin_7" type="passive"/>
+        <pin num="8" name="Pin_8" type="passive"/>
+        <pin num="9" name="Pin_9" type="passive"/>
+        <pin num="10" name="Pin_10" type="passive"/>
+        <pin num="11" name="Pin_11" type="passive"/>
+        <pin num="12" name="Pin_12" type="passive"/>
+        <pin num="13" name="Pin_13" type="passive"/>
+        <pin num="14" name="Pin_14" type="passive"/>
+        <pin num="15" name="Pin_15" type="passive"/>
+        <pin num="16" name="Pin_16" type="passive"/>
+        <pin num="17" name="Pin_17" type="passive"/>
+        <pin num="18" name="Pin_18" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="CH340T(SSOP20W)">
+      <description>USB 2MBPS 3.3V, 5V SSOP-20_208MIL ROHS</description>
+      <docs>https://pdf1.alldatasheet.com/datasheet-pdf/view/1132603/WCH/CH340T.html</docs>
+      <footprints>
+        <fp>SSOP-20W</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">CH340T(SSOP20W)</field>
+        <field name="Footprint">Open_Automation:SSOP-20W</field>
+        <field name="Part Number">CH340T</field>
+        <field name="LCSC">C8689</field>
+      </fields>
+      <pins>
+        <pin num="3" name="TXD" type="output"/>
+        <pin num="4" name="RXD" type="input"/>
+        <pin num="5" name="V3" type="power_in"/>
+        <pin num="6" name="UD+" type="BiDi"/>
+        <pin num="7" name="UD-" type="BiDi"/>
+        <pin num="8" name="GND" type="power_in"/>
+        <pin num="9" name="XI" type="input"/>
+        <pin num="10" name="XO" type="output"/>
+        <pin num="11" name="CTS#" type="input"/>
+        <pin num="12" name="DSR#" type="input"/>
+        <pin num="13" name="RI#" type="input"/>
+        <pin num="14" name="DCD#" type="input"/>
+        <pin num="15" name="DTR#" type="output"/>
+        <pin num="16" name="RTS#" type="output"/>
+        <pin num="17" name="IR#" type="input"/>
+        <pin num="19" name="VCC" type="power_in"/>
+        <pin num="20" name="NOS#" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="C_100nF_0402">
+      <description>100NF 16V 0402</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf</docs>
+      <footprints>
+        <fp>C?</fp>
+        <fp>C_????_*</fp>
+        <fp>C_????</fp>
+        <fp>SMD*_c</fp>
+        <fp>Capacitor*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_100nF_0402</field>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</field>
+        <field name="LCSC">C1525</field>
+        <field name="Part Number">CL05B104KO5NNNC</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="C_10uF">
+      <description>MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 10UF 25V 0805 ROHS</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf</docs>
+      <footprints>
+        <fp>C?</fp>
+        <fp>C_????_*</fp>
+        <fp>C_????</fp>
+        <fp>SMD*_c</fp>
+        <fp>Capacitor*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_10uF</field>
+        <field name="Footprint">Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</field>
+        <field name="Part Number">CL21A106KAYNNNE</field>
+        <field name="LCSC">C15850</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="C_1uF">
+      <description>MULTILAYER CERAMIC CAPACITORS MLCC - SMD/SMT 1UF 25V 0402 ROHS</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL05A105KA5NQNC_C52923.pdf</docs>
+      <footprints>
+        <fp>C?</fp>
+        <fp>C_????_*</fp>
+        <fp>C_????</fp>
+        <fp>SMD*_c</fp>
+        <fp>Capacitor*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_1uF</field>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</field>
+        <field name="LCSC">C52923</field>
+        <field name="Part Number">CL05A105KA5NQNC</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="C_22uF">
+      <docs>https://datasheet.lcsc.com/szlcsc/Samsung-Electro-Mechanics-CL10A226MQ8NRNC_C59461.pdf</docs>
+      <footprints>
+        <fp>C?</fp>
+        <fp>C_????_*</fp>
+        <fp>C_????</fp>
+        <fp>SMD*_c</fp>
+        <fp>Capacitor*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_22uF</field>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</field>
+        <field name="Part Number">CL10A226MQ8NRNC</field>
+        <field name="LCSC">C59461</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="C_27pF_0402">
+      <docs>https://datasheet.lcsc.com/szlcsc/Guangdong-Fenghua-Advanced-Tech-0402CG270J500NTN_C1557.pdf</docs>
+      <footprints>
+        <fp>C?</fp>
+        <fp>C_????_*</fp>
+        <fp>C_????</fp>
+        <fp>SMD*_c</fp>
+        <fp>Capacitor*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_27pF_0402</field>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder</field>
+        <field name="Part Number">0402CG270J500NTN</field>
+        <field name="LCSC">C1557</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="Crystal_12Mhz">
+      <docs>https://datasheet.lcsc.com/szlcsc/Yangxing-Tech-X322512MSB4SI_C9002.pdf</docs>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">Crystal_12Mhz</field>
+        <field name="Footprint">Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm_HandSoldering</field>
+        <field name="Part Number">X322512MSB4SI</field>
+        <field name="LCSC">C9002</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="case" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+        <pin num="4" name="case" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="D_SM4007PL">
+      <aliases>
+        <alias>BAS20_copy_copy</alias>
+        <alias>BAS21_copy_copy</alias>
+      </aliases>
+      <description>40V 1A 600mV @ 1A SOD-123 Schottky Barrier Diodes (SBD) RoHS</description>
+      <docs>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</docs>
+      <footprints>
+        <fp>SOT?23*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">D_SM4007PL</field>
+        <field name="Footprint">Diode_SMD:D_SOD-123F</field>
+        <field name="Part Number">SM4007PL</field>
+        <field name="LCSC">C64898</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="ESP32-WROOM-32">
+      <aliases>
+        <alias>ESP32-WROOM-32D</alias>
+      </aliases>
+      <description>RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/2007061615_Espressif-Systems-ESP32-WROOM-32_C82899.pdf</docs>
+      <footprints>
+        <fp>ESP32?WROOM?32*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ESP32-WROOM-32</field>
+        <field name="Footprint">RF_Module:ESP32-WROOM-32</field>
+        <field name="LCSC">C82899</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="power_in"/>
+        <pin num="2" name="VDD" type="power_in"/>
+        <pin num="3" name="EN" type="input"/>
+        <pin num="4" name="SENSOR_VP" type="input"/>
+        <pin num="5" name="SENSOR_VN" type="input"/>
+        <pin num="6" name="IO34" type="input"/>
+        <pin num="7" name="IO35" type="input"/>
+        <pin num="8" name="IO32" type="BiDi"/>
+        <pin num="9" name="IO33" type="BiDi"/>
+        <pin num="10" name="IO25" type="BiDi"/>
+        <pin num="11" name="IO26" type="BiDi"/>
+        <pin num="12" name="IO27" type="BiDi"/>
+        <pin num="13" name="IO14" type="BiDi"/>
+        <pin num="14" name="IO12" type="BiDi"/>
+        <pin num="15" name="GND" type="passive"/>
+        <pin num="16" name="IO13" type="BiDi"/>
+        <pin num="17" name="SHD/SD2" type="BiDi"/>
+        <pin num="18" name="SWP/SD3" type="BiDi"/>
+        <pin num="19" name="SCS/CMD" type="BiDi"/>
+        <pin num="20" name="SCK/CLK" type="BiDi"/>
+        <pin num="21" name="SDO/SD0" type="BiDi"/>
+        <pin num="22" name="SDI/SD1" type="BiDi"/>
+        <pin num="23" name="IO15" type="BiDi"/>
+        <pin num="24" name="IO2" type="BiDi"/>
+        <pin num="25" name="IO0" type="BiDi"/>
+        <pin num="26" name="IO4" type="BiDi"/>
+        <pin num="27" name="IO16" type="BiDi"/>
+        <pin num="28" name="IO17" type="BiDi"/>
+        <pin num="29" name="IO5" type="BiDi"/>
+        <pin num="30" name="IO18" type="BiDi"/>
+        <pin num="31" name="IO19" type="BiDi"/>
+        <pin num="32" name="NC" type="NotConnected"/>
+        <pin num="33" name="IO21" type="BiDi"/>
+        <pin num="34" name="RXD0/IO3" type="BiDi"/>
+        <pin num="35" name="TXD0/IO1" type="BiDi"/>
+        <pin num="36" name="IO22" type="BiDi"/>
+        <pin num="37" name="IO23" type="BiDi"/>
+        <pin num="38" name="GND" type="passive"/>
+        <pin num="39" name="GND" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="LED_G">
+      <description>Green 570nm LED Indication - Discrete 2V 0603 (1608 Metric)</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf</docs>
+      <footprints>
+        <fp>LED*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">LED_G</field>
+        <field name="Footprint">LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</field>
+        <field name="Part Number">19-217/BHC-ZL1M2RY/3T</field>
+        <field name="LCSC">C72041</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="Q_MMBT5551">
+      <description>160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</docs>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">Q_MMBT5551</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-23</field>
+        <field name="Part Number">MMBT5551</field>
+        <field name="LCSC">C2145</field>
+      </fields>
+      <pins>
+        <pin num="1" name="B" type="passive"/>
+        <pin num="2" name="E" type="passive"/>
+        <pin num="3" name="C" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="Q_SS8050">
+      <description>NPN 1.5A</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8050_C2150.pdf</docs>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">Q_SS8050</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-23</field>
+        <field name="Part Number">SS8050</field>
+        <field name="LCSC">C2150</field>
+      </fields>
+      <pins>
+        <pin num="1" name="B" type="passive"/>
+        <pin num="2" name="E" type="passive"/>
+        <pin num="3" name="C" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="Q_SS8550">
+      <description>0.025A Ic, 15V Vce, 5GHz Wideband PNP Transistor, SOT-23</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/Changjiang-Electronics-Tech-CJ-SS8550_C8542.pdf</docs>
+      <footprints>
+        <fp>SOT?23*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">Q_SS8550</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-23</field>
+        <field name="Part Number">SS8550</field>
+        <field name="LCSC">C8542</field>
+      </fields>
+      <pins>
+        <pin num="1" name="B" type="input"/>
+        <pin num="2" name="E" type="passive"/>
+        <pin num="3" name="C" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="REG_AMS1117-3.3">
+      <description>LOW DROPOUT REGULATORS(LDO) POSITIVE FIXED 1.3V @ 800MA 15V 3.3V 1A SOT-223 ROHS</description>
+      <docs>https://datasheet.lcsc.com/szlcsc/1811201117_Advanced-Monolithic-Systems-AMS-AMS1117-3-3_C6186.pdf</docs>
+      <footprints>
+        <fp>SOT-23*</fp>
+        <fp>SOT-23*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U1</field>
+        <field name="Value">REG_AMS1117-3.3</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-223-3_TabPin2</field>
+        <field name="Part Number">AMS1117-3.3</field>
+        <field name="LCSC">C347222</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="openCol"/>
+        <pin num="2" name="Vout" type="input"/>
+        <pin num="3" name="Vin" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="R_10K_0402">
+      <docs>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</docs>
+      <footprints>
+        <fp>R_*</fp>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R_10K_0402</field>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+        <field name="LCSC">C25744</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="R_1K_0402">
+      <docs>https://www.digikey.com/product-detail/en/panasonic-electronic-components/ERJ-3GEYJ102V/P1.0KGDKR-ND/577615</docs>
+      <footprints>
+        <fp>R_*</fp>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R_1K_0402</field>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</field>
+        <field name="Part Number">0402WGF1001TCE</field>
+        <field name="LCSC">C11702</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="SW_PUSH_SM">
+      <description>Tactile Switch SPST-NO Top Actuated Surface Mount</description>
+      <docs>https://datasheet.lcsc.com/lcsc/2002271431_XKB-Connectivity-TS-1187A-B-A-B_C318884.pdf</docs>
+      <fields>
+        <field name="Reference">SW</field>
+        <field name="Value">SW_PUSH_SM</field>
+        <field name="Footprint">Button_Switch_SMD:SW_SPST_TL3342</field>
+        <field name="Part Number">TS-1187A-B-A-B</field>
+        <field name="LCSC">C318884</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Open_Automation" part="USB_B_Micro">
+      <aliases>
+        <alias>USB_B_Mini</alias>
+      </aliases>
+      <description>USB Micro Type B connector</description>
+      <docs>https://datasheet.lcsc.com/lcsc/1811131822_Amphenol-ICC-10118194-0001LF_C132563.pdf</docs>
+      <footprints>
+        <fp>USB*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">USB_B_Micro</field>
+        <field name="Footprint">Connector_USB:USB_Micro-B_Amphenol_10118194_Horizontal</field>
+        <field name="LCSC">C132563</field>
+        <field name="Part Number">10118194-0001LF</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VBUS" type="power_out"/>
+        <pin num="2" name="D-" type="BiDi"/>
+        <pin num="3" name="D+" type="BiDi"/>
+        <pin num="4" name="ID" type="passive"/>
+        <pin num="5" name="GND" type="power_out"/>
+        <pin num="6" name="Shield" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="strike-controller-rescue" part="Molex_Blade_6pin-Open_Automation">
+      <description>6 Header - 0.049"(1.25mm) Male Blade,P=1.25mm Wire To Board / Wire To Wire Connector ROHS</description>
+      <docs>https://datasheet.lcsc.com/lcsc/1912111437_MOLEX-533980671_C277393.pdf</docs>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Molex_Blade_6pin-Open_Automation</field>
+        <field name="Footprint">Connector_Molex:Molex_PicoBlade_53261-0671_1x06-1MP_P1.25mm_Horizontal</field>
+        <field name="Part Number">533980671</field>
+        <field name="LCSC">C395347</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+        <pin num="5" name="Pin_5" type="passive"/>
+        <pin num="6" name="Pin_6" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>/usr/share/kicad/library/Connector.lib</uri>
+    </library>
+    <library logical="Connector_Generic">
+      <uri>/usr/share/kicad/library/Connector_Generic.lib</uri>
+    </library>
+    <library logical="Open_Automation">
+      <uri>/home/andy/circuits/kicad-parts/Open_Automation.lib</uri>
+    </library>
+    <library logical="strike-controller-rescue">
+      <uri>/home/andy/devices/access-controller/circuits-strike/strike-controller-rescue.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/3V3">
+      <node ref="R8" pin="2"/>
+      <node ref="R24" pin="2"/>
+      <node ref="C2" pin="1"/>
+      <node ref="C1" pin="1"/>
+      <node ref="D1" pin="2"/>
+      <node ref="R15" pin="2"/>
+      <node ref="U3" pin="2"/>
+      <node ref="D4" pin="2"/>
+      <node ref="D2" pin="2"/>
+      <node ref="U3" pin="2"/>
+      <node ref="C9" pin="1"/>
+      <node ref="J6" pin="3"/>
+      <node ref="R21" pin="2"/>
+      <node ref="J1" pin="13"/>
+      <node ref="R18" pin="2"/>
+      <node ref="U1" pin="2"/>
+      <node ref="R12" pin="2"/>
+      <node ref="J4" pin="4"/>
+    </net>
+    <net code="2" name="GND">
+      <node ref="Q1" pin="2"/>
+      <node ref="C7" pin="2"/>
+      <node ref="C4" pin="2"/>
+      <node ref="C5" pin="2"/>
+      <node ref="C6" pin="2"/>
+      <node ref="EN1" pin="2"/>
+      <node ref="U1" pin="38"/>
+      <node ref="U1" pin="39"/>
+      <node ref="U1" pin="1"/>
+      <node ref="U1" pin="15"/>
+      <node ref="PROG1" pin="2"/>
+      <node ref="C3" pin="2"/>
+      <node ref="C2" pin="2"/>
+      <node ref="C1" pin="2"/>
+      <node ref="Q4" pin="2"/>
+      <node ref="Q7" pin="2"/>
+      <node ref="Q8" pin="2"/>
+      <node ref="Q10" pin="2"/>
+      <node ref="Q13" pin="2"/>
+      <node ref="Q11" pin="2"/>
+      <node ref="Q9" pin="2"/>
+      <node ref="Q6" pin="2"/>
+      <node ref="Q5" pin="2"/>
+      <node ref="J3" pin="4"/>
+      <node ref="U2" pin="8"/>
+      <node ref="J2" pin="6"/>
+      <node ref="J2" pin="5"/>
+      <node ref="C9" pin="2"/>
+      <node ref="Q12" pin="2"/>
+      <node ref="Q1" pin="4"/>
+      <node ref="C8" pin="2"/>
+      <node ref="U3" pin="1"/>
+      <node ref="R3" pin="2"/>
+      <node ref="J1" pin="17"/>
+      <node ref="J1" pin="7"/>
+      <node ref="J10" pin="1"/>
+      <node ref="J9" pin="1"/>
+      <node ref="J8" pin="1"/>
+      <node ref="J7" pin="1"/>
+      <node ref="J1" pin="18"/>
+      <node ref="J6" pin="6"/>
+      <node ref="J6" pin="1"/>
+      <node ref="J4" pin="6"/>
+      <node ref="J4" pin="3"/>
+    </net>
+    <net code="3" name="/POWER">
+      <node ref="J6" pin="2"/>
+      <node ref="J1" pin="2"/>
+      <node ref="J5" pin="4"/>
+      <node ref="J5" pin="1"/>
+      <node ref="J1" pin="8"/>
+      <node ref="J4" pin="1"/>
+      <node ref="U3" pin="3"/>
+      <node ref="C8" pin="1"/>
+      <node ref="D9" pin="1"/>
+      <node ref="D5" pin="1"/>
+      <node ref="D6" pin="1"/>
+      <node ref="D7" pin="1"/>
+      <node ref="D8" pin="1"/>
+      <node ref="J3" pin="1"/>
+      <node ref="J6" pin="5"/>
+      <node ref="J1" pin="1"/>
+      <node ref="J1" pin="14"/>
+    </net>
+    <net code="4" name="/IO17">
+      <node ref="J6" pin="4"/>
+      <node ref="U1" pin="28"/>
+    </net>
+    <net code="5" name="/CONTACT1">
+      <node ref="J5" pin="3"/>
+      <node ref="J1" pin="6"/>
+      <node ref="R14" pin="2"/>
+    </net>
+    <net code="6" name="/LOCK1">
+      <node ref="Q4" pin="3"/>
+      <node ref="J1" pin="4"/>
+      <node ref="J5" pin="2"/>
+      <node ref="D5" pin="2"/>
+    </net>
+    <net code="7" name="/AUX">
+      <node ref="J1" pin="11"/>
+      <node ref="Q13" pin="3"/>
+      <node ref="D9" pin="2"/>
+      <node ref="J3" pin="6"/>
+    </net>
+    <net code="8" name="/BUZZER1">
+      <node ref="J4" pin="5"/>
+      <node ref="D8" pin="2"/>
+      <node ref="Q11" pin="3"/>
+      <node ref="J1" pin="15"/>
+    </net>
+    <net code="9" name="/KEYPAD_PUSH">
+      <node ref="Q9" pin="3"/>
+      <node ref="D7" pin="2"/>
+      <node ref="J3" pin="5"/>
+      <node ref="J1" pin="9"/>
+    </net>
+    <net code="10" name="/LOCK2">
+      <node ref="J1" pin="10"/>
+      <node ref="D6" pin="2"/>
+      <node ref="Q6" pin="3"/>
+      <node ref="J5" pin="5"/>
+    </net>
+    <net code="11" name="/WG_D1">
+      <node ref="J3" pin="3"/>
+      <node ref="J1" pin="5"/>
+      <node ref="R22" pin="2"/>
+    </net>
+    <net code="12" name="/WG_D0">
+      <node ref="J3" pin="2"/>
+      <node ref="J1" pin="3"/>
+      <node ref="R19" pin="2"/>
+    </net>
+    <net code="13" name="/EXIT">
+      <node ref="J1" pin="16"/>
+      <node ref="R11" pin="2"/>
+      <node ref="J4" pin="2"/>
+    </net>
+    <net code="14" name="/CONTACT2">
+      <node ref="R16" pin="2"/>
+      <node ref="J5" pin="6"/>
+      <node ref="J1" pin="12"/>
+    </net>
+    <net code="15" name="/RX">
+      <node ref="R8" pin="1"/>
+      <node ref="U1" pin="34"/>
+      <node ref="R5" pin="2"/>
+      <node ref="U2" pin="3"/>
+    </net>
+    <net code="16" name="/TX">
+      <node ref="U1" pin="35"/>
+      <node ref="R4" pin="2"/>
+      <node ref="U2" pin="4"/>
+    </net>
+    <net code="17" name="/CONTACT2_IO">
+      <node ref="R18" pin="1"/>
+      <node ref="U1" pin="27"/>
+      <node ref="Q8" pin="3"/>
+    </net>
+    <net code="18" name="/AUX_IO">
+      <node ref="U1" pin="37"/>
+      <node ref="R23" pin="2"/>
+    </net>
+    <net code="19" name="/KEYPAD_PUSH_IO">
+      <node ref="R17" pin="2"/>
+      <node ref="U1" pin="33"/>
+    </net>
+    <net code="20" name="/BUZZER1_IO">
+      <node ref="U1" pin="36"/>
+      <node ref="R20" pin="2"/>
+    </net>
+    <net code="21" name="/LOCK1_IO">
+      <node ref="R10" pin="2"/>
+      <node ref="U1" pin="30"/>
+    </net>
+    <net code="22" name="/WG_D0_IO">
+      <node ref="U1" pin="14"/>
+      <node ref="Q10" pin="3"/>
+      <node ref="R21" pin="1"/>
+    </net>
+    <net code="23" name="/CONTACT1_IO">
+      <node ref="Q7" pin="3"/>
+      <node ref="R15" pin="1"/>
+      <node ref="U1" pin="23"/>
+    </net>
+    <net code="24" name="/EXIT_IO">
+      <node ref="Q5" pin="3"/>
+      <node ref="R12" pin="1"/>
+      <node ref="U1" pin="13"/>
+    </net>
+    <net code="25" name="/WG_D1_IO">
+      <node ref="U1" pin="16"/>
+      <node ref="R24" pin="1"/>
+      <node ref="Q12" pin="3"/>
+    </net>
+    <net code="26" name="/Microcontroller/IO35">
+      <node ref="U1" pin="7"/>
+    </net>
+    <net code="27" name="/Microcontroller/IO26">
+      <node ref="U1" pin="11"/>
+    </net>
+    <net code="28" name="/Microcontroller/IO25">
+      <node ref="U1" pin="10"/>
+    </net>
+    <net code="29" name="/Microcontroller/IO34">
+      <node ref="U1" pin="6"/>
+    </net>
+    <net code="30" name="/Microcontroller/IO27">
+      <node ref="U1" pin="12"/>
+    </net>
+    <net code="31" name="/PROG">
+      <node ref="C3" pin="1"/>
+      <node ref="R2" pin="1"/>
+      <node ref="U1" pin="25"/>
+      <node ref="Q3" pin="2"/>
+      <node ref="PROG1" pin="1"/>
+    </net>
+    <net code="32" name="/Microcontroller/IO32">
+      <node ref="U1" pin="8"/>
+    </net>
+    <net code="33" name="/Microcontroller/IO33">
+      <node ref="U1" pin="9"/>
+    </net>
+    <net code="34" name="/Microcontroller/IO4">
+      <node ref="U1" pin="26"/>
+    </net>
+    <net code="35" name="/Microcontroller/IO5">
+      <node ref="U1" pin="29"/>
+    </net>
+    <net code="36" name="/IO2">
+      <node ref="U1" pin="24"/>
+    </net>
+    <net code="37" name="/ESP_EN">
+      <node ref="Q2" pin="3"/>
+      <node ref="R1" pin="1"/>
+      <node ref="U1" pin="3"/>
+      <node ref="EN1" pin="1"/>
+    </net>
+    <net code="38" name="/LOCK2_IO">
+      <node ref="R13" pin="2"/>
+      <node ref="U1" pin="31"/>
+    </net>
+    <net code="39" name="Net-(U1-Pad32)">
+      <node ref="U1" pin="32"/>
+    </net>
+    <net code="40" name="Net-(U1-Pad22)">
+      <node ref="U1" pin="22"/>
+    </net>
+    <net code="41" name="Net-(U1-Pad21)">
+      <node ref="U1" pin="21"/>
+    </net>
+    <net code="42" name="Net-(U1-Pad20)">
+      <node ref="U1" pin="20"/>
+    </net>
+    <net code="43" name="Net-(U1-Pad5)">
+      <node ref="U1" pin="5"/>
+    </net>
+    <net code="44" name="Net-(U1-Pad17)">
+      <node ref="U1" pin="17"/>
+    </net>
+    <net code="45" name="Net-(U1-Pad18)">
+      <node ref="U1" pin="18"/>
+    </net>
+    <net code="46" name="Net-(U1-Pad19)">
+      <node ref="U1" pin="19"/>
+    </net>
+    <net code="47" name="Net-(D1-Pad1)">
+      <node ref="D1" pin="1"/>
+      <node ref="R1" pin="2"/>
+    </net>
+    <net code="48" name="Net-(D2-Pad1)">
+      <node ref="D2" pin="1"/>
+      <node ref="R2" pin="2"/>
+    </net>
+    <net code="49" name="/Microcontroller/FACT">
+      <node ref="U1" pin="4"/>
+    </net>
+    <net code="50" name="Net-(C7-Pad1)">
+      <node ref="U2" pin="5"/>
+      <node ref="R5" pin="1"/>
+      <node ref="C7" pin="1"/>
+    </net>
+    <net code="51" name="Net-(Q2-Pad1)">
+      <node ref="Q2" pin="1"/>
+      <node ref="R6" pin="1"/>
+    </net>
+    <net code="52" name="Net-(Q2-Pad2)">
+      <node ref="Q2" pin="2"/>
+      <node ref="U2" pin="16"/>
+      <node ref="R7" pin="2"/>
+    </net>
+    <net code="53" name="Net-(Q3-Pad1)">
+      <node ref="Q3" pin="1"/>
+      <node ref="R7" pin="1"/>
+    </net>
+    <net code="54" name="/USB/D-">
+      <node ref="J2" pin="3"/>
+      <node ref="U2" pin="7"/>
+    </net>
+    <net code="55" name="/USB/D+">
+      <node ref="J2" pin="2"/>
+      <node ref="U2" pin="6"/>
+    </net>
+    <net code="56" name="Net-(C4-Pad1)">
+      <node ref="U2" pin="9"/>
+      <node ref="C4" pin="1"/>
+      <node ref="Q1" pin="1"/>
+    </net>
+    <net code="57" name="Net-(J2-Pad4)">
+      <node ref="J2" pin="4"/>
+    </net>
+    <net code="58" name="Net-(Q3-Pad3)">
+      <node ref="U2" pin="15"/>
+      <node ref="R6" pin="2"/>
+      <node ref="Q3" pin="3"/>
+    </net>
+    <net code="59" name="Net-(U2-Pad20)">
+      <node ref="U2" pin="20"/>
+    </net>
+    <net code="60" name="Net-(C5-Pad1)">
+      <node ref="C5" pin="1"/>
+      <node ref="Q1" pin="3"/>
+      <node ref="U2" pin="10"/>
+    </net>
+    <net code="61" name="Net-(U2-Pad11)">
+      <node ref="U2" pin="11"/>
+    </net>
+    <net code="62" name="Net-(U2-Pad12)">
+      <node ref="U2" pin="12"/>
+    </net>
+    <net code="63" name="Net-(U2-Pad13)">
+      <node ref="U2" pin="13"/>
+    </net>
+    <net code="64" name="Net-(U2-Pad14)">
+      <node ref="U2" pin="14"/>
+    </net>
+    <net code="65" name="Net-(U2-Pad17)">
+      <node ref="U2" pin="17"/>
+    </net>
+    <net code="66" name="/USB/5V">
+      <node ref="U2" pin="19"/>
+      <node ref="R4" pin="1"/>
+      <node ref="C6" pin="1"/>
+      <node ref="J2" pin="1"/>
+    </net>
+    <net code="67" name="Net-(D4-Pad1)">
+      <node ref="D4" pin="1"/>
+      <node ref="R3" pin="1"/>
+    </net>
+    <net code="68" name="Net-(Q12-Pad1)">
+      <node ref="R22" pin="1"/>
+      <node ref="Q12" pin="1"/>
+    </net>
+    <net code="69" name="Net-(Q11-Pad1)">
+      <node ref="Q11" pin="1"/>
+      <node ref="R20" pin="1"/>
+    </net>
+    <net code="70" name="Net-(D5-Pad2)">
+      <node ref="D5" pin="2"/>
+    </net>
+    <net code="71" name="Net-(D6-Pad2)">
+      <node ref="D6" pin="2"/>
+    </net>
+    <net code="72" name="Net-(D7-Pad2)">
+      <node ref="D7" pin="2"/>
+    </net>
+    <net code="73" name="Net-(D8-Pad2)">
+      <node ref="D8" pin="2"/>
+    </net>
+    <net code="74" name="Net-(D9-Pad2)">
+      <node ref="D9" pin="2"/>
+    </net>
+    <net code="75" name="Net-(Q13-Pad1)">
+      <node ref="R23" pin="1"/>
+      <node ref="Q13" pin="1"/>
+    </net>
+    <net code="76" name="Net-(Q4-Pad1)">
+      <node ref="R10" pin="1"/>
+      <node ref="Q4" pin="1"/>
+    </net>
+    <net code="77" name="Net-(Q7-Pad1)">
+      <node ref="Q7" pin="1"/>
+      <node ref="R14" pin="1"/>
+    </net>
+    <net code="78" name="Net-(Q8-Pad1)">
+      <node ref="Q8" pin="1"/>
+      <node ref="R16" pin="1"/>
+    </net>
+    <net code="79" name="Net-(Q5-Pad1)">
+      <node ref="Q5" pin="1"/>
+      <node ref="R11" pin="1"/>
+    </net>
+    <net code="80" name="Net-(Q10-Pad1)">
+      <node ref="Q10" pin="1"/>
+      <node ref="R19" pin="1"/>
+    </net>
+    <net code="81" name="Net-(Q9-Pad1)">
+      <node ref="R17" pin="1"/>
+      <node ref="Q9" pin="1"/>
+    </net>
+    <net code="82" name="Net-(Q6-Pad1)">
+      <node ref="Q6" pin="1"/>
+      <node ref="R13" pin="1"/>
+    </net>
+  </nets>
+</export>

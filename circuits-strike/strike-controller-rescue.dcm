@@ -1,0 +1,8 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP Molex_Blade_6pin-Open_Automation
+D 6 Header - 0.049"(1.25mm) Male Blade,P=1.25mm Wire To Board / Wire To Wire Connector ROHS
+F https://datasheet.lcsc.com/lcsc/1912111437_MOLEX-533980671_C277393.pdf
+$ENDCMP
+#
+#End Doc Library
