@@ -1,6 +1,13 @@
-# NFC Lock
-ESP32 lock controller with NFC and motion detection.
+### Objective
 
+Commercial access controller for strike and magnetic locks. Supports Weigand protocols for RFID Keypad, fingerprint scanners, and other end devices.
+
+Includes firmware, schematics, layout, and 3D models.
+
+
+![Alt text](/images/controller.png?raw=true "PCB")
+
+![Alt text](/images/controller-3d.png?raw=true "PCB")
 
 ## Install [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html)
 
