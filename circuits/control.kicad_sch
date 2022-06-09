@@ -213,11 +213,11 @@
         )
       )
     )
-    (symbol "Q_MMBT5551_1" (pin_names (offset 0) hide) (in_bom yes) (on_board yes)
+    (symbol "Open_Automation:Q_MMBT5551" (pin_names (offset 0) hide) (in_bom yes) (on_board yes)
       (property "Reference" "Q" (id 0) (at 7.62 1.27 0)
         (effects (font (size 1.27 1.27)) (justify right))
       )
-      (property "Value" "Q_MMBT5551_1" (id 1) (at 15.24 -1.27 0)
+      (property "Value" "Q_MMBT5551" (id 1) (at 15.24 -1.27 0)
         (effects (font (size 1.27 1.27)) (justify right))
       )
       (property "Footprint" "Package_TO_SOT_SMD:SOT-23" (id 2) (at 5.08 2.54 0)
@@ -235,7 +235,7 @@
       (property "ki_description" "160V 0.3W NPN 0.6A SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS" (id 6) (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
-      (symbol "Q_MMBT5551_1_0_1"
+      (symbol "Q_MMBT5551_0_1"
         (polyline
           (pts
             (xy 0.635 0.635)
@@ -278,7 +278,7 @@
           (fill (type none))
         )
       )
-      (symbol "Q_MMBT5551_1_1_1"
+      (symbol "Q_MMBT5551_1_1"
         (pin passive line (at -5.08 0 0) (length 5.715)
           (name "B" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
@@ -624,7 +624,7 @@
     (pin "2" (uuid 872b9139-dc5a-42d0-9513-86903bc6e6cf))
   )
 
-  (symbol (lib_name "Q_MMBT5551_1") (lib_id "Open_Automation:Q_MMBT5551") (at 70.485 59.69 0) (unit 1)
+  (symbol (lib_id "Open_Automation:Q_MMBT5551") (at 70.485 59.69 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 4f81d612-55e5-4389-943b-d8486d5b0972)
     (property "Reference" "Q1" (id 0) (at 75.3364 58.5216 0)
@@ -650,7 +650,7 @@
     (pin "3" (uuid 3f6b1d49-5e4c-40ff-8ae6-5d44b25dd533))
   )
 
-  (symbol (lib_name "Q_MMBT5551_1") (lib_id "Open_Automation:Q_MMBT5551") (at 70.485 87.63 0) (unit 1)
+  (symbol (lib_id "Open_Automation:Q_MMBT5551") (at 70.485 87.63 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 5978e7f2-2145-4b1b-ba42-6e49fff83f00)
     (property "Reference" "Q3" (id 0) (at 75.3364 86.4616 0)

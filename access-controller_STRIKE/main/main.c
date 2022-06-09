@@ -40,14 +40,14 @@ void app_main(void)
 		mcp23x17_main();
 	}
 
-	// lock_main();
-	// buzzer_main();
-	wiegand_main();
-	// exit_main();
-	// keypad_main();
+	lock_main();
+	buzzer_main();
+	// wiegand_main();
+	exit_main();
+	keypad_main();
 	// fob_main();
-	// server_main();
-	// ap_main();
+	server_main();
+	ap_main();
 
   // ESP_ERROR_CHECK(example_connect());
 

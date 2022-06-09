@@ -1,4 +1,4 @@
-20349392075503361
+20355998083017936
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60466,6 +60466,13 @@ LOGO
 0
 0
 Open_Automation
+L_4x4
+Inductor, Taiyo Yuden, NR series, Taiyo-Yuden_NR-50xx, 4.9mmx4.9mm
+inductor taiyo-yuden nr smd
+0
+2
+2
+Open_Automation
 L_5.4x5.3_H3
 Choke, SMD, 6.3x6.3mm 3mm height
 Choke SMD
@@ -60518,6 +60525,13 @@ Open_Automation
 Opto_FOD817A3SD
 4-Lead Plastic Small Outline (SO) (http://www.everlight.com/file/ProductFile/201407061745083848.pdf)
 SO SOIC 2.54
+0
+4
+4
+Open_Automation
+Opto_PC817X2CSP9F
+OnSemi CASE 100CY, light-direction upwards, see http://www.onsemi.com/pub/Collateral/QRE1113-D.PDF
+refective opto couple photo coupler
 0
 4
 4
@@ -60830,6 +60844,13 @@ RGB LED PLLC-6
 6
 6
 Open_Automation
+S_YXDZ
+
+
+0
+2
+2
+Open_Automation
 TE-AUTO-CONN-52
 Through hole angled pin header, 2x26, 2.54mm pitch, 6mm pin length, double rows
 Through hole angled pin header THT 2x26 2.54mm double row
@@ -60857,6 +60878,13 @@ TSOP75338TR
 0
 4
 3
+Open_Automation
+T_PA2649NL
+
+
+0
+10
+10
 Open_Automation
 TerminalBlock_Pheonix_PT-3.5mm_3pol
 3-way 3.5mm pitch terminal block, Phoenix PT series

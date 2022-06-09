@@ -22,11 +22,10 @@
 
 #define EXIT_BUTTON_IO_1		14
 #define EXIT_BUTTON_IO_2		14
-// #define KEYPAD_IO_1					26
 #define KEYPAD_IO_1					13
 #define KEYPAD_IO_2					27
 
-#define BUZZER_IO 			14
+#define BUZZER_IO 			22
 
 #define WG0_DATA0_IO		27
 #define WG0_DATA1_IO		26
