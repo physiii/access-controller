@@ -4,6 +4,7 @@ Commercial access controller for strike and magnetic locks. Supports Weigand pro
 
 Includes firmware, schematics, layout, and 3D models.
 
+![Alt text](/images/controller-schematic.png?raw=true "PCB")
 
 ![Alt text](/images/controller.png?raw=true "PCB")
 
@@ -14,7 +15,7 @@ Includes firmware, schematics, layout, and 3D models.
 ```
 sudo apt install -y \
   libncurses5 gcc git wget make libncurses-dev flex bison gperf python python-pip genromfs \
-  python-setuptools python-serial python-cryptography python-future python-pyparsing 
+  python-setuptools python-serial python-cryptography python-future python-pyparsing
 echo 'export PATH="$PATH:/usr/local/src/esp/xtensa-esp32-elf/bin"' >> ~/.bashrc
 echo 'export IDF_PATH="/usr/local/src/esp/esp-idf"' >> ~/.bashrc
 source ~/.bashrc
@@ -28,7 +29,7 @@ mkdir esp
 cd esp
 git clone --recursive https://github.com/espressif/esp-idf.git
 wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
-tar -zxvf xtensa-esp32* 
+tar -zxvf xtensa-esp32*
 
 python2.7 -m pip install --user -r $IDF_PATH/requirements.txt
 ```
