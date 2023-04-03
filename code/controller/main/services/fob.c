@@ -202,8 +202,13 @@ void fob_main()
 	fobs[1].alert = false;
 	strcpy(fobs[1].type, "fob");
 
-	set_mcp_io_dir(fobs[0].pin, MCP_INPUT);
-	set_mcp_io_dir(fobs[1].pin, MCP_INPUT);
+	if (USE_MCP23017) {
+		set_mcp_io_dir(fobs[0].pin, MCP_INPUT);
+		set_mcp_io_dir(fobs[1].pin, MCP_INPUT);
+	} else {
+		gpio_set_direction(fobs[0].pin, GPIO_MODE_INPUT);
+		gpio_set_direction(fobs[1].pin, GPIO_MODE_INPUT);
+	}
 
   	xTaskCreate(fob_timer, "fob_timer", 2048, NULL, 10, NULL);
 	xTaskCreate(fob_service, "fob_service", 5000, NULL, 10, NULL);

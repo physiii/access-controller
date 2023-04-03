@@ -1,6 +1,13 @@
-#define SERVICE_LOOP 100
-#define SERVICE_LOOP_SHORT 10
-#define USE_MCP23017	   1
+#define SERVICE_LOOP 			100
+#define SERVICE_LOOP_SHORT		10
+#define STRIKE					1
+
+
+#ifdef STRIKE
+	#define USE_MCP23017	0
+#else
+	#define USE_MCP23017	1
+#endif
 
 struct ServiceMessage
 {
@@ -20,8 +27,18 @@ struct ClientMessage
 	int queueCount;
 };
 
+struct ServerMessage
+{
+	char message[1000];
+	char messageQueue[20][1000];
+	bool readyToSend;
+	int timeout;
+	int queueCount;
+};
+
 struct ServiceMessage serviceMessage;
 struct ClientMessage clientMessage;
+struct ServerMessage serverMessage;
 
 void set_mcp_io(uint8_t, bool);
 bool get_mcp_io(uint8_t);
@@ -77,18 +94,46 @@ serviceMessageTask (void *pvParameter)
   }
 }
 
+
+void addServerMessageToQueue (char *message)
+{
+	serverMessage.queueCount++;
+	strcpy(serverMessage.messageQueue[serverMessage.queueCount], message);
+	ESP_LOGI(TAG, "addServerMessageToQueue (%d) %s\n", serverMessage.queueCount, message);
+}
+
+static void
+serverMessageTask (void *pvParameter)
+{
+	int cnt = 0;
+ 	while (1) {
+		if (!serverMessage.readyToSend) {
+			if (serverMessage.queueCount > 0) {
+				strcpy(serverMessage.message, serverMessage.messageQueue[serverMessage.queueCount]);
+				serverMessage.readyToSend = true;
+				serverMessage.queueCount--;
+				printf("serverMessageTask (%d)\n", serverMessage.queueCount);
+			}
+		}
+
+    vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
+  }
+}
+
 void addClientMessageToQueue (char *message)
 {
 	clientMessage.queueCount++;
 	strcpy(clientMessage.messageQueue[clientMessage.queueCount], message);
 	printf("addClientMessageToQueue (%d) %s\n", clientMessage.queueCount, message);
+
+	addServerMessageToQueue(message); // Just adding all client message to server message que	
 }
 
 static void
 clientMessageTask (void *pvParameter)
 {
 	int cnt = 0;
-  while (1) {
+  	while (1) {
 		if (!clientMessage.readyToSend) {
 			if (clientMessage.queueCount > 0) {
 				strcpy(clientMessage.message, clientMessage.messageQueue[clientMessage.queueCount]);

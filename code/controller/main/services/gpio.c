@@ -17,24 +17,44 @@
 #define CONTACT_IO_1 	15
 #define CONTACT_IO_2 	16
 
-#define OPEN_IO_1		4
-#define OPEN_IO_2		23
+#ifdef STRIKE
+	#define OPEN_IO_1		4
+	#define OPEN_IO_2		23
 
-#define EXIT_BUTTON_IO_1		14
-#define EXIT_BUTTON_IO_2		14
-// #define KEYPAD_IO_1					26
-#define KEYPAD_IO_1					13
-#define KEYPAD_IO_2					27
+	#define EXIT_BUTTON_IO_1		14
+	#define EXIT_BUTTON_IO_2		14
 
-#define BUZZER_IO 			14
+	#define RADAR_BUTTON_IO_1		17
+	#define RADAR_BUTTON_IO_2		17
 
-#define WG0_DATA0_IO		16
-#define WG0_DATA1_IO		4
-#define WG1_DATA0_IO		32
-#define WG1_DATA1_IO		5
+	#define KEYPAD_IO_1					13
+	#define KEYPAD_IO_2					27
 
-#define GPIO_OUTPUT_PIN_SEL  ((1ULL<<BUZZER_IO) | (1ULL<<LOCK_IO_1) | (1ULL<<OPEN_IO_1))
-#define GPIO_INPUT_PIN_SEL  ((1ULL<<CONTACT_IO_1) | (1ULL<<CONTACT_IO_2) | (1ULL<<MCP_INTA_GPIO) | (1ULL<<MCP_INTB_GPIO) | (1ULL<<KEYPAD_IO_1))
+	#define BUZZER_IO 			14
+
+	#define WG0_DATA0_IO		16
+	#define WG0_DATA1_IO		4
+	#define WG1_DATA0_IO		32
+	#define WG1_DATA1_IO		5
+#else
+	#define OPEN_IO_1		21
+	#define OPEN_IO_2		21
+
+	#define EXIT_BUTTON_IO_1		35
+	#define EXIT_BUTTON_IO_2		35
+	#define KEYPAD_IO_1					13
+	#define KEYPAD_IO_2					27
+
+	#define BUZZER_IO 			22
+
+	#define WG0_DATA0_IO		27
+	#define WG0_DATA1_IO		26
+	#define WG1_DATA0_IO		32
+	#define WG1_DATA1_IO		5
+#endif
+
+#define GPIO_OUTPUT_PIN_SEL  ((1ULL<<BUZZER_IO) | (1ULL<<LOCK_IO_1) | (1ULL<<LOCK_IO_2) | (1ULL<<OPEN_IO_1))
+#define GPIO_INPUT_PIN_SEL  ((1ULL<<WG0_DATA0_IO) | (1ULL<<WG0_DATA1_IO) | (1ULL<<CONTACT_IO_1) | (1ULL<<CONTACT_IO_2) | (1ULL<<MCP_INTA_GPIO) | (1ULL<<MCP_INTB_GPIO) | (1ULL<<KEYPAD_IO_1) | (1ULL<<EXIT_BUTTON_IO_1))
 #define ESP_INTR_FLAG_DEFAULT 0
 
 void gpio_main(void)

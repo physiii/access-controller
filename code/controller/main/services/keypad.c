@@ -212,8 +212,14 @@ void keypad_main()
 	keypads[1].alert = true;
 	strcpy(keypads[1].type, "keypad");
 
-	set_mcp_io_dir(keypads[0].pin, MCP_INPUT);
-	set_mcp_io_dir(keypads[1].pin, MCP_INPUT);
+	
+	if (USE_MCP23017) {
+		set_mcp_io_dir(keypads[0].pin, MCP_INPUT);
+		set_mcp_io_dir(keypads[1].pin, MCP_INPUT);
+	} else {
+		gpio_set_direction(keypads[0].pin, GPIO_MODE_INPUT);
+		gpio_set_direction(keypads[1].pin, GPIO_MODE_INPUT);
+	}
 
   xTaskCreate(keypad_timer, "keypad_timer", 2048, NULL, 10, NULL);
 	xTaskCreate(keypad_service, "keypad_service", 2048, NULL, 10, NULL);

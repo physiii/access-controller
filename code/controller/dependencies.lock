@@ -1,0 +1,15 @@
+dependencies:
+  espressif/esp_websocket_client:
+    component_hash: fe199a31269568cfdf67b52c8a338f8befa4d3385041b9e1a601ed3ee10b5c64
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 0.0.4
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.1.0
+manifest_hash: 64534483981657c180a301761f5d93020cb2578c6c7289ca0954e0a752245ad2
+target: esp32
+version: 1.0.0

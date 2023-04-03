@@ -1,12 +1,3 @@
-/* WebSocket Echo Server Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-
 #include <esp_event.h>
 #include <esp_log.h>
 #include <esp_system.h>
@@ -15,6 +6,8 @@
 #include "protocol_examples_common.h"
 
 #include <esp_http_server.h>
+
+bool should_send_data = 0; // wait for data to be received so hd an fd can be initialized
 
 /* A simple example that demonstrates using websocket echo server
  */
@@ -33,6 +26,8 @@ struct async_resp_arg {
 
 struct async_resp_arg *resp_arg;
 
+// Initialize resp_arg with a valid handle and invalid fd
+
 /*
  * async send function, which we put into the httpd work queue
  */
@@ -40,6 +35,7 @@ static void ws_async_send(void *arg)
 {
     resp_arg = arg;
 }
+
 
 static esp_err_t trigger_async_send(httpd_handle_t handle, httpd_req_t *req)
 {
@@ -91,6 +87,7 @@ static esp_err_t echo_handler(httpd_req_t *req)
 		if (msg)
 		{
 			ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
+            should_send_data = true;
 			addServiceMessageToQueue(msg);
 			return trigger_async_send(req->handle, req);
 		} else {
@@ -171,7 +168,7 @@ static void
 ws_service (void *pvParameter)
 {
   while (1) {
-		if (clientMessage.readyToSend) {
+		if (clientMessage.readyToSend && should_send_data) {
 			printf("Sending (%d): %s\n", clientMessage.queueCount, clientMessage.message);
 			char * data = clientMessage.message;
             httpd_handle_t hd = resp_arg->hd;
@@ -195,5 +192,5 @@ void start_ws_server(httpd_handle_t server)
 	ESP_LOGI(WS_TAG, "Registering WS URI handlers");
 	httpd_register_uri_handler(server, &ws);
 	xTaskCreate(ws_service, "ws_service", 5000, NULL, 10, NULL);
-	resp_arg = malloc(sizeof(struct async_resp_arg));
+	// resp_arg = malloc(sizeof(struct async_resp_arg));
 }
