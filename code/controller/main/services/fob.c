@@ -10,7 +10,7 @@ bool FOB_ALERT = true;
 
 struct fob
 {
-  int pin;
+  	int pin;
 	bool alert;
 	bool isPressed;
 	bool prevPress;

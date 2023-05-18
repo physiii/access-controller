@@ -181,13 +181,13 @@ void radar_main()
 
 	restoreRadarSettings();
 
-	if (USE_MCP23017) {
-		set_mcp_io_dir(radars[0].pin, MCP_INPUT);
-		set_mcp_io_dir(radars[1].pin, MCP_INPUT);
-	} else {
-		gpio_set_direction(radars[0].pin, GPIO_MODE_INPUT);
-		gpio_set_direction(radars[1].pin, GPIO_MODE_INPUT);
-	}
+	// if (USE_MCP23017) {
+	// 	set_mcp_io_dir(radars[0].pin, MCP_INPUT);
+	// 	set_mcp_io_dir(radars[1].pin, MCP_INPUT);
+	// } else {
+	// 	gpio_set_direction(radars[0].pin, GPIO_MODE_INPUT);
+	// 	gpio_set_direction(radars[1].pin, GPIO_MODE_INPUT);
+	// }
 
-	xTaskCreate(radar_service, "radar_service", 5000, NULL, 10, NULL);
+	// xTaskCreate(radar_service, "radar_service", 5000, NULL, 10, NULL);
 }

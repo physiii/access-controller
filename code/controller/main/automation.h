@@ -1,18 +1,16 @@
 #define SERVICE_LOOP 			100
 #define SERVICE_LOOP_SHORT		10
-#define STRIKE					1
-
-
-#ifdef STRIKE
-	#define USE_MCP23017	0
+#define STRIKE					0
+#if STRIKE
+	#define USE_MCP23017		0
 #else
-	#define USE_MCP23017	1
+	#define USE_MCP23017		1
 #endif
 
 struct ServiceMessage
 {
 	cJSON *message;
-	cJSON messageQueue[100];
+	cJSON *messageQueue[100];  // Pointers instead of objects
 	bool read;
 	int timeout;
 	int queueCount;
@@ -36,9 +34,9 @@ struct ServerMessage
 	int queueCount;
 };
 
-struct ServiceMessage serviceMessage;
-struct ClientMessage clientMessage;
-struct ServerMessage serverMessage;
+struct ServiceMessage serviceMessage = {0};  // Initialize struct
+struct ClientMessage clientMessage = {0};  // Initialize struct
+struct ServerMessage serverMessage = {0};  // Initialize struct
 
 void set_mcp_io(uint8_t, bool);
 bool get_mcp_io(uint8_t);
@@ -66,32 +64,34 @@ cJSON * checkServiceMessage(char *eventType)
 void addServiceMessageToQueue (cJSON *message)
 {
 	serviceMessage.queueCount++;
-	serviceMessage.messageQueue[serviceMessage.queueCount] = *message;
-	printf("addServiceMessageToQueue (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(message));
+	serviceMessage.messageQueue[serviceMessage.queueCount] = cJSON_Duplicate(message, 1); // Duplicate message
+	ESP_LOGI(TAG, "addServiceMessageToQueue (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(message));
 }
 
 static void
 serviceMessageTask (void *pvParameter)
 {
 	int cnt = 0;
-  while (1) {
+  	while (1) {
 		if (serviceMessage.read) {
 			cnt = 0;
 			if (serviceMessage.queueCount > 0) {
-				serviceMessage.message = &serviceMessage.messageQueue[serviceMessage.queueCount];
-				printf("serviceMessageTask (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(serviceMessage.message));
+				cJSON_Delete(serviceMessage.message); // Delete old message
+				serviceMessage.message = serviceMessage.messageQueue[serviceMessage.queueCount]; // Point to duplicated message
+				ESP_LOGI(TAG, "serviceMessageTask (%d) %s\n", serviceMessage.queueCount, cJSON_PrintUnformatted(serviceMessage.message));
 				serviceMessage.read = false;
 				serviceMessage.queueCount--;
 			}
 		} else if (cnt > 10) {
-			printf("serviceMessage timeout reached.\n");
+			ESP_LOGE(TAG, "serviceMessage timeout reached.\n");
+			// cJSON_Delete(serviceMessage.message); // Delete old message
 			serviceMessage.read = true;
 		} else {
 			cnt++;
 		}
 
-    vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
-  }
+    	vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
+  	}
 }
 
 
@@ -112,19 +112,19 @@ serverMessageTask (void *pvParameter)
 				strcpy(serverMessage.message, serverMessage.messageQueue[serverMessage.queueCount]);
 				serverMessage.readyToSend = true;
 				serverMessage.queueCount--;
-				printf("serverMessageTask (%d)\n", serverMessage.queueCount);
+				ESP_LOGI(TAG, "serverMessageTask (%d)\n", serverMessage.queueCount);
 			}
 		}
 
-    vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
-  }
+    	vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
+  	}
 }
 
 void addClientMessageToQueue (char *message)
 {
 	clientMessage.queueCount++;
 	strcpy(clientMessage.messageQueue[clientMessage.queueCount], message);
-	printf("addClientMessageToQueue (%d) %s\n", clientMessage.queueCount, message);
+	ESP_LOGI(TAG, "addClientMessageToQueue (%d) %s\n", clientMessage.queueCount, message);
 
 	addServerMessageToQueue(message); // Just adding all client message to server message que	
 }
@@ -139,10 +139,10 @@ clientMessageTask (void *pvParameter)
 				strcpy(clientMessage.message, clientMessage.messageQueue[clientMessage.queueCount]);
 				clientMessage.readyToSend = true;
 				clientMessage.queueCount--;
-				printf("clientMessageTask (%d)\n", clientMessage.queueCount);
+				ESP_LOGI(TAG, "clientMessageTask (%d)\n", clientMessage.queueCount);
 			}
 		}
 
-    vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
-  }
+    	vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
+  	}
 }

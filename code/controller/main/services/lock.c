@@ -1,9 +1,12 @@
-#define LOCK_MCP_IO_1        A0
-#define LOCK_MCP_IO_2        B0
-#define NUM_OF_LOCKS 				 2
+#define LOCK_MCP_IO_1       A0
+#define LOCK_MCP_IO_2       B0
+
+#define OPEN_IO_1			B1
+#define OPEN_IO_2			A2
+#define NUM_OF_LOCKS 	 	2
 
 const uint8_t LOCK_CONTACT_PIN_1 = B1;
-const uint8_t LOCK_CONTACT_PIN_2 = A2;
+const uint8_t LOCK_CONTACT_PIN_2 = B1;
 
 bool ARM = false;
 bool DISARM = true;
@@ -148,7 +151,7 @@ void lock_init()
     locks[1].controlPin = USE_MCP23017 ? LOCK_MCP_IO_2 : LOCK_IO_2;
     locks[1].isLocked = true;
 		locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
-		locks[1].openPin = OPEN_IO_1;
+		locks[1].openPin = OPEN_IO_2;
 		locks[1].enable = true;
 		locks[1].alert = true;
 		locks[1].enableContactAlert = false;
@@ -156,8 +159,9 @@ void lock_init()
 
 		for (int i=0; i < NUM_OF_LOCKS; i++) {
 			if (USE_MCP23017) {
-				set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
+				printf("Setting lock direction: %u\n", locks[i].controlPin);
 				set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
+				set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
 			}
 			// arm_lock(locks[i].channel, true, true);
 		}

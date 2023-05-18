@@ -188,26 +188,27 @@ ws_event_handler(cJSON * root)
 	char event_type[500];
 	char callback[70];
 
-	if (cJSON_GetObjectItem(root,"payload")) {
-		payload = cJSON_GetObjectItemCaseSensitive(root,"payload");
-	} else {
-		ESP_LOGW(TAG, "payload key not found");
-		return 0;
-	}
-
 	// Reply with callback
 	if (cJSON_GetObjectItemCaseSensitive(root,"id")) {
 		int callback_id = cJSON_GetObjectItemCaseSensitive(root,"id")->valueint;
 		snprintf(callback,sizeof(callback),"{\"id\":%d,\"callback\":true,\"payload\":[false,\"\"]}",callback_id);
-		// strcpy(clientMessage.message,callback);
-		// clientMessage.readyToSend = true;
 		addServerMessageToQueue(callback);
-        ESP_LOGI(TAG, "Sending callback...");
+        ESP_LOGI(TAG, "Sending callback.");
+	}
+
+	if (cJSON_GetObjectItem(root,"payload")) {
+		payload = cJSON_GetObjectItemCaseSensitive(root,"payload");
+	} else {
+		ESP_LOGW(TAG, "Payload key not found.");
+		return 0;
 	}
 
 	if (cJSON_GetObjectItem(root,"event_type")) {
 		snprintf(event_type,sizeof(event_type),"%s",cJSON_GetObjectItem(root,"event_type")->valuestring);
-		return handle_event(event_type);
+		// return handle_event(event_type);
+	} else {
+		ESP_LOGW(TAG, "Event type key not found.");
+		return 0;
 	}
 
 	return handle_event(payload);
@@ -230,13 +231,13 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         }
         break;
     case WEBSOCKET_EVENT_DATA:
-        ESP_LOGI(TAG, "WEBSOCKET_EVENT_DATA");
-        ESP_LOGI(TAG, "Received opcode=%d", data->op_code);
-        if (data->op_code == 0x08 && data->data_len == 2) {
-            ESP_LOGW(TAG, "Received closed message with code=%d", 256 * data->data_ptr[0] + data->data_ptr[1]);
-        } else {
-            ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
-        }
+        // ESP_LOGI(TAG, "WEBSOCKET_EVENT_DATA");
+        // ESP_LOGI(TAG, "Received opcode=%d", data->op_code);
+        // if (data->op_code == 0x08 && data->data_len == 2) {
+        //     ESP_LOGW(TAG, "Received closed message with code=%d", 256 * data->data_ptr[0] + data->data_ptr[1]);
+        // } else {
+        //     ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
+        // }
 
         // If received data contains json structure it succeed to parse
         cJSON *root = cJSON_Parse(data->data_ptr);

@@ -114,14 +114,17 @@ void set_mcp_io(uint8_t io, bool val)
 		MCP_IO_VALUES &= ~(1 << io);
 	}
 
-  data_wr[0] = REG_GPIOA;
-  data_wr[1] = MCP_IO_VALUES & 0x00ff;
-  data_wr[2] = MCP_IO_VALUES >> 8;
-  mcp_write(data_wr, 3);
+	data_wr[0] = REG_GPIOA;
+	data_wr[1] = MCP_IO_VALUES & 0x00ff;
+	data_wr[2] = MCP_IO_VALUES >> 8;
+
+	mcp_write(data_wr, 3);
+	// printf("set_mcp_io %d\tvalue %d\tdata [%u, %u, %u]\n", io, val, data_wr[0], data_wr[1], data_wr[2]);
 }
 
 bool get_mcp_io(uint8_t io)
 {
+	// printf("get_mcp_io: %u\n", MCP_IO_VALUES);
 	int val = MCP_IO_VALUES >> io;
 
 	return val &= 0x0001;
@@ -138,8 +141,12 @@ void set_mcp_io_dir(uint8_t io, bool dir)
 	data_wr[0] = REG_IODIRA;
 	data_wr[1] = MCP_DIR & 0x00ff;
 	data_wr[2] = MCP_DIR >> 8;
+	// data_wr[1] = 254;
+	// data_wr[2] = 255;
+
 	mcp_write(data_wr, 3);
 
+	printf("set_mcp_io_dir(%u): io:%u\tdir:%d\n", MCP_DIR, io, dir);
 	printf("Set Direction: A:%d\tB:%d\n", data_wr[1], data_wr[2]);
 }
 

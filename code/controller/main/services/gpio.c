@@ -17,40 +17,33 @@
 #define CONTACT_IO_1 	15
 #define CONTACT_IO_2 	16
 
-#ifdef STRIKE
-	#define OPEN_IO_1		4
-	#define OPEN_IO_2		23
-
+#if STRIKE
+	#define OPEN_IO_1				4
+	#define OPEN_IO_2				23
 	#define EXIT_BUTTON_IO_1		14
 	#define EXIT_BUTTON_IO_2		14
+	#define KEYPAD_IO_1				13
+	#define KEYPAD_IO_2				27
+	#define BUZZER_IO 				14
+	#define WG0_DATA0_IO			16
+	#define WG0_DATA1_IO			4
+	#define WG1_DATA0_IO			32
+	#define WG1_DATA1_IO			5
+#else
 
 	#define RADAR_BUTTON_IO_1		17
 	#define RADAR_BUTTON_IO_2		17
-
-	#define KEYPAD_IO_1					13
-	#define KEYPAD_IO_2					27
-
-	#define BUZZER_IO 			14
-
-	#define WG0_DATA0_IO		16
-	#define WG0_DATA1_IO		4
-	#define WG1_DATA0_IO		32
-	#define WG1_DATA1_IO		5
-#else
-	#define OPEN_IO_1		21
-	#define OPEN_IO_2		21
-
+	#define OPEN_IO_1				2
+	#define OPEN_IO_2				21
 	#define EXIT_BUTTON_IO_1		35
 	#define EXIT_BUTTON_IO_2		35
-	#define KEYPAD_IO_1					13
-	#define KEYPAD_IO_2					27
-
-	#define BUZZER_IO 			22
-
-	#define WG0_DATA0_IO		27
-	#define WG0_DATA1_IO		26
-	#define WG1_DATA0_IO		32
-	#define WG1_DATA1_IO		5
+	#define KEYPAD_IO_1				13
+	#define KEYPAD_IO_2				27
+	#define BUZZER_IO 				22
+	#define WG0_DATA0_IO			27
+	#define WG0_DATA1_IO			26
+	#define WG1_DATA0_IO			32
+	#define WG1_DATA1_IO			5
 #endif
 
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<BUZZER_IO) | (1ULL<<LOCK_IO_1) | (1ULL<<LOCK_IO_2) | (1ULL<<OPEN_IO_1))
@@ -92,7 +85,7 @@ void set_io (uint8_t io, bool val)
 {
 	
 	if (USE_MCP23017) {
-		// printf("set_mcp_io io:%d\tval: %d\n", io, val);
+		printf("set_mcp_io io:%d\tval: %d\n", io, val);
 		set_mcp_io(io, val);
 	} else {
 		printf("gpio_set_level io:%d\tval: %d\n", io, val);

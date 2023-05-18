@@ -25,36 +25,6 @@ char token[700];
 #include "services/ap.c"
 #include "services/ws_client.c"
 
-// void
-// load_device()
-// {
-// 	char state_str[300];
-// 	char msg[600];
-
-// 	snprintf(state_str, sizeof(state_str), "{\"light_level\":51, \"time\":1, \"cycletime\":1, "
-// 		"\"presence\":true, "
-// 		"\"water_temp\":75, \"ec\":0.000, \"pco2\":4.1}");
-// 	snprintf(msg, sizeof(msg),"{\"event_type\":\"load\", \"payload\":{\"services\":"
-// 		"[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":%s}]}}", state_str);
-
-// 	addServerMessageToQueue(msg);
-// }
-
-// void
-// send_event()
-// {
-// 	char state_str[300];
-// 	char msg[600];
-
-// 	snprintf(state_str, sizeof(state_str), "{\"light_level\":51, \"time\":1, \"cycletime\":1, "
-// 		"\"presence\":true, "
-// 		"\"water_temp\":75, \"ec\":0.000, \"pco2\":4.1}");
-// 	snprintf(msg, sizeof(msg),"{\"event_type\":\"event\", \"payload\":{\"services\":"
-// 		"[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":%s}]}}", state_str);
-
-// 	addServerMessageToQueue(msg);
-// }
-
 void app_main(void)
 {
 	ESP_ERROR_CHECK(esp_netif_init());
@@ -70,7 +40,7 @@ void app_main(void)
 	strcpy(device_id, get_char("device_id"));
 	if (strcmp(device_id, "")==0) {
 		ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
-	  xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
+	//   xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
 	} else {
 		ESP_LOGI(TAG, "Device ID : %s", device_id);
 	}
@@ -91,25 +61,22 @@ void app_main(void)
 
 	gpio_main();
 
-	if (STRIKE) {
-		i2c_main();
-		mcp23x17_main();
-	}
+	i2c_main();
+	mcp23x17_main();
 
 	auth_main();
 	lock_main();
 	buzzer_main();
-	// // wiegand_main();
+	// wiegand_main();
 	radar_main();
 	exit_main();
 	keypad_main();
-	if (!STRIKE) fob_main();
+	fob_main();
 	server_main();
-	// // ap_main();
+	ap_main();
 
-  	ESP_ERROR_CHECK(example_connect());
-
-	ws_client_main();
+  	// ESP_ERROR_CHECK(example_connect());
+	// ws_client_main();
 
 	xTaskCreate(serviceMessageTask, "serviceMessageTask", 5000, NULL, 10, NULL);
 	xTaskCreate(clientMessageTask, "clientMessageTask", 5000, NULL, 10, NULL);
