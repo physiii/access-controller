@@ -20,6 +20,8 @@
 #if STRIKE
 	#define OPEN_IO_1				4
 	#define OPEN_IO_2				23
+	#define RADAR_BUTTON_IO_1		17
+	#define RADAR_BUTTON_IO_2		17
 	#define EXIT_BUTTON_IO_1		14
 	#define EXIT_BUTTON_IO_2		14
 	#define KEYPAD_IO_1				13
@@ -30,18 +32,17 @@
 	#define WG1_DATA0_IO			32
 	#define WG1_DATA1_IO			5
 #else
-
 	#define RADAR_BUTTON_IO_1		17
 	#define RADAR_BUTTON_IO_2		17
-	#define OPEN_IO_1				2
-	#define OPEN_IO_2				21
+	#define OPEN_IO_1				A4
+	#define OPEN_IO_2				B4
 	#define EXIT_BUTTON_IO_1		35
 	#define EXIT_BUTTON_IO_2		35
 	#define KEYPAD_IO_1				13
 	#define KEYPAD_IO_2				27
 	#define BUZZER_IO 				22
-	#define WG0_DATA0_IO			27
-	#define WG0_DATA1_IO			26
+	#define WG0_DATA0_IO			16
+	#define WG0_DATA1_IO			4
 	#define WG1_DATA0_IO			32
 	#define WG1_DATA1_IO			5
 #endif
@@ -51,7 +52,7 @@
 #define ESP_INTR_FLAG_DEFAULT 0
 
 void gpio_main(void)
-{
+{printf("MAIN TESTING OPEN_IO_1: %d\n", OPEN_IO_1);
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;

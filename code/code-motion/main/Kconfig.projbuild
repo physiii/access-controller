@@ -1,0 +1,135 @@
+menu "Example Configuration"
+
+choice WIFI_MODE
+    prompt "WiFi mode"
+    default STATION_MODE
+    help
+        WiFi mode(station or softap).
+
+config STATION_MODE
+    bool "Station"
+config SOFTAP_MODE
+    bool "Softap"
+endchoice
+
+config ESPNOW_PMK
+    string "ESPNOW primary master key"
+    default "pmk1234567890123"
+    help
+        ESPNOW primary master for the example to use. The length of ESPNOW primary master must be 16 bytes.
+
+config ESPNOW_LMK
+    string "ESPNOW local master key"
+    default "lmk1234567890123"
+    help
+        ESPNOW local master for the example to use. The length of ESPNOW local master must be 16 bytes.
+
+config ESPNOW_CHANNEL
+    int "Channel"
+    default 1
+    range 1 13
+    help
+        The channel on which sending and receiving ESPNOW data.
+
+config ESPNOW_SEND_COUNT
+    int "Send count"
+    default 100
+    range 1 65535
+    help
+        Total count of unicast ESPNOW data to be sent.
+
+config ESPNOW_SEND_DELAY
+    int "Send delay"
+    default 1000
+    range 0 65535
+    help
+        Delay between sending two ESPNOW data, unit: ms.
+
+config ESPNOW_SEND_LEN
+    int "Send len"
+    range 10 250
+    default 200
+    help
+        Length of ESPNOW data to be sent, unit: byte.
+
+endmenu
+
+menu "LED Config"
+    config LED_IO
+        int "LED IO"
+        range 0 34
+        default 18
+        help
+            GPIO number to control LED array.
+
+    config EXIT_TIME
+        int "Delay time(s) to activate motion"
+        range 0 60000
+        default 25
+        help
+            Debounces motion allowing you to exit the area.
+
+    config LED_OFF_TIME
+        int "Delay time(m) turn off LED"
+        range 0 60000
+        default 60
+        help
+            If no activity detected, turn off LED array after this amount of minutes.
+
+    config DEFAULT_PIXEL_COUNT
+        int "Pixel Count"
+        range 0 1500
+        default 1000
+        help
+            Set number of pixels on strip or panel.
+endmenu
+
+menu "Keypad IO"
+    config KEYPAD_R1_IO
+        int "Keypad - Row 1"
+        range 0 34
+        default 5
+        help
+            GPIO number for row or column.
+
+    config KEYPAD_R2_IO
+        int "Keypad - Row 2"
+        range 0 34
+        default 5
+        help
+            GPIO number for row or column.
+endmenu
+
+menu "Motion"
+    config PIR_IO
+        int "PIR IO Number"
+        range 0 34
+        default 27
+        help
+            GPIO number for row or column.
+endmenu
+
+choice UID_PROGRAM_MODE
+    bool "Set UID Program Mode"
+    default CHECK_UID
+    help
+        Specify how much output to see in bootloader logs.
+
+    config CHECK_UID
+        bool "Authenticate UID"
+    config ADD_UID
+        bool "Add UID"
+    config REMOVE_UID
+        bool "Remove UID"
+endchoice
+
+menu "Rotary Encoder"
+
+    config HOLD_TIME
+        int "Time(s) to activate menu mode"
+        range 0 600
+        default 1
+        help
+            Amount of time you hold down the switch to activate.
+
+endmenu

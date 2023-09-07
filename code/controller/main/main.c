@@ -1,22 +1,12 @@
-static const char *TAG = "open-automation";
-
-char device_id[100];
-char token[700];
-
-#include <esp_log.h>
-#include "cJSON.h"
-#include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "automation.h"
-#include "services/gpio.c"
 #include "services/drivers/i2c.c"
 #include "services/drivers/mcp23x17.c"
+#include "services/gpio.c"
 #include "services/store.c"
 #include "services/authorize.c"
 #include "services/buzzer.c"
-#include "services/wiegand.c"
 #include "services/lock.c"
+#include "services/wiegand.c"
 #include "services/exit.c"
 #include "services/radar.c"
 #include "services/keypad.c"
@@ -24,6 +14,7 @@ char token[700];
 #include "services/server.c"
 #include "services/ap.c"
 #include "services/ws_client.c"
+#include "services/utilities_server.c"
 
 void app_main(void)
 {
@@ -40,7 +31,8 @@ void app_main(void)
 	strcpy(device_id, get_char("device_id"));
 	if (strcmp(device_id, "")==0) {
 		ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
-	//   xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
+		// store_char("device_id", "69696909-a5e5-401c-8da7-184fe2d5c844");
+	  	xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
 	} else {
 		ESP_LOGI(TAG, "Device ID : %s", device_id);
 	}
@@ -67,25 +59,30 @@ void app_main(void)
 	auth_main();
 	lock_main();
 	buzzer_main();
-	// wiegand_main();
-	radar_main();
-	exit_main();
-	keypad_main();
-	fob_main();
+	wiegand_main();
+	// exit_main();
+	// keypad_main();
+	#if STRIKE
+		// radar_main();
+		ws_client_main();
+	#else
+		fob_main();
+		ap_main();
+	#endif
+	ws_client_main();
+  	ESP_ERROR_CHECK(example_connect());
 	server_main();
-	ap_main();
-
-  	// ESP_ERROR_CHECK(example_connect());
-	// ws_client_main();
 
 	xTaskCreate(serviceMessageTask, "serviceMessageTask", 5000, NULL, 10, NULL);
 	xTaskCreate(clientMessageTask, "clientMessageTask", 5000, NULL, 10, NULL);
 	xTaskCreate(serverMessageTask, "serverMessageTask", 5000, NULL, 10, NULL);
 
 	int cnt = 0;
+
 	while(1) {
 		// load_device();
 		// send_event();
+		sendUsers();
 
 		printf("count %d\n", cnt++);
 		vTaskDelay(10 * 1000 / portTICK_PERIOD_MS);

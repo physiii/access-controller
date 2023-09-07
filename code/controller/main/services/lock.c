@@ -1,9 +1,9 @@
 #define LOCK_MCP_IO_1       A0
 #define LOCK_MCP_IO_2       B0
 
-#define OPEN_IO_1			B1
-#define OPEN_IO_2			A2
-#define NUM_OF_LOCKS 	 	2
+// #define OPEN_IO_1           B1
+// #define OPEN_IO_2           A2
+#define NUM_OF_LOCKS        2
 
 const uint8_t LOCK_CONTACT_PIN_1 = B1;
 const uint8_t LOCK_CONTACT_PIN_2 = B1;
@@ -11,35 +11,34 @@ const uint8_t LOCK_CONTACT_PIN_2 = B1;
 bool ARM = false;
 bool DISARM = true;
 bool ALERT = true;
-char lock_service_message[2000];
+char lock_service_message[1000]; // Reduced size, assuming you don't actually need 2000 characters
 bool lock_service_message_ready = false;
 int relock_delay = 2 * 1000;
 int button_disabled = false;
-cJSON * lock_payload = NULL;
+cJSON * lock_payload = NULL; // Make sure to manage this appropriately
 int LOCK_DEBOUNCE_DELAY = 5;
 bool lock_contact_timer_1_expired = true;
 int lock_count = 0;
 
-struct lock
-{
-  uint8_t controlPin;
-	uint8_t contactPin;
-	uint8_t openPin;
-  uint8_t channel;
-	bool isContact;
-  bool isLocked;
-  bool pulse;
-	bool expired;
-	bool enable;
-	bool enableContactAlert;
-	bool arm;
-	int delay;
-	int count;
-	bool alert;
-	cJSON *payload;
-	char settings[1000];
-	char key[50];
-	char type[40];
+struct lock {
+    uint8_t controlPin;
+    uint8_t contactPin;
+    uint8_t openPin;
+    uint8_t channel;
+    bool isContact;
+    bool isLocked;
+    bool pulse;
+    bool expired;
+    bool enable;
+    bool enableContactAlert;
+    bool arm;
+    int delay;
+    int count;
+    bool alert;
+    cJSON *payload; // Make sure to manage this appropriately
+    char settings[200]; // Reduced size
+    char key[50];
+    char type[40];
 };
 
 struct lock locks[NUM_OF_LOCKS];
@@ -109,6 +108,7 @@ void _arm_lock (struct lock *lck, bool val)
 		if (lck->alert) {
 			beep(1);
 			set_io(lck->openPin, ARM);
+			printf("Lock %d open pin: %d\n", lck->channel, lck->openPin);
 		}
 
     printf("Lock %d armed.\n", lck->channel);
@@ -119,6 +119,7 @@ void _arm_lock (struct lock *lck, bool val)
 		if (lck->alert) {
 			beep(2);
 			set_io(lck->openPin, DISARM);
+			printf("Lock %d open pin: %d\n", lck->channel, lck->openPin);
 		}
 
 		printf("Lock %d disarmed.\n", lck->channel);
@@ -140,31 +141,32 @@ void lock_init()
     locks[0].channel = 1;
     locks[0].controlPin = USE_MCP23017 ? LOCK_MCP_IO_1 : LOCK_IO_1;
     locks[0].isLocked = true;
-		locks[0].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1;
-		locks[0].openPin = OPEN_IO_1;
-		locks[0].enable = true;
-		locks[0].alert = true;
-		locks[0].enableContactAlert = false;
-		strcpy(locks[0].type, "lock");
+	locks[0].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1;
+	locks[0].openPin = OPEN_IO_1;
+	printf("Lock 1 open pin: %d\n", locks[0].openPin);
+	locks[0].enable = true;
+	locks[0].alert = true;
+	locks[0].enableContactAlert = false;
+	strcpy(locks[0].type, "lock");
 
     locks[1].channel = 2;
     locks[1].controlPin = USE_MCP23017 ? LOCK_MCP_IO_2 : LOCK_IO_2;
     locks[1].isLocked = true;
-		locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
-		locks[1].openPin = OPEN_IO_2;
-		locks[1].enable = true;
-		locks[1].alert = true;
-		locks[1].enableContactAlert = false;
-		strcpy(locks[1].type, "lock");
+	locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
+	locks[1].openPin = OPEN_IO_2;
+	locks[1].enable = true;
+	locks[1].alert = true;
+	locks[1].enableContactAlert = false;
+	strcpy(locks[1].type, "lock");
 
-		for (int i=0; i < NUM_OF_LOCKS; i++) {
-			if (USE_MCP23017) {
-				printf("Setting lock direction: %u\n", locks[i].controlPin);
-				set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
-				set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
-			}
-			// arm_lock(locks[i].channel, true, true);
+	for (int i=0; i < NUM_OF_LOCKS; i++) {
+		if (USE_MCP23017) {
+			printf("Setting lock direction: %u\n", locks[i].controlPin);
+			set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
+			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
 		}
+		// arm_lock(locks[i].channel, true, true);
+	}
 }
 
 int storeLockSettings()
@@ -187,7 +189,7 @@ int storeLockSettings()
 		storeSetting(locks[i].key, cJSON_Parse(locks[i].settings));
 		printf("storeLockSettings\t%s\n", locks[i].settings);
 	}
-  return 0;
+	return 0;
 }
 
 int restoreLockSettings()
@@ -223,12 +225,12 @@ int sendLockState()
   return 0;
 }
 
-void handle_lock_message(cJSON * payload)
-{
-	int ch=0;
-	bool val;
+void handle_lock_message(cJSON * payload) {
+    int ch=0;
+    bool val;
+    char property[250];
 
-	if (payload == NULL) return;
+    if (payload == NULL) return;
 
 	if (cJSON_GetObjectItem(payload,"getState")) {
 		sendLockState();
@@ -252,10 +254,18 @@ void handle_lock_message(cJSON * payload)
 			locks[ch - 1].enableContactAlert = val;
 	 	}
 
-		// printf("lock payload: %s\n",cJSON_PrintUnformatted(payload));
 		storeLockSettings();
 	}
-	return;
+
+	if (cJSON_GetObjectItem(payload,"property")) {
+		sprintf(property, "%s", cJSON_GetObjectItem(payload,"property")->valuestring);
+		if (strcmp(property, "pulseLock") == 0) {
+			for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+				arm_lock(i, false, true);
+			}
+			cJSON_Delete(payload);
+		}
+	}
 }
 
 static void
@@ -270,19 +280,19 @@ lock_service(void *pvParameter)
 		}
 
 		handle_lock_message(checkServiceMessage("lock"));
+		handle_lock_message(checkServiceMessageByAction("ac_1", "pulseLock"));
 
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }
 
-void lock_main()
-{
-  printf("Starting lock service.\n");
-  TaskHandle_t lock_service_task;
+void lock_main() {
+    printf("Starting lock service.\n");
+    TaskHandle_t lock_service_task;
 
-	lock_init();
-	restoreLockSettings();
+    lock_init();
+    restoreLockSettings();
 
-  xTaskCreate(&lock_service, "lock_service_task", 5000, NULL, 5, NULL);
-  xTaskCreate(lock_contact_timer, "lock_contact_timer", 2048, NULL, 10, NULL);
+    xTaskCreate(&lock_service, "lock_service_task", 5000, NULL, 5, NULL);
+    xTaskCreate(lock_contact_timer, "lock_contact_timer", 2048, NULL, 10, NULL);
 }

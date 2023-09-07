@@ -46,7 +46,6 @@ int storeRadarSettings()
   return 0;
 }
 
-
 int restoreRadarSettings()
 {
 	for (uint8_t i=0; i < NUM_OF_RADARS; i++) {
@@ -172,7 +171,7 @@ void radar_main()
 {
   printf("Starting radar service.\n");
 
-	radars[0].pin = USE_MCP23017 ? RADAR_BUTTON_MCP_IO_1 : RADAR_BUTTON_IO_1;
+	radars[0].pin = RADAR_BUTTON_IO_1;
 	radars[0].delay = 4;
 	radars[0].channel = 1;
 	radars[0].alert = false;

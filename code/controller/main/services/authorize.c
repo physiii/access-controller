@@ -1,6 +1,11 @@
 #define MAX_UIDS			400
 #define MAX_UID_SIZE	50
 
+#define MAX_USERS		400
+#define MAX_UID_SIZE	50
+#define MAX_NAME_SIZE   50
+#define MAX_PIN_SIZE    10
+
 int CHECK_UID = 0;
 int ADD_UID = 1;
 int REMOVE_UID = 2;
@@ -14,138 +19,160 @@ bool auth_service_message_ready = false;
 cJSON *auth_uids = NULL;
 cJSON *new_auth_uids = NULL;
 
-int store_auth_uids(cJSON * uids)
-{
-  printf("Storing UIDs: %s\n",cJSON_PrintUnformatted(uids));
-  store_char("auth_uids", cJSON_PrintUnformatted(uids));
-  return 0;
+typedef struct {
+    char uid[MAX_UID_SIZE];
+    char name[MAX_NAME_SIZE];
+    char pin[MAX_PIN_SIZE];
+} user_info;
+
+user_info users[MAX_USERS];
+cJSON *auth_users = NULL;
+
+void store_users_to_flash() {
+    auth_users = cJSON_CreateArray();
+    for (int i = 0; i < MAX_USERS; i++) {
+      if (strlen(users[i].name) == 0) continue;
+      cJSON *user = cJSON_CreateObject();
+      cJSON_AddStringToObject(user, "name", users[i].name);
+      cJSON_AddStringToObject(user, "pin", users[i].pin);
+      cJSON_AddItemToArray(auth_users, user);
+    }
+
+    char *auth_users_str = cJSON_PrintUnformatted(auth_users);  // Allocated dynamically
+    if (auth_users_str != NULL) {
+        printf("Storing users to flash: %s\n", auth_users_str);
+        store_char("auth_users", auth_users_str);
+        free(auth_users_str);  // Free the allocated memory
+    } else {
+        ESP_LOGE(TAG, "Failed to print JSON");
+    }
 }
 
-int load_auth_uids_from_flash()
-{
-  char *uids = get_char("auth_uids");
-  if (strcmp(uids,"")==0) {
-    printf("auth_uids not found in flash.\n");
-    auth_uids = cJSON_CreateArray();
-    return 1;
-  } else {
-    printf("auth_uids found in flash.\n%s\n",uids);
-  }
-
-  cJSON *obj = cJSON_Parse(uids);
-  if (cJSON_IsArray(obj)) {
-    auth_uids = obj;
-    printf("Loaded auth_uids from flash. %s\n", uids);
-  } else {
-    printf("auth_uids are not in a json array\n");
-  }
-
-  return 0;
-}
-
-void add_auth_uid (char * new_id)
-{
-  cJSON *id = NULL;
-  char current_id[50] = { 0 };
-
-	printf("add_auth_uid %s\n",new_id);
-  cJSON_ArrayForEach(id, auth_uids) {
-    if (cJSON_IsString(id)) {
-      strcpy(current_id,id->valuestring);
-      if (strcmp(current_id, new_id)==0) {
-        printf("UID Already added.\n");
+void load_users_from_flash() {
+    char *user_str = get_char("auth_users");
+    if (user_str == NULL || strcmp(user_str, "") == 0) {
+        printf("No users found in flash.\n");
         return;
-      }
     }
-  }
-
-  cJSON *id_obj =  cJSON_CreateString(new_id);
-  cJSON_AddItemToArray(auth_uids, id_obj);
-  store_auth_uids(auth_uids);
-}
-
-void remove_auth_uid (char * target_id)
-{
-  cJSON *id =  NULL;
-	int id_cnt = 0;
-  char current_id[50];
-	new_auth_uids = cJSON_CreateArray();
-
-	cJSON_ArrayForEach(id, auth_uids) {
-    strcpy(current_id,id->valuestring);
-		if (strcmp(current_id, target_id)==0) {
-			// printf("Found match for remove target %s...%s\n", target_id, current_id);
-		} else {
-      // printf("Adding UID %s.\n",current_id);
-			cJSON *id_obj =  cJSON_CreateString(current_id);
-			sprintf(uids[id_cnt], "%s", current_id);
-			id_cnt++;
-		}
-	}
-
-	for (int i = 0; i < id_cnt; i++) {
-		cJSON *id_obj =  cJSON_CreateString(uids[i]);
-		cJSON_AddItemToArray(new_auth_uids, id_obj);
-	}
-
-	auth_uids = new_auth_uids;
-  store_auth_uids(auth_uids);
-}
-
-bool is_uid_authorized (char * uid)
-{
-  cJSON *uid_obj =  NULL;
-  char current_uid[20] = { 0 };
-
-  cJSON_ArrayForEach(uid_obj, auth_uids) {
-    sprintf(current_uid,"%s",uid_obj->valuestring);
-
-    if (strcmp(current_uid,uid)==0) {
-			printf("UID Authorized.\n");
-      return true;
+    cJSON *loaded_users = cJSON_Parse(user_str);
+    if (loaded_users == NULL || !cJSON_IsArray(loaded_users)) {
+        printf("Corrupt user data in flash.\n");
+        return;
     }
-  }
 
-	printf("UID is NOT Authorized.\n");
-  return false;
+    int i = 0;
+    cJSON *user = NULL;
+    cJSON_ArrayForEach(user, loaded_users) {
+        cJSON *name = cJSON_GetObjectItem(user, "name");
+        cJSON *pin = cJSON_GetObjectItem(user, "pin");
+        if (name && pin) {
+            strncpy(users[i].name, name->valuestring, MAX_NAME_SIZE);
+            strncpy(users[i].pin, pin->valuestring, MAX_PIN_SIZE);
+            i++;
+        }
+        printf("Loaded user: Name = %s, Pin = %s\n", name->valuestring, pin->valuestring);
+    }
+    cJSON_Delete(loaded_users);
+    free(user_str);
 }
 
-int handle_uid (char * uid)
-{
+void sendUsers() {
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strlen(users[i].name) == 0) continue;
 
-  if (current_mode == ADD_UID) {
-    add_auth_uid(uid);
-    return 0;
-  }
+        cJSON *user = cJSON_CreateObject();
+        cJSON_AddStringToObject(user, "name", users[i].name);
+        cJSON_AddStringToObject(user, "pin", users[i].pin);
 
-  if (current_mode == REMOVE_UID) {
-    remove_auth_uid(uid);
-    return 0;
-  }
+        // Create the message JSON array with only this user
+        cJSON *users_json = cJSON_CreateArray();
+        cJSON_AddItemToArray(users_json, user);
 
-  if (current_mode == CHECK_UID) {
-		return is_uid_authorized(uid);
-  }
+        char *users_json_str = cJSON_PrintUnformatted(users_json);  // This allocates memory
+        if (users_json_str == NULL) {
+            // Handle error
+            ESP_LOGE(TAG, "Failed to print JSON");
+            cJSON_Delete(users_json);
+            continue;
+        }
 
-  printf("Access granted to %s.\n", uid);
-  return 0;
+        char msg[2000] = "";
+        snprintf(msg, sizeof(msg), "{\"event_type\":\"load\", \"payload\":{\"services\":[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":{\"users\":%s}}]}}", users_json_str);
+
+        free(users_json_str);  // Free the allocated memory
+
+        addServerMessageToQueue(msg);
+
+        cJSON_Delete(users_json);
+    }
+    // addClientMessageToQueue(users_str);
 }
 
-void sendUsers()
-{
-	char users_str[1000] = "";
-	sprintf(users_str,
-		"{\"eventType\":\"users\", "
-		"\"payload\":%s}",
-		cJSON_PrintUnformatted(auth_uids));
-
-	printf("users: %s\n", users_str);
-	addClientMessageToQueue(users_str);
+void addUser(char *name, char *pin) {
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strcmp(users[i].name, name) == 0) {
+            printf("User with name %s already exists.\n", name);
+            return;
+        }
+    }
+    printf("Adding user 1: Name = %s, Pin = %s\n", name, pin);
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strcmp(users[i].name, "") == 0) {
+          strncpy(users[i].name, name, MAX_NAME_SIZE);
+          strncpy(users[i].pin, pin, MAX_PIN_SIZE);
+          store_users_to_flash();
+          printf("User added: Name = %s, Pin = %s\n", name, pin);
+          sendUsers();
+          return;
+        }
+    }
+    printf("User limit reached. Cannot add more users.\n");
 }
 
-void handle_users_message(cJSON * payload)
-{
+void modifyUser(char *name, char *newName, char *newPin) {
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strcmp(users[i].name, name) == 0) {
+            strncpy(users[i].name, newName, MAX_NAME_SIZE);
+            strncpy(users[i].pin, newPin, MAX_PIN_SIZE);
+            store_users_to_flash();
+            printf("User modified: New Name = %s, New Pin = %s\n", newName, newPin);
+            sendUsers();
+            return;
+        }
+    }
+    printf("No user with name %s found to modify.\n", name);
+}
+
+void removeUser(char *name) {
+    printf("Removing user with name %s\n", name);
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strcmp(users[i].name, name) == 0) {
+            memset(&users[i], 0, sizeof(user_info));
+            store_users_to_flash();
+            printf("User with name %s removed.\n", name);
+            sendUsers();
+            return;
+        }
+    }
+    printf("No user with name %s found.\n", name);
+}
+
+int is_pin_authorized(const char *incomingPin) {
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strlen(users[i].name) == 0) continue;  // Skip uninitialized users
+        if (strcmp(users[i].pin, incomingPin) == 0) {
+            return 1;  // PIN found and authorized
+        }
+    }
+    return 0;  // PIN not found, not authorized
+}
+
+void handle_authorize_message(cJSON * payload)
+{ 
 	char user[250];
+  char name[100] = "";
+  char pin[10] = "";
+	char property[250];
 
 	if (payload == NULL) return;
 
@@ -153,19 +180,66 @@ void handle_users_message(cJSON * payload)
 		sendUsers();
 	}
 
-	if (cJSON_GetObjectItem(payload,"addUser")) {
-		 int addUser = cJSON_GetObjectItem(payload,"addUser")->valueint;
-		 if (addUser) {
-			 current_mode = ADD_UID;
-		 } else {
-			 current_mode = CHECK_UID;
-		 }
+  if (cJSON_GetObjectItem(payload,"uuid")) {
+    sprintf(device_id, "%s", cJSON_GetObjectItem(payload,"uuid")->valuestring);
+    printf("device ID received: %s\n", device_id); 
+    store_char("device_id", device_id);
+    cJSON_free(payload);
 	}
 
-	if (cJSON_GetObjectItem(payload,"removeUser")) {
+  if (cJSON_GetObjectItem(payload,"token")) {
+    sprintf(token, "%s", cJSON_GetObjectItem(payload,"token")->valuestring);
+    printf("token received: %s\n", token);
+    store_char("token",token);
+    cJSON_free(payload);
+	}
+
+    if (cJSON_GetObjectItem(payload,"property")) {
+        sprintf(property, "%s", cJSON_GetObjectItem(payload,"property")->valuestring);
+
+        if (strcmp(property, "addUser") == 0) {
+            printf("handle_authorize_message: %s\n",cJSON_PrintUnformatted(payload));
+            cJSON *value = cJSON_GetObjectItem(payload, "value");
+            char name[MAX_NAME_SIZE] = "";
+            char pin[MAX_PIN_SIZE] = "";
+            if (cJSON_GetObjectItem(value, "name") && cJSON_GetObjectItem(value, "pin")) {
+              sprintf(name, "%s", cJSON_GetObjectItem(value, "name")->valuestring);
+              sprintf(pin, "%s", cJSON_GetObjectItem(value, "pin")->valuestring);
+            }
+            addUser(name, pin);
+            cJSON_free(payload);
+        }
+
+        if (strcmp(property, "modifyUser") == 0) {
+            cJSON *value = cJSON_GetObjectItem(payload, "value");
+            char name[MAX_NAME_SIZE] = "";
+            char newName[MAX_NAME_SIZE] = "";
+            char newPin[MAX_PIN_SIZE] = "";
+            if (cJSON_GetObjectItem(value, "name") && 
+                cJSON_GetObjectItem(value, "newName") && 
+                cJSON_GetObjectItem(value, "newPin")) {
+              sprintf(name, "%s", cJSON_GetObjectItem(value, "name")->valuestring);
+              sprintf(newName, "%s", cJSON_GetObjectItem(value, "newName")->valuestring);
+              sprintf(newPin, "%s", cJSON_GetObjectItem(value, "newPin")->valuestring);
+            }
+            modifyUser(name, newName, newPin);
+            cJSON_free(payload);
+        }
+
+        printf("property: %s\n", property);
+        if (strcmp(property, "removeUser") == 0) {
+          cJSON *value = cJSON_GetObjectItem(payload, "value");
+          printf("remove user: %s\n",cJSON_GetObjectItem(value,"name")->valuestring);
+          sprintf(name, "%s", cJSON_GetObjectItem(value,"name")->valuestring);
+          removeUser(name);
+          cJSON_free(payload);
+        }
+    }
+
+  if (cJSON_GetObjectItem(payload,"removeUser")) {
 		 char user[100] = "";
 		 sprintf(user, "%s", cJSON_GetObjectItem(payload,"removeUser")->valuestring);
-		 remove_auth_uid(user);
+     removeUser(user);
 	}
 }
 
@@ -173,10 +247,13 @@ static void auth_service (void *pvParameter)
 {
   uint32_t io_num;
   uint8_t r;
-  load_auth_uids_from_flash();
 
   while (1) {
-		handle_users_message(checkServiceMessage("users"));
+    handle_authorize_message(checkServiceMessageByAction("ac_1", "addUser"));
+    handle_authorize_message(checkServiceMessageByAction("ac_1", "modifyUser"));
+    handle_authorize_message(checkServiceMessageByAction("ac_1", "removeUser"));
+		handle_authorize_message(checkServiceMessageByKey("uuid"));
+		handle_authorize_message(checkServiceMessageByKey("token"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }
@@ -184,6 +261,7 @@ static void auth_service (void *pvParameter)
 void auth_main()
 {
   printf("starting auth service\n");
+  load_users_from_flash();
   TaskHandle_t auth_service_task;
-  xTaskCreate(&auth_service, "auth_service_task", 5000, NULL, 5, NULL);
+  xTaskCreate(&auth_service, "auth_service_task", 9 * 1000, NULL, 5, NULL);
 }
