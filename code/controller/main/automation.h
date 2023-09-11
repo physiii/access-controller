@@ -1,8 +1,11 @@
 #include <string.h>
+#include <ctype.h>
 #include "cJSON.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+void beep_keypad(int, int);
 
 #define SERVICE_LOOP 100
 #define SERVICE_LOOP_SHORT 10
@@ -27,7 +30,7 @@ bool get_time = false;
 char token[700];
 char device_id[100];
 bool disconnect_from_relay = false;
-bool connect_to_relay = true;
+bool connect_to_relay = false;
 
 static const char *TAG = "open-automation";
 

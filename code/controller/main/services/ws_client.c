@@ -113,16 +113,19 @@ static void ws_client_task(void)
     int i = 0;
     while (1) {
         if (esp_websocket_client_is_connected(client)) {
+            connect_to_relay = true;
 			if (serverMessage.readyToSend) {
 				int len = sprintf(data, serverMessage.message);
 				char * data = serverMessage.message;
             	esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
 				serverMessage.readyToSend = false;
-				// ESP_LOGI(TAG, "Sending server a message. (%d): %s\n", serverMessage.queueCount, serverMessage.message);
+				ESP_LOGI(TAG, "Sending server a message. (%d): %s\n", serverMessage.queueCount, serverMessage.message);
 			}
+        } else {
+            connect_to_relay = false;
         }
 
-        vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
+        vTaskDelay(2 * SERVICE_LOOP / portTICK_PERIOD_MS);
     }
 
     esp_websocket_client_stop(client);

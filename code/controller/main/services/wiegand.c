@@ -1,14 +1,22 @@
+static portMUX_TYPE myMutex = portMUX_INITIALIZER_UNLOCKED;
+
 #define WG_DELAY					80
 #define NUM_OF_WIEGANDS			    2
 #define NUM_OF_KEYS			    	12
 #define KEYCODE_LENGTH	    		6
+
+typedef struct {
+    uint32_t gpio_num;
+    int wg_index;
+    int gpio_val; // Added this field to store the GPIO value
+} gpio_event_t;
 
 struct wiegand
 {
 	uint8_t pin0;
 	uint8_t pin1;
 	uint8_t pin_push;
-	uint64_t code;
+	char code[25];
 	uint8_t bitCount;
 	char name[100];
 	int count;
@@ -32,49 +40,83 @@ struct wiegand wg[NUM_OF_WIEGANDS];
 
 static QueueHandle_t gpio_evt_queue = NULL;
 
-static void IRAM_ATTR wiegand_isr_handler(void* arg)
+void beep_keypad (int count, int ch)
 {
-    uint32_t gpio_num = (uint32_t) arg;
+	if (ch < 1 || ch > NUM_OF_WIEGANDS) return;
 
-		for (int i=0; i < NUM_OF_WIEGANDS; i++) {
-			if (!wg[i].enable) continue;
+	for (int i=0; i < count; i++) {
+		vTaskDelay(30 / portTICK_PERIOD_MS);
+		set_io(wg[ch - 1].pin_push, true);
+		vTaskDelay(240 / portTICK_PERIOD_MS);
+		set_io(wg[ch - 1].pin_push, false);
+		vTaskDelay(30 / portTICK_PERIOD_MS);
+		set_io(wg[ch - 1].pin_push, true);
+	}
+}
 
-			// if (wg[i].code == 0) wg[i].newKey = true;
-			wg[i].newKey = true;
-			wg[i].bitCount++;
+static void IRAM_ATTR wiegand_isr_handler(void* arg) {
+	gpio_event_t event;
+	event.gpio_num = (uint32_t) arg;
+	event.gpio_val = gpio_get_level(event.gpio_num);
+	xQueueSendFromISR(gpio_evt_queue, &event, NULL);
+}
 
-			if (gpio_num == wg[i].pin0) {
-				wg[i].code = (wg[i].code << 1) | 0;
-			} else if (gpio_num == wg[i].pin1) {
-				wg[i].code = (wg[i].code << 1) | 1;
-			}
-		}
+void start_keypress_timer (struct wiegand *wg, bool val)
+{
+	if (val) {
+		wg->keypressExpired = false;
+		wg->keypressCount = 0;
+	} else {
+		wg->keypressExpired = true;
+	}
+}
+
+void check_keypress_timer (struct wiegand *wg)
+{
+	if (wg->keypressCount >= wg->keypressTimeout && !wg->keypressExpired) {
+		printf("Keypress timer expired for wg %d\n", wg->channel);
+		memset(wg->code, 0, sizeof(wg->code));
+		memset(wg->incomingCode, 0, sizeof(wg->incomingCode));
+		wg->incomingCodeCount = 0;
+		wg->keypressExpired = true;
+		wg->keypressCount = 0;
+		beep_keypad(2, wg->channel);
+	} else wg->keypressCount++;
+}
+
+static void keypress_timer (void *pvParameter)
+{
+  while (1) {
+	for (int i=0; i < NUM_OF_WIEGANDS; i++)
+		check_keypress_timer(&wg[i]);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
 }
 
 void start_wiegand_timer (struct wiegand *wg, bool val)
 {
+  start_keypress_timer(wg, false);
   if (val) {
     wg->expired = false;
     wg->count = 0;
   } else {
     wg->expired = true;
-		wg->incomingCodeCount = 0;
+	wg->incomingCodeCount = 0;
   }
 }
 
 void check_wiegand_timer (struct wiegand *wg)
 {
+  if (!wg->enable) return;
   if (wg->count >= wg->delay && !wg->expired) {
 		printf("Re-arming lock from wg %d service. Alert %d\n", wg->channel, wg->alert);
 
-		arm_lock(wg[0].channel, true, wg[0].alert);
-		arm_lock(wg[1].channel, true, wg[1].alert);
+		arm_lock(wg->channel, true, wg->alert);
 		wg->expired = true;
   } else wg->count++;
 }
 
-static void
-wiegand_timer (void *pvParameter)
+static void wiegand_timer (void *pvParameter)
 {
   while (1) {
 		for (int i=0; i < NUM_OF_WIEGANDS; i++)
@@ -83,104 +125,91 @@ wiegand_timer (void *pvParameter)
   }
 }
 
-void start_keypress_timer (struct wiegand *wg, bool val)
-{
-  if (val) {
-    wg->keypressExpired = false;
-    wg->keypressCount = 0;
-  } else {
-    wg->keypressExpired = true;
-		wg->incomingCodeCount = 0;
-  }
-}
+void handleKeyCode(struct wiegand *wg) {
+	uint8_t key[12] = {
+        0b00000000, // 0
+        0b00000011, // 1
+        0b00001100, // 2
+        0b00001111, // 3
+        0b00110000, // 4
+        0b00110011, // 5
+        0b00111100, // 6
+        0b00111111, // 7
+        0b11000000, // 8
+        0b11000011, // 9
+        0b11001100, // *
+        0b11001111  // #
+    };
+    uint8_t incomingByte = (uint8_t) strtol(wg->incomingCode, NULL, 2);
+    int keyIndex = -1;
+    start_keypress_timer(wg, true);
 
-void check_keypress_timer (struct wiegand *wg)
-{
-  if (wg->keypressCount >= wg->keypressTimeout && !wg->keypressExpired) {
-		wg->keypressExpired = true;
-		wg->incomingCodeCount = 0;
-  } else wg->keypressCount++;
-}
+    for(int i = 0; i < NUM_OF_KEYS; i++) {
+        if (incomingByte == key[i]) {
+            keyIndex = i;
+            break;
+        }
+    }
 
-static void
-keypress_timer (void *pvParameter)
-{
-  while (1) {
-		for (int i=0; i < NUM_OF_WIEGANDS; i++)
-			check_keypress_timer(&wg[i]);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-  }
-}
-void handleCode(struct wiegand *wg, char *codeStr) {
-    if (current_mode == ADD_UID) {
-        // add_auth_uid(codeStr);
-    } else {
-		if (is_pin_authorized(wg->incomingCode)) {
+    // Add the ASCII equivalent to the code string
+    if (keyIndex >= 0 && keyIndex <= 9) {
+        wg->code[strlen(wg->code)] = '0' + keyIndex;
+    } else if (keyIndex == 10) {
+        wg->code[strlen(wg->code)] = '*';
+    } else if (keyIndex == 11) {
+        // wg->code[strlen(wg->code)] = '#';
+
+        if (is_pin_authorized(wg->code)) {
+			printf("Authorized pin %s\n", wg->code);
 			arm_lock(wg->channel, false, wg->alert);
 			start_wiegand_timer(wg, true);
+		} else {
+			printf("Unauthorized pin %s\n", wg->code);
+			beep_keypad(2, wg->channel);
 		}
+		memset(wg->code, 0, sizeof(wg->code));
+		start_keypress_timer(wg, false);
+        return;
     }
-}
 
-void handleKeyCode(struct wiegand *wg) {
-    printf("KEYCODE: %s\n", wg->incomingCode);
-    handleCode(wg, wg->incomingCode);
+	if (strlen(wg->code) > KEYCODE_LENGTH) {
+		printf("Exceeded max keycode length (%d): %s\n", KEYCODE_LENGTH, wg->code);
+		memset(wg->code, 0, sizeof(wg->code));
+		memset(wg->incomingCode, 0, sizeof(wg->incomingCode));
+		wg->incomingCodeCount = 0;
+		start_keypress_timer(wg, false);
+		beep_keypad(2, wg->channel);
+	}
+
     memset(wg->incomingCode, 0, sizeof(wg->incomingCode));
     wg->incomingCodeCount = 0;
 }
 
-void handleFingerCode(struct wiegand *wg) {
-    printf("FINGER: %s\n", wg->fingerCode);
-    handleCode(wg, wg->fingerCode);
-    wg->code = 0;
-    wg->bitCount = 0;
-}
-
 static void wiegand_task(void *pvParameter) {
-    uint64_t keys[NUM_OF_KEYS] = {0, 3, 12, 15, 48, 51, 60, 63, 192, 195, 204, 207};
+    gpio_event_t event;
     char codeStr[25];
 
     for (;;) {
-        for (int i = 0; i < NUM_OF_WIEGANDS; i++) {
-            if (!wg[i].enable || !wg[i].newKey) {
-                vTaskDelay(WG_DELAY / portTICK_PERIOD_MS);
-                continue;
+        if(xQueueReceive(gpio_evt_queue, &event, portMAX_DELAY)) {
+            struct wiegand *current_wg = &wg[event.wg_index];
+            if (!current_wg->enable) continue;
+
+            if(event.gpio_num == current_wg->pin0 && event.gpio_val == 0) {
+                current_wg->incomingCodeCount++;
+                current_wg->incomingCode[current_wg->incomingCodeCount - 1] = '0';
+            } else if(event.gpio_num == current_wg->pin1 && event.gpio_val == 0) {
+                current_wg->incomingCodeCount++;
+                current_wg->incomingCode[current_wg->incomingCodeCount - 1] = '1';
             }
-            
-            wg[i].newKey = false;
-            printf("code (%d): %lld\n", wg[i].bitCount, wg[i].code);
-            vTaskDelay(WG_DELAY / portTICK_PERIOD_MS);
 
-            if (wg[i].code < 256) {
-                start_keypress_timer(&wg[i], true);
+            if(current_wg->incomingCodeCount >= 8) {
+                current_wg->incomingCode[current_wg->incomingCodeCount] = '\0';
+                handleKeyCode(current_wg);
 
-                if (wg[i].bitCount == 52) {
-                    handleFingerCode(&wg[i]);
-                    continue;
-                }
-
-                for (int j = 0; j < NUM_OF_KEYS; j++) {
-                    if (keys[j] != wg[i].code) continue;
-
-                    if (j == 11) { // 11 represents pound key
-                        handleKeyCode(&wg[i]);
-                    } else {
-                        wg[i].incomingCode[wg[i].incomingCodeCount] = '0' + j;
-                        wg[i].incomingCodeCount++;
-
-                        if (wg[i].incomingCodeCount > KEYCODE_LENGTH) {
-                            printf("Reached max keycode length.\n");
-                            memset(wg[i].incomingCode, 0, sizeof(wg[i].incomingCode));
-                            wg[i].incomingCodeCount = 0;
-                        }
-                    }
-                }
-            } else {
-                sprintf(codeStr, "%lld", wg[i].code);
-                // handleCode(&wg[i], codeStr);
+                // Reset for the next round
+				current_wg->incomingCodeCount = 0;
+				memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
             }
-            wg[i].code = 0;
-            wg[i].bitCount = 0;
         }
     }
 }
@@ -194,7 +223,7 @@ void enableWiegand (int ch, bool val)
 void wiegand_main() {
 	wg[0].pin0 = WG0_DATA0_IO;
 	wg[0].pin1 = WG0_DATA1_IO;
-	// wg[0].pin_push = OPEN_IO_1;
+	wg[0].pin_push = OPEN_IO_1;
 	wg[0].delay = 4;
 	wg[0].keypressTimeout = 4;
 	wg[0].channel = 1;
@@ -206,7 +235,7 @@ void wiegand_main() {
 
 	wg[1].pin0 = WG1_DATA0_IO;
 	wg[1].pin1 = WG1_DATA1_IO;
-	// wg[1].pin_push = OPEN_IO_1;
+	wg[1].pin_push = OPEN_IO_1;
 	wg[1].delay = 4;
 	wg[1].keypressTimeout = 4;
 	wg[1].channel = 2;

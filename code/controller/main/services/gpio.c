@@ -52,7 +52,7 @@
 #define ESP_INTR_FLAG_DEFAULT 0
 
 void gpio_main(void)
-{printf("MAIN TESTING OPEN_IO_1: %d\n", OPEN_IO_1);
+{
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
@@ -86,10 +86,10 @@ void set_io (uint8_t io, bool val)
 {
 	
 	if (USE_MCP23017) {
-		printf("set_mcp_io io:%d\tval: %d\n", io, val);
+		// printf("set_mcp_io io:%d\tval: %d\n", io, val);
 		set_mcp_io(io, val);
 	} else {
-		printf("gpio_set_level io:%d\tval: %d\n", io, val);
+		// printf("gpio_set_level io:%d\tval: %d\n", io, val);
 		gpio_set_level(io, val);
 	}
 }

@@ -28,6 +28,7 @@ struct lock {
     bool isContact;
     bool isLocked;
     bool pulse;
+	bool polarity;
     bool expired;
     bool enable;
     bool enableContactAlert;
@@ -43,9 +44,7 @@ struct lock {
 
 struct lock locks[NUM_OF_LOCKS];
 
-void
-start_lock_contact_timer(struct lock *lck, bool val)
-{
+void start_lock_contact_timer(struct lock *lck, bool val) {
   if (val) {
     lck->expired = !val;
     lck->count = 0;
@@ -54,8 +53,7 @@ start_lock_contact_timer(struct lock *lck, bool val)
   }
 }
 
-void check_lock_contact_timer (struct lock *lck)
-{
+void check_lock_contact_timer (struct lock *lck) {
 	if (lck >= lck->delay
 		&& lck->enableContactAlert
 		&& !lck->isContact
@@ -67,9 +65,7 @@ void check_lock_contact_timer (struct lock *lck)
 	} else lck->count++;
 }
 
-static void
-lock_contact_timer (void *pvParameter)
-{
+static void lock_contact_timer (void *pvParameter) {
   while (1) {
 		for (int i=0; i < NUM_OF_LOCKS; i++)
 			check_lock_contact_timer(&locks[i]);
@@ -99,41 +95,21 @@ void enableLock (int ch, bool val)
 		if (locks[i].channel == ch) locks[i].enable = val;
 }
 
-void _arm_lock (struct lock *lck, bool val)
+void arm_lock (int channel, bool arm, bool alert)
 {
-  if (val) {
-		set_io(lck->controlPin, ARM);
-		start_lock_contact_timer(lck, false);
+	int ch = channel - 1;
+	printf("arm_lock (%d): enabled %s\n", channel, locks[ch].enable ? "true" : "false");
+	if (!locks[ch].enable) return;
+	locks[ch].alert = alert;
 
-		if (lck->alert) {
-			beep(1);
-			set_io(lck->openPin, ARM);
-			printf("Lock %d open pin: %d\n", lck->channel, lck->openPin);
-		}
-
-    printf("Lock %d armed.\n", lck->channel);
-  } else {
-	  set_io(lck->controlPin, DISARM);
-		start_lock_contact_timer(lck, false);
-
-		if (lck->alert) {
-			beep(2);
-			set_io(lck->openPin, DISARM);
-			printf("Lock %d open pin: %d\n", lck->channel, lck->openPin);
-		}
-
-		printf("Lock %d disarmed.\n", lck->channel);
-  }
-
-  lck->isLocked = val;
-}
-
-void arm_lock (int channel, bool val, bool alert)
-{
-	for (int i=0; i < NUM_OF_LOCKS; i++) {
-		locks[i].alert = alert;
-		if (channel == locks[i].channel) _arm_lock(&locks[i], val);
+	set_io(locks[ch].controlPin, arm);
+	start_lock_contact_timer(&locks[ch], false);
+	if (locks[ch].alert) {
+		beep(1);
+		beep_keypad(1, locks[ch].channel);
 	}
+	locks[ch].isLocked = arm;
+	printf("Lock channel %d was %s.\n", locks[ch].channel, arm ? "armed" : "disarmed");
 }
 
 void lock_init()
@@ -145,6 +121,7 @@ void lock_init()
 	locks[0].openPin = OPEN_IO_1;
 	printf("Lock 1 open pin: %d\n", locks[0].openPin);
 	locks[0].enable = true;
+	locks[0].delay = 4;
 	locks[0].alert = true;
 	locks[0].enableContactAlert = false;
 	strcpy(locks[0].type, "lock");
@@ -155,6 +132,7 @@ void lock_init()
 	locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
 	locks[1].openPin = OPEN_IO_2;
 	locks[1].enable = true;
+	locks[1].delay = 4;
 	locks[1].alert = true;
 	locks[1].enableContactAlert = false;
 	strcpy(locks[1].type, "lock");
@@ -165,7 +143,6 @@ void lock_init()
 			set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
 			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
 		}
-		// arm_lock(locks[i].channel, true, true);
 	}
 }
 
@@ -232,36 +209,60 @@ void handle_lock_message(cJSON * payload) {
 
     if (payload == NULL) return;
 
+	cJSON *channel_item = cJSON_GetObjectItem(payload, "channel");
+	cJSON *enable_item = cJSON_GetObjectItem(payload, "enable");
+	cJSON *enableContactAlert_item = cJSON_GetObjectItem(payload, "enableContactAlert");
+	cJSON *arm_item = cJSON_GetObjectItem(payload, "arm");
+	cJSON *property_item = cJSON_GetObjectItem(payload,"property");
+
 	if (cJSON_GetObjectItem(payload,"getState")) {
 		sendLockState();
 	}
 
-	if (cJSON_GetObjectItem(payload,"channel")) {
-	 	ch = cJSON_GetObjectItem(payload,"channel")->valueint;
+	if (channel_item) {
+	 	ch = channel_item->valueint;
 
-	 	if (cJSON_GetObjectItem(payload,"arm")) {
-	 		val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"arm"));
+	 	if (arm_item) {
+	 		val = arm_item->type == cJSON_True;
 	 		arm_lock(ch, val, true);
 	 	}
 
-	 	if (cJSON_GetObjectItem(payload,"enable")) {
-	 		val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enable"));
-	 		enableLock(ch, val);
+	 	// if (enable_item) {
+		// 	val = enable_item->type == cJSON_True;
+	 	// 	enableLock(ch, val);
+		// 	printf("enableLock (%d): %s\n", ch, val ? "true" : "false");
+	 	// }
+
+		if (enable_item) {
+			val = cJSON_IsTrue(enable_item);
+			enableLock(ch, val);
 	 	}
 
-		if (cJSON_GetObjectItem(payload,"enableContactAlert")) {
-	 		val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"enableContactAlert"));
+		if (enableContactAlert_item) {
+	 		val = enableContactAlert_item->type == cJSON_True;
 			locks[ch - 1].enableContactAlert = val;
 	 	}
 
 		storeLockSettings();
 	}
 
-	if (cJSON_GetObjectItem(payload,"property")) {
-		sprintf(property, "%s", cJSON_GetObjectItem(payload,"property")->valuestring);
+	if (property_item) {
+		if (property_item->valuestring == NULL) return;
+
+		sprintf(property, "%s", property_item->valuestring);
 		if (strcmp(property, "pulseLock") == 0) {
 			for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-				arm_lock(i, false, true);
+				if (!locks[i].enable) continue;
+				int ch = i + 1;
+				arm_lock(ch, false, true);
+			}
+
+			vTaskDelay(locks[0].delay * 1000 / portTICK_PERIOD_MS);
+
+			for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
+				if (!locks[i].enable) continue;
+				int ch = i + 1;
+				arm_lock(ch, true, true);
 			}
 			cJSON_Delete(payload);
 		}
@@ -293,6 +294,6 @@ void lock_main() {
     lock_init();
     restoreLockSettings();
 
-    xTaskCreate(&lock_service, "lock_service_task", 5000, NULL, 5, NULL);
+    xTaskCreate(&lock_service, "lock_service_task", 8 * 1000, NULL, 5, NULL);
     xTaskCreate(lock_contact_timer, "lock_contact_timer", 2048, NULL, 10, NULL);
 }

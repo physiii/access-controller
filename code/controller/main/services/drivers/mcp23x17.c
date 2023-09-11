@@ -141,13 +141,11 @@ void set_mcp_io_dir(uint8_t io, bool dir)
 	data_wr[0] = REG_IODIRA;
 	data_wr[1] = MCP_DIR & 0x00ff;
 	data_wr[2] = MCP_DIR >> 8;
-	// data_wr[1] = 254;
-	// data_wr[2] = 255;
 
 	mcp_write(data_wr, 3);
 
-	printf("set_mcp_io_dir(%u): io:%u\tdir:%d\n", MCP_DIR, io, dir);
-	printf("Set Direction: A:%d\tB:%d\n", data_wr[1], data_wr[2]);
+	// printf("set_mcp_io_dir(%u): io:%u\tdir:%d\n", MCP_DIR, io, dir);
+	// printf("Set Direction: A:%d\tB:%d\n", data_wr[1], data_wr[2]);
 }
 
 uint16_t get_mcp_values ()

@@ -51,41 +51,56 @@ void app_main(void)
 	clientMessage.readyToSend = false;
 	serverMessage.readyToSend = false;
 
+  	ESP_ERROR_CHECK(example_connect());
+	ws_client_main();
+	
 	gpio_main();
-
 	i2c_main();
 	mcp23x17_main();
-
 	auth_main();
 	lock_main();
 	buzzer_main();
 	wiegand_main();
+
 	// exit_main();
 	// keypad_main();
 	#if STRIKE
-		// radar_main();
-		ws_client_main();
+		radar_main();
 	#else
-		fob_main();
-		ap_main();
+		// fob_main();
+		// ap_main();
 	#endif
-	ws_client_main();
-  	ESP_ERROR_CHECK(example_connect());
 	server_main();
 
-	xTaskCreate(serviceMessageTask, "serviceMessageTask", 5000, NULL, 10, NULL);
-	xTaskCreate(clientMessageTask, "clientMessageTask", 5000, NULL, 10, NULL);
-	xTaskCreate(serverMessageTask, "serverMessageTask", 5000, NULL, 10, NULL);
+    TaskHandle_t serviceMessageTaskHandle = NULL;
+    TaskHandle_t clientMessageTaskHandle = NULL;
+    TaskHandle_t serverMessageTaskHandle = NULL;
 
-	int cnt = 0;
+    xTaskCreate(serviceMessageTask, "serviceMessageTask", 5000, NULL, 10, &serviceMessageTaskHandle);
+    xTaskCreate(clientMessageTask, "clientMessageTask", 5000, NULL, 10, &clientMessageTaskHandle);
+    xTaskCreate(serverMessageTask, "serverMessageTask", 5000, NULL, 10, &serverMessageTaskHandle);
 
-	while(1) {
-		// load_device();
-		// send_event();
-		sendUsers();
+    int cnt = 0;
 
-		printf("count %d\n", cnt++);
-		vTaskDelay(10 * 1000 / portTICK_PERIOD_MS);
-		printf("Minimum free heap size: %ld bytes\n", esp_get_minimum_free_heap_size());
-	}
+    while(1) {
+        sendUsers();
+
+        printf("count %d\n", cnt++);
+        
+        // Log the minimum free heap size
+        printf("Minimum free heap size: %ld bytes\n", esp_get_minimum_free_heap_size());
+
+        // Check the stack's high water mark
+        // if (serviceMessageTaskHandle != NULL) {
+        //     printf("ServiceMessageTask High Water Mark: %d\n", uxTaskGetStackHighWaterMark(serviceMessageTaskHandle));
+        // }
+        // if (clientMessageTaskHandle != NULL) {
+        //     printf("ClientMessageTask High Water Mark: %d\n", uxTaskGetStackHighWaterMark(clientMessageTaskHandle));
+        // }
+        // if (serverMessageTaskHandle != NULL) {
+        //     printf("ServerMessageTask High Water Mark: %d\n", uxTaskGetStackHighWaterMark(serverMessageTaskHandle));
+        // }
+
+        vTaskDelay(10 * 1000 / portTICK_PERIOD_MS);
+    }
 }
