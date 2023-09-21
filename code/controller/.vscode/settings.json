@@ -35,7 +35,8 @@
         "unordered_map": "c",
         "unordered_set": "c",
         "ios": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "ctype.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

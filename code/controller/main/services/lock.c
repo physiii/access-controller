@@ -60,7 +60,7 @@ void check_lock_contact_timer (struct lock *lck) {
 		&& lck->isLocked
 		&& lck->enable
 		&& !lck->expired) {
-		printf("Contact delay expired for door %d, sounding alert.\n", lck->channel);
+		ESP_LOGI(TAG, "Contact delay expired for door %d, sounding alert.\n", lck->channel);
 		longBeep(1);
 	} else lck->count++;
 }
@@ -98,7 +98,6 @@ void enableLock (int ch, bool val)
 void arm_lock (int channel, bool arm, bool alert)
 {
 	int ch = channel - 1;
-	printf("arm_lock (%d): enabled %s\n", channel, locks[ch].enable ? "true" : "false");
 	if (!locks[ch].enable) return;
 	locks[ch].alert = alert;
 
@@ -109,7 +108,6 @@ void arm_lock (int channel, bool arm, bool alert)
 		beep_keypad(1, locks[ch].channel);
 	}
 	locks[ch].isLocked = arm;
-	printf("Lock channel %d was %s.\n", locks[ch].channel, arm ? "armed" : "disarmed");
 }
 
 void lock_init()
@@ -119,7 +117,6 @@ void lock_init()
     locks[0].isLocked = true;
 	locks[0].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1;
 	locks[0].openPin = OPEN_IO_1;
-	printf("Lock 1 open pin: %d\n", locks[0].openPin);
 	locks[0].enable = true;
 	locks[0].delay = 4;
 	locks[0].alert = true;
@@ -139,7 +136,6 @@ void lock_init()
 
 	for (int i=0; i < NUM_OF_LOCKS; i++) {
 		if (USE_MCP23017) {
-			printf("Setting lock direction: %u\n", locks[i].controlPin);
 			set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
 			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
 		}
@@ -148,7 +144,6 @@ void lock_init()
 
 int storeLockSettings()
 {
-
 	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
 		char type[25] = "";
 		strcpy(type, locks[i].type);
@@ -164,7 +159,6 @@ int storeLockSettings()
 
 		sprintf(locks[i].key, "%s%d", type, i);
 		storeSetting(locks[i].key, cJSON_Parse(locks[i].settings));
-		printf("storeLockSettings\t%s\n", locks[i].settings);
 	}
 	return 0;
 }
@@ -197,7 +191,6 @@ int sendLockState()
 			(locks[i].enableContactAlert) ? "true" : "false");
 
 		addClientMessageToQueue(locks[i].settings);
-		// printf("sendLockSettings: %s\n", locks[i].settings);
 	}
   return 0;
 }
@@ -227,16 +220,12 @@ void handle_lock_message(cJSON * payload) {
 	 		arm_lock(ch, val, true);
 	 	}
 
-	 	// if (enable_item) {
-		// 	val = enable_item->type == cJSON_True;
-	 	// 	enableLock(ch, val);
-		// 	printf("enableLock (%d): %s\n", ch, val ? "true" : "false");
-	 	// }
-
 		if (enable_item) {
-			val = cJSON_IsTrue(enable_item);
-			enableLock(ch, val);
-	 	}
+			if (enable_item->type == cJSON_False || enable_item->type == cJSON_True) {
+				val = cJSON_IsTrue(enable_item);
+				enableLock(ch, val);
+			}
+		}
 
 		if (enableContactAlert_item) {
 	 		val = enableContactAlert_item->type == cJSON_True;
@@ -247,10 +236,25 @@ void handle_lock_message(cJSON * payload) {
 	}
 
 	if (property_item) {
-		if (property_item->valuestring == NULL) return;
+		if (property_item->valuestring == NULL) {
+			cJSON_Delete(payload);
+			return;
+		}
 
 		sprintf(property, "%s", property_item->valuestring);
 		if (strcmp(property, "pulseLock") == 0) {
+
+    		char log_msg[1000];
+			snprintf(log_msg, sizeof(log_msg), 
+				"{\"event_type\":\"log\",\"payload\":"
+				"{\"service_id\":\"ac_1\", "
+				"\"type\":\"access-control\", "
+				"\"description\":\"Access granted from online portal.\", "
+				"\"event\":\"authentication\", "
+				"\"value\":\"true\"}"
+				"}");
+			addServerMessageToQueue(log_msg);
+
 			for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
 				if (!locks[i].enable) continue;
 				int ch = i + 1;
@@ -264,8 +268,9 @@ void handle_lock_message(cJSON * payload) {
 				int ch = i + 1;
 				arm_lock(ch, true, true);
 			}
-			cJSON_Delete(payload);
 		}
+
+		cJSON_Delete(payload);
 	}
 }
 
@@ -277,7 +282,6 @@ lock_service(void *pvParameter)
   while (1) {
 		for (int i=0; i < NUM_OF_LOCKS; i++) {
 			locks[i].isContact = !get_io(locks[i].contactPin);
-			// printf("Lock %d |\tContact (%d): %d\n", i, locks[i].contactPin, locks[i].isContact);
 		}
 
 		handle_lock_message(checkServiceMessage("lock"));
@@ -288,7 +292,7 @@ lock_service(void *pvParameter)
 }
 
 void lock_main() {
-    printf("Starting lock service.\n");
+	ESP_LOGI(TAG, "Starting lock service.\n");
     TaskHandle_t lock_service_task;
 
     lock_init();

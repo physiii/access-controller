@@ -5,6 +5,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "esp_system.h"
+#include "esp_timer.h"
+#include "nvs_flash.h"
+
 void beep_keypad(int, int);
 
 #define SERVICE_LOOP 100
@@ -193,7 +197,7 @@ void addServerMessageToQueue(const char *message)
         return;
     }
     strncpy(serverMessage.messageQueue[serverMessage.queueCount], message, sizeof(serverMessage.messageQueue[serverMessage.queueCount]) - 1);
-    ESP_LOGI(TAG, "addServerMessageToQueue (%d) %s\n", serverMessage.queueCount, message);
+    // ESP_LOGI(TAG, "addServerMessageToQueue (%d) %s\n", serverMessage.queueCount, message);
     serverMessage.queueCount++;
 }
 

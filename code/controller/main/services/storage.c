@@ -25,7 +25,7 @@ char * get_char(char * key)
     esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
 
     if (err != ESP_OK) {
-      printf("Error (%d) opening NVS handle\n", err);
+      ESP_LOGE(tag, "Error (%d) opening NVS handle\n", err);
     } else {
       size_t required_size;
       err = nvs_get_str(my_handle, key, NULL, &required_size);
@@ -38,10 +38,10 @@ char * get_char(char * key)
           //printf("%s current value: %s\n", tag, previous_value);
           break;
         case ESP_ERR_NVS_NOT_FOUND:
-          printf("%s value not initialized, key: %s\n",tag, key);
+          ESP_LOGE(tag, "%s value not initialized, key: %s\n",tag, key);
           return "";
         default :
-          printf("%s Error (%d) reading %s\n", tag, err, key);
+          ESP_LOGE(tag, "%s Error (%d) reading %s\n", tag, err, key);
       }
 
       //free(value_str);
@@ -59,18 +59,18 @@ void store_char(char * key, char * value) {
   nvs_handle my_handle;
   esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
   if (err != ESP_OK) {
-      printf("Error (%d) opening NVS handle\n", err);
+      ESP_LOGE(tag, "Error (%d) opening NVS handle\n", err);
   } else {
 
     err = nvs_set_str(my_handle, key, value);
     if (err == ESP_OK) {
 	     // printf("%s nvs_set_str for %s\n", tag, key);
-	  } else printf("%s write to flash failed\n", tag);
+	  } else ESP_LOGE(tag, "%s nvs_set_str for %s failed!\n", tag, key);
 
     err = nvs_commit(my_handle);
     if (err == ESP_OK) {
 	     // printf("%s nvs_commit %s:%s\n", tag, key, value);
-	  } else printf("%s commiting to flash failed!\n", tag);
+	  } else ESP_LOGE(tag, "%s nvs_commit for %s failed!\n", tag, key);
 
     nvs_close(my_handle);
   }
@@ -94,27 +94,25 @@ void store_u32(char * key, uint32_t value) {
     nvs_handle my_handle;
     err = nvs_open("storage", NVS_READWRITE, &my_handle);
     if (err != ESP_OK) {
-        printf("Error (%d) opening NVS handle\n", err);
+        ESP_LOGE(tag, "Error (%d) opening NVS handle\n", err);
     } else {
 
         err = nvs_set_u32(my_handle, key, value);
 
-        if (err == ESP_OK) {
-	  printf("%s %s:%lu\n", tag, key, value);
-	}
-	else {
-	  printf("%s write failed %lu\n", tag, value);
-	  //printf("%s write to flash failed\n",tag);
-	}
+    if (err == ESP_OK) {
+      ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
+    }
+    else {
+      ESP_LOGE(tag, "Error (%d) writing!\n", err);
+    }
 
-        err = nvs_commit(my_handle);
-        if (err == ESP_OK) {
-	  //printf("%s committed %s:%u\n", tag, key, value);
-	  //printf("%s stored %s:%d\n",tag,key,*value);
-	}
-	else {
-	  printf("%s commiting to flash failed!\n", tag);
-	}
+    err = nvs_commit(my_handle);
+    if (err == ESP_OK) {
+      //printf("%s committed %s:%u\n", tag, key, value);
+      //printf("%s stored %s:%d\n",tag,key,*value);
+    } else {
+      ESP_LOGE(tag, "Error (%d) committing!\n", err);
+    }
 
         // Close
         nvs_close(my_handle);
@@ -139,18 +137,18 @@ uint32_t get_u32(char * key, uint32_t value) {
     nvs_handle my_handle;
     err = nvs_open("storage", NVS_READWRITE, &my_handle);
     if (err != ESP_OK) {
-        printf("Error (%d) opening NVS handle\n", err);
+        ESP_LOGE(tag, "Error (%d) opening NVS handle\n", err);
     } else {
 	err = nvs_get_u32(my_handle, key, &value);
         switch (err) {
             case ESP_OK:
-                printf("%s %s:%lu\n", tag, key, value);
+                ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
                 break;
             case ESP_ERR_NVS_NOT_FOUND:
-                printf("%s %s not initialized\n",tag, key);
+                ESP_LOGE(tag, "Error (%d) reading!\n", err);
                 break;
             default :
-                printf("%s Error (%d) reading %s\n", tag, err, key);
+                ESP_LOGE(tag, "Error (%d) reading!\n", err);
         }
         nvs_close(my_handle);
     }

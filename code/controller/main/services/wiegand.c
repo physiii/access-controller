@@ -249,7 +249,7 @@ void wiegand_main() {
 
 	xTaskCreate(wiegand_timer, "wigand_timer", 2048, NULL, 10, NULL);
 	xTaskCreate(keypress_timer, "keypress_timer", 2048, NULL, 10, NULL);
-	xTaskCreate(wiegand_task, "wiegand_task", 2048, NULL, 10, NULL);
+	xTaskCreate(wiegand_task, "wiegand_task", 4 * 1000, NULL, 10, NULL);
 
 	for (int i=0; i < NUM_OF_WIEGANDS; i++) {
 	  gpio_isr_handler_add(wg[i].pin0, wiegand_isr_handler, (void*) wg[i].pin0);

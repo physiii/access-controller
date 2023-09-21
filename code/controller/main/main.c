@@ -81,26 +81,53 @@ void app_main(void)
     xTaskCreate(serverMessageTask, "serverMessageTask", 5000, NULL, 10, &serverMessageTaskHandle);
 
     int cnt = 0;
+    TaskStatus_t *pxTaskStatusArray;
 
-    while(1) {
-        sendUsers();
+    while (1) {
+        // Get system information
+        int64_t uptime_us = esp_timer_get_time();
+        int64_t uptime_s = uptime_us / 1000000;
+        int days = uptime_s / (24 * 3600);
+        uptime_s %= (24 * 3600);
+        int hours = uptime_s / 3600;
+        uptime_s %= 3600;
+        int minutes = uptime_s / 60;
+        int seconds = uptime_s % 60;
 
-        printf("count %d\n", cnt++);
-        
-        // Log the minimum free heap size
-        printf("Minimum free heap size: %ld bytes\n", esp_get_minimum_free_heap_size());
+        size_t min_free_heap = esp_get_minimum_free_heap_size();
 
-        // Check the stack's high water mark
-        // if (serviceMessageTaskHandle != NULL) {
-        //     printf("ServiceMessageTask High Water Mark: %d\n", uxTaskGetStackHighWaterMark(serviceMessageTaskHandle));
-        // }
-        // if (clientMessageTaskHandle != NULL) {
-        //     printf("ClientMessageTask High Water Mark: %d\n", uxTaskGetStackHighWaterMark(clientMessageTaskHandle));
-        // }
-        // if (serverMessageTaskHandle != NULL) {
-        //     printf("ServerMessageTask High Water Mark: %d\n", uxTaskGetStackHighWaterMark(serverMessageTaskHandle));
-        // }
+        // Get NVS stats for the 'nvs' partition
+        nvs_stats_t nvs_stats;
+        esp_err_t err = nvs_get_stats("nvs", &nvs_stats);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to get NVS stats (%s)", esp_err_to_name(err));
+        }
 
+        // Get Task Status
+        UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
+        pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t));
+        if (pxTaskStatusArray != NULL) {
+            uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, NULL);
+        }
+
+        // Log system status
+        ESP_LOGI(TAG, "------ SYSTEM STATUS ------");
+        ESP_LOGI(TAG, "Uptime: %d days %d hours %d minutes %d seconds", days, hours, minutes, seconds);
+        ESP_LOGI(TAG, "Minimum Free Heap: %zu bytes", min_free_heap);
+        ESP_LOGI(TAG, "NVS Free Entries: %u", nvs_stats.free_entries);
+        ESP_LOGI(TAG, "NVS Used Entries: %u", nvs_stats.used_entries);
+        ESP_LOGI(TAG, "Loop Count: %d", cnt++);
+        ESP_LOGI(TAG, "--- Task Status ---");
+        for (UBaseType_t i = 0; i < uxArraySize; i++) {
+            ESP_LOGI(TAG, "Task [%s] - State: %c Priority: %u", pxTaskStatusArray[i].pcTaskName,
+                    pxTaskStatusArray[i].eCurrentState, pxTaskStatusArray[i].uxCurrentPriority);
+        }
+        ESP_LOGI(TAG, "----------------------------");
+
+        // Cleanup
+        vPortFree(pxTaskStatusArray);
+
+        // Delay for 10 seconds
         vTaskDelay(10 * 1000 / portTICK_PERIOD_MS);
     }
 }

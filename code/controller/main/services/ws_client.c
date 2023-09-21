@@ -23,12 +23,16 @@ int ws_event_handler(cJSON * root)
         int callback_id = idItem->valueint;
         snprintf(callback, sizeof(callback), "{\"id\":%d,\"callback\":true,\"payload\":[false,\"\"]}", callback_id);
         addServerMessageToQueue(callback);
-        // ESP_LOGI(TAG, "Sending callback.");
     }
 
     cJSON *payload = cJSON_GetObjectItemCaseSensitive(root, "payload");
     if (payload) {
-		addServiceMessageToQueue(payload);
+        if (cJSON_IsObject(payload)) {
+            addServiceMessageToQueue(payload);
+        } else {
+            ESP_LOGW(TAG, "Payload is not a JSON object.");
+        }
+        
     } else {
         ESP_LOGW(TAG, "Payload key not found.");
     }
@@ -125,7 +129,7 @@ static void ws_client_task(void)
             connect_to_relay = false;
         }
 
-        vTaskDelay(2 * SERVICE_LOOP / portTICK_PERIOD_MS);
+        vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
     }
 
     esp_websocket_client_stop(client);

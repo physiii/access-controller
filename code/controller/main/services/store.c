@@ -4,11 +4,6 @@
 char store_service_message[1000];
 bool store_service_message_ready = false;
 
-// struct payloadState {
-// 	char str[1000];
-// 	cJSON *obj;
-// };
-
 struct Setting {
 	char str[1000];
 	uint32_t cnt;
@@ -23,7 +18,6 @@ int storeSetting(char *key, cJSON *payload)
 {
 	// snprintf(setting.str, "%s", cJSON_PrintUnformatted(payload));
   	store_char(key, cJSON_PrintUnformatted(payload));
-	// printf("storeSetting\t%s\n", cJSON_PrintUnformatted(payload));
 	vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
 	return 0;
 }
