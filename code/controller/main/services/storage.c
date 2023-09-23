@@ -100,7 +100,7 @@ void store_u32(char * key, uint32_t value) {
         err = nvs_set_u32(my_handle, key, value);
 
     if (err == ESP_OK) {
-      ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
+      // ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
     }
     else {
       ESP_LOGE(tag, "Error (%d) writing!\n", err);
@@ -142,7 +142,7 @@ uint32_t get_u32(char * key, uint32_t value) {
 	err = nvs_get_u32(my_handle, key, &value);
         switch (err) {
             case ESP_OK:
-                ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
+                // ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
                 break;
             case ESP_ERR_NVS_NOT_FOUND:
                 ESP_LOGE(tag, "Error (%d) reading!\n", err);

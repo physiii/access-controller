@@ -1,5 +1,4 @@
 var url = "ws://" + location.host + '/ws';
-// var url = "ws://" + location.host;
 var webSocket = new WebSocket(url);
 
 webSocket.onopen = function (event) {
@@ -82,6 +81,21 @@ document.getElementById('alertFob_2').onclick = function() {
 			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
 };
 
+document.getElementById('wifi-submit').addEventListener('click', function() {
+    const wifiName = document.getElementById('wifi-name').value;
+    const wifiPassword = document.getElementById('wifi-password').value;
+
+    // Sending WiFi credentials through WebSocket
+    let msg = `{
+        "eventType": "setWifiCredentials",
+        "payload": {
+            "wifiName": "${wifiName}",
+            "wifiPassword": "${wifiPassword}"
+        }
+    }`;
+
+    webSocket.send(msg);
+});
 
 webSocket.onmessage = function (event) {
 	let state = JSON.parse(event.data);

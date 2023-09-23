@@ -1,11 +1,3 @@
-/*  WiFi softAP Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -18,14 +10,6 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-/* The examples use WiFi configuration that you can set via project configuration menu.
-
-   If you'd rather not, just change the below entries to strings with
-   the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
-*/
-#define EXAMPLE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
-#define EXAMPLE_ESP_WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD
-#define EXAMPLE_ESP_WIFI_CHANNEL   CONFIG_ESP_WIFI_CHANNEL
 #define EXAMPLE_MAX_STA_CONN       CONFIG_ESP_MAX_STA_CONN
 
 static void wifi_event_handler(void* arg, esp_event_base_t event_base,
@@ -42,7 +26,7 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-void wifi_init_softap(void)
+void ap_main(char *ssid, char *password)
 {
     esp_netif_create_default_wifi_ap();
 
@@ -57,18 +41,29 @@ void wifi_init_softap(void)
 
     wifi_config_t wifi_config = {
         .ap = {
-            .ssid = EXAMPLE_ESP_WIFI_SSID,
-            .ssid_len = strlen(EXAMPLE_ESP_WIFI_SSID),
-            .channel = EXAMPLE_ESP_WIFI_CHANNEL,
-            .password = EXAMPLE_ESP_WIFI_PASS,
+            .ssid = "",
+            .ssid_len = 0, // This will be set after copying SSID
+            .channel = CONFIG_ESP_WIFI_CHANNEL,
+            .password = "",
             .max_connection = EXAMPLE_MAX_STA_CONN,
-            .authmode = WIFI_AUTH_WPA_WPA2_PSK,
+#ifdef CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT
+            .authmode = WIFI_AUTH_WPA3_PSK,
+            .sae_pwe_h2e = WPA3_SAE_PWE_BOTH,
+#else /* CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT */
+            .authmode = WIFI_AUTH_WPA2_PSK,
+#endif
             .pmf_cfg = {
-                    .required = false,
+                    .required = true,
             },
         },
     };
-    if (strlen(EXAMPLE_ESP_WIFI_PASS) == 0) {
+
+    strncpy((char *)wifi_config.ap.ssid, ssid, sizeof(wifi_config.ap.ssid));
+    wifi_config.ap.ssid_len = strlen(ssid);
+    strncpy((char *)wifi_config.ap.password, password, sizeof(wifi_config.ap.password));
+    printf("ap_main\t%s\t%s\n", wifi_config.ap.ssid, wifi_config.ap.password);
+
+    if (strlen(password) == 0) {
         wifi_config.ap.authmode = WIFI_AUTH_OPEN;
     }
 
@@ -77,12 +72,5 @@ void wifi_init_softap(void)
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(TAG, "wifi_init_softap finished. SSID:%s password:%s channel:%d",
-             EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS, EXAMPLE_ESP_WIFI_CHANNEL);
-}
-
-
-void ap_main(void)
-{
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_AP");
-    wifi_init_softap();
+             ssid, password, CONFIG_ESP_WIFI_CHANNEL);
 }

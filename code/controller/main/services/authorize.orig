@@ -1,13 +1,10 @@
-#define MAX_UIDS		400
+#define MAX_UIDS			400
 #define MAX_UID_SIZE	50
 
 #define MAX_USERS		400
 #define MAX_UID_SIZE	50
 #define MAX_NAME_SIZE   50
 #define MAX_PIN_SIZE    10
-
-#define MAX_SSID_SIZE     32
-#define MAX_PASS_SIZE     64
 
 int CHECK_UID = 0;
 int ADD_UID = 1;
@@ -28,11 +25,103 @@ typedef struct {
     char pin[MAX_PIN_SIZE];
 } user_info;
 
+user_info users[MAX_USERS];
 cJSON *auth_users = NULL;
+
+void store_user_to_flash(char *uuid, char *name, char *pin) {
+    uint32_t user_count = get_u32("auth_user_count", 0);
+
+    char key[20];
+    snprintf(key, sizeof(key), "auth_user_%lu", (unsigned long)(user_count + 1));
+
+    cJSON *user = cJSON_CreateObject();
+    cJSON_AddStringToObject(user, "uuid", uuid);
+    cJSON_AddStringToObject(user, "name", name);
+    cJSON_AddStringToObject(user, "pin", pin);
+
+    char *auth_user_str = cJSON_PrintUnformatted(user);
+    if (auth_user_str != NULL) {
+        store_char(key, auth_user_str);
+        store_u32("auth_user_count", user_count + 1);
+
+        free(auth_user_str);
+        cJSON_Delete(user);
+    } else {
+        ESP_LOGE(TAG, "Failed to print JSON");
+    }
+}
+
+cJSON* load_user_from_flash(uint32_t user_id) {
+    char key[20];
+    snprintf(key, sizeof(key), "auth_user_%lu", (unsigned long)user_id);
+
+    char *auth_user_str = get_char(key);
+    if (auth_user_str == NULL) {
+        ESP_LOGE(TAG, "User not found");
+        return NULL;
+    }
+
+    cJSON *user = cJSON_Parse(auth_user_str);
+
+    if (user == NULL) {
+        ESP_LOGE(TAG, "Failed to parse JSON");
+        return NULL;
+    }
+
+    free(auth_user_str);
+    return user;
+}
+
+void delete_user(char *key_to_delete) {
+    // Parse key to get the user_id of the user to delete
+    uint32_t user_id_to_delete;
+    sscanf(key_to_delete, "auth_user_%lu", &user_id_to_delete);
+
+    // Get the current user count
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    if (user_id_to_delete > user_count || user_id_to_delete == 0) {
+        ESP_LOGW(TAG, "Invalid user ID. Cannot delete.");
+        return;
+    }
+
+    // Shift down users
+    for (uint32_t i = user_id_to_delete; i < user_count; i++) {
+        cJSON *user_to_move = load_user_from_flash(i + 1);
+        if (user_to_move != NULL) {
+            // Convert the user object to a string
+            char *auth_user_str = cJSON_PrintUnformatted(user_to_move);  // Allocated dynamically
+            if (auth_user_str != NULL) {
+                // Generate the key for the position to which the user will be moved
+                char new_key[50];
+                snprintf(new_key, sizeof(new_key), "auth_user_%lu", (unsigned long)i);
+                
+                // Store the moved user to the new position in flash
+                store_char(new_key, auth_user_str);
+                
+                // Free the allocated memory
+                free(auth_user_str);
+
+                // Free cJSON object
+                cJSON_Delete(user_to_move);
+            } else {
+                ESP_LOGE(TAG, "Failed to print JSON");
+            }
+        }
+    }
+
+    // Delete the last user's data from flash as it should have been moved down
+    char last_user_key[20];
+    snprintf(last_user_key, sizeof(last_user_key), "auth_user_%lu", (unsigned long)user_count);
+    // Add your code here to actually remove this key-value pair from flash
+    // This may depend on your specific flash storage API
+
+    // Update the user count in flash
+    store_u32("auth_user_count", user_count - 1);
+}
 
 void addUser(char *uuid, char *name, char *pin) {
     uint32_t user_count = get_u32("auth_user_count", 0);
-
+    
     for (uint32_t i = 1; i <= user_count; i++) {
         cJSON *user = load_user_from_flash(i);
         if (user == NULL) continue;
@@ -45,7 +134,107 @@ void addUser(char *uuid, char *name, char *pin) {
         }
         cJSON_Delete(user);
     }
+    
     store_user_to_flash(uuid, name, pin);
+    // sendUsers();
+}
+
+void get_key_for_user(char *uuid, char *key, uint32_t size) {
+    uint32_t user_count = get_u32("auth_user_count", 0);
+
+    for (uint32_t i = 1; i <= user_count; i++) {
+        cJSON *user = load_user_from_flash(i);
+        if (user == NULL) continue;
+
+        cJSON *uuid_json = cJSON_GetObjectItem(user, "uuid");
+        if (uuid_json != NULL && strcmp(uuid_json->valuestring, uuid) == 0) {
+            snprintf(key, size, "auth_user_%lu", (unsigned long)i);
+            cJSON_Delete(user);
+            return;
+        }
+        cJSON_Delete(user);
+    }
+}
+
+void replace_user_in_flash(char *key, char *uuid, char *name, char *pin) {
+    cJSON *user = cJSON_CreateObject();
+    cJSON_AddStringToObject(user, "uuid", uuid);
+    cJSON_AddStringToObject(user, "name", name);
+    cJSON_AddStringToObject(user, "pin", pin);
+
+    char *auth_user_str = cJSON_PrintUnformatted(user);
+    if (auth_user_str != NULL) {
+        store_char(key, auth_user_str);
+        free(auth_user_str);
+        cJSON_Delete(user);
+    } else {
+        ESP_LOGE(TAG, "Failed to print JSON");
+    }
+}
+
+void modifyUser(char *uuid, char *newName, char *newPin) {
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    char key[20] = {0};
+
+    get_key_for_user(uuid, key, sizeof(key));
+
+    if (strlen(key) > 0) {
+        replace_user_in_flash(key, uuid, newName, newPin);
+        ESP_LOGI(TAG, "User modified: New Name = %s, New Pin = %s\n", newName, newPin);
+        return;
+    }
+    ESP_LOGI(TAG, "No user with uuid %s found to modify.\n", uuid);
+}
+
+
+void removeUser(char *uuid) {
+    uint32_t user_count = get_u32("auth_user_count", 0);
+
+    for (uint32_t i = 1; i <= user_count; i++) {
+        cJSON *user = load_user_from_flash(i);
+        if (user == NULL) continue;
+
+        cJSON *uuid_json = cJSON_GetObjectItem(user, "uuid");
+        if (uuid_json != NULL && strcmp(uuid_json->valuestring, uuid) == 0) {
+            char key[20];
+            snprintf(key, sizeof(key), "auth_user_%lu", (unsigned long)i);
+            delete_user(key);  // Assume delete_user removes key-value from flash
+
+            // Decrement the user count
+            store_u32("auth_user_count", user_count - 1);
+
+            cJSON_Delete(user);
+            ESP_LOGI(TAG, "User with uuid %s removed.\n", uuid);
+            return;
+        }
+        cJSON_Delete(user);
+    }
+    ESP_LOGI(TAG, "No user with uuid %s found.\n", uuid);
+}
+
+char* find_pin_in_flash(const char* pin) {
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    ESP_LOGI(TAG, "Total User Count: %u", (unsigned int)user_count);
+    for (uint32_t i = 1; i <= user_count; i++) {
+        cJSON *user = load_user_from_flash(i);
+        if (user == NULL) continue;
+        
+        cJSON *pin_json = cJSON_GetObjectItem(user, "pin");
+        if (pin_json != NULL && strcmp(pin_json->valuestring, pin) == 0) {
+            cJSON *name_json = cJSON_GetObjectItem(user, "name");
+            char *name = NULL;
+            if (name_json) {
+                name = strdup(name_json->valuestring);  // Make a copy of the name
+            } else {
+                name = strdup("Unknown");
+            }
+            ESP_LOGI(TAG, "Name Found: %s", name);
+            cJSON_Delete(user);
+            return name;
+        }
+        cJSON_Delete(user);
+    }
+    return NULL;
 }
 
 int is_pin_authorized(const char *incomingPin) {
@@ -89,7 +278,7 @@ int is_pin_authorized(const char *incomingPin) {
 
 void send_user_count() {
     uint32_t user_count = get_u32("auth_user_count", 0);
-    char msg[1000] = "";
+    char msg[2000] = "";
     snprintf(msg, sizeof(msg), "{\"event_type\":\"load\", \"payload\":{\"services\":[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":{\"user_count\": %lu}}]}}", user_count);
     addServerMessageToQueue(msg);
 }
@@ -171,8 +360,7 @@ void handle_authorize_message(cJSON * payload)
               sprintf(newName, "%s", cJSON_GetObjectItem(value, "newName")->valuestring);
               sprintf(newPin, "%s", cJSON_GetObjectItem(value, "newPin")->valuestring);
             }
-            // modifyUser(uuid, newName, newPin);
-            modify_user_from_flash(uuid, newName, newPin);
+            modifyUser(uuid, newName, newPin);
             cJSON_free(payload);
             return;
         }
@@ -181,8 +369,7 @@ void handle_authorize_message(cJSON * payload)
           cJSON *value = cJSON_GetObjectItem(payload, "value");
           ESP_LOGI(TAG, "remove user: %s\n",value->valuestring);
           sprintf(uuid, "%s", value->valuestring);
-          delete_user_from_flash(uuid);
-        //   removeUser(uuid);
+          removeUser(uuid);
           cJSON_free(payload);
           return; 
         }
@@ -205,20 +392,6 @@ void handle_authorize_message(cJSON * payload)
         ESP_LOGI(TAG, "token received: %s\n", token);
         store_char("token",token);
         cJSON_free(payload);
-        esp_restart();
-        return;
-    }
-
-    if (cJSON_GetObjectItem(payload,"wifiName")) {
-        char wifiName[MAX_SSID_SIZE] = "";
-        char wifiPassword[MAX_PASS_SIZE] = "";
-        if (cJSON_GetObjectItem(payload, "wifiName") && cJSON_GetObjectItem(payload, "wifiPassword")) {
-            snprintf(wifiName, sizeof(wifiName), "%s", cJSON_GetObjectItem(payload, "wifiName")->valuestring);
-            snprintf(wifiPassword, sizeof(wifiPassword), "%s", cJSON_GetObjectItem(payload, "wifiPassword")->valuestring);
-            store_wifi_credentials_to_flash(wifiName, wifiPassword);
-            esp_restart();
-        }
-        cJSON_Delete(payload);
         return;
     }
 
@@ -236,7 +409,6 @@ static void auth_service (void *pvParameter)
     handle_authorize_message(checkServiceMessageByAction("ac_1", "removeUser"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserCount"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserByCount"));
-    handle_authorize_message(checkServiceMessage("setWifiCredentials"));
     handle_authorize_message(checkServiceMessageByKey("uuid"));
     handle_authorize_message(checkServiceMessageByKey("token"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
@@ -245,7 +417,7 @@ static void auth_service (void *pvParameter)
 
 void auth_main()
 {
-  ESP_LOGI(TAG, "starting auth service");
+  printf("starting auth service\n");
   TaskHandle_t auth_service_task;
   xTaskCreate(&auth_service, "auth_service_task", 9 * 1000, NULL, 5, NULL);
 }

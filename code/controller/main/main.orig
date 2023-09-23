@@ -1,5 +1,4 @@
 #include "automation.h"
-#include "services/station.c"
 #include "services/drivers/i2c.c"
 #include "services/drivers/mcp23x17.c"
 #include "services/gpio.c"
@@ -16,19 +15,6 @@
 #include "services/ap.c"
 #include "services/ws_client.c"
 #include "services/utilities_server.c"
-
-void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
-    if (strlen(device_id) >= 5) {
-        // Use the last 5 characters from device_id
-        snprintf(ssid, size, "ac_%s", device_id + strlen(device_id) - 5);
-    } else if (strcmp(device_id, "") == 0) {
-        // If there's no device_id, use "ac_uuid"
-        snprintf(ssid, size, "ac_uuid");
-    } else {
-        // If device_id length is less than 5 but not empty, use what's available
-        snprintf(ssid, size, "ac_%s", device_id);
-    }
-}
 
 void app_main(void)
 {
@@ -65,20 +51,8 @@ void app_main(void)
 	clientMessage.readyToSend = false;
 	serverMessage.readyToSend = false;
 
-    char wifi_ssid[32];
-    char wifi_password[64];    
-    snprintf(wifi_ssid, sizeof(wifi_ssid), "pyfitech");
-    snprintf(wifi_password, sizeof(wifi_password), "pyfitech");
-
-    load_wifi_credentials_from_flash(wifi_ssid, wifi_password);
-    if (!station_main(wifi_ssid, wifi_password)) {
-        ESP_LOGI(TAG, "Starting Access Point...");
-        
-        char ap_ssid[32];
-        generate_ssid_from_device_id(device_id, ap_ssid, sizeof(ap_ssid));
-        
-        ap_main(ap_ssid, "pyfitech");
-    }
+  	ESP_ERROR_CHECK(example_connect());
+	ws_client_main();
 	
 	gpio_main();
 	i2c_main();
@@ -94,10 +68,9 @@ void app_main(void)
 		radar_main();
 	#else
 		// fob_main();
+		// ap_main();
 	#endif
 	server_main();
-	ws_client_main();
-    send_user_count();
 
     TaskHandle_t serviceMessageTaskHandle = NULL;
     TaskHandle_t clientMessageTaskHandle = NULL;
@@ -109,7 +82,7 @@ void app_main(void)
 
     int cnt = 0;
     TaskStatus_t *pxTaskStatusArray;
-    
+
     while (1) {
         // Get system information
         int64_t uptime_us = esp_timer_get_time();
@@ -144,11 +117,11 @@ void app_main(void)
         ESP_LOGI(TAG, "NVS Free Entries: %u", nvs_stats.free_entries);
         ESP_LOGI(TAG, "NVS Used Entries: %u", nvs_stats.used_entries);
         ESP_LOGI(TAG, "Loop Count: %d", cnt++);
-        // ESP_LOGI(TAG, "--- Task Status ---");
-        // for (UBaseType_t i = 0; i < uxArraySize; i++) {
-        //     ESP_LOGI(TAG, "Task [%s] - State: %c Priority: %u", pxTaskStatusArray[i].pcTaskName,
-        //             pxTaskStatusArray[i].eCurrentState, pxTaskStatusArray[i].uxCurrentPriority);
-        // }
+        ESP_LOGI(TAG, "--- Task Status ---");
+        for (UBaseType_t i = 0; i < uxArraySize; i++) {
+            ESP_LOGI(TAG, "Task [%s] - State: %c Priority: %u", pxTaskStatusArray[i].pcTaskName,
+                    pxTaskStatusArray[i].eCurrentState, pxTaskStatusArray[i].uxCurrentPriority);
+        }
         ESP_LOGI(TAG, "----------------------------");
 
         // Cleanup

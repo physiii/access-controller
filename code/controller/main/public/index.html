@@ -56,7 +56,7 @@
 			</td>
 	    <td>
 				<label class="switch">
-					<input type="checkbox" id="enableExit_1">
+					<input type="cgetUserByCounteckbox" id="enableExit_1">
 					<span class="slider round"></span>
 				</label>
 			</td>
@@ -206,6 +206,34 @@
 			<td>
 				<input type="number" id="armDelay_2" value=5></input>
 				<button id="relock" type="button" onclick="armDelay(2, document.getElementById('armDelay_2').value)">Save</button>
+			</td>
+		</tr>
+	</table>
+
+	<!-- WiFi Settings -->
+	<table>
+		<tr>
+			<th colspan="2">WiFi Settings</th>
+		</tr>
+		<tr>
+			<td>
+				<label for="wifi-name">WiFi Name:</label>
+			</td>
+			<td>
+				<input type="text" id="wifi-name" name="wifi-name" placeholder="Enter WiFi Name">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="wifi-password">Password:</label>
+			</td>
+			<td>
+				<input type="password" id="wifi-password" name="wifi-password" placeholder="Enter Password">
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<button type="submit" id="wifi-submit">Submit</button>
 			</td>
 		</tr>
 	</table>
