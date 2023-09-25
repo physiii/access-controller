@@ -94,132 +94,88 @@ void send_user_count() {
     addServerMessageToQueue(msg);
 }
 
-void handle_authorize_message(cJSON * payload)
-{ 
-    char user[250];
-    char uuid[250];
-    char name[100] = "";
-    char pin[10] = "";
-	char property[250];
-
-	if (payload == NULL) return;
+void handle_authorize_message(cJSON * payload) {
+    if (payload == NULL) return;
 
     cJSON *propertyItem = cJSON_GetObjectItem(payload,"property");
+    char uuid[250];
+    char property[250];
+
     if (propertyItem) {
         snprintf(property, sizeof(property), "%s", propertyItem->valuestring);
 
         if (strcmp(property, "getUserCount") == 0) {
             send_user_count();
-            cJSON_Delete(payload);
-            return;
-        }
 
-        if (strcmp(property, "getUserByCount") == 0) {
+        } else if (strcmp(property, "getUserByCount") == 0) {
             int count = 0;
             cJSON *value = cJSON_GetObjectItem(payload, "value");
             if (value) {
                 count = value->valueint;
                 cJSON *user = load_user_from_flash(count);
-                if (user == NULL) {
-                    ESP_LOGI(TAG, "User not found");
-                    cJSON_Delete(payload);
-                    return;
-                }
-
-                char *user_json_str = cJSON_PrintUnformatted(user);
-                if (user_json_str == NULL) {
-                    ESP_LOGE(TAG, "Failed to print JSON\n");
+                if (user) {
+                    char *user_json_str = cJSON_PrintUnformatted(user);
+                    if (user_json_str) {
+                        char msg[2000] = "";
+                        snprintf(msg, sizeof(msg), "{\"event_type\":\"load\", \"payload\":{\"services\":[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":{\"user\":%s, \"count\": %d}}]}}", user_json_str, count);
+                        addServerMessageToQueue(msg);
+                        free(user_json_str);
+                    }
                     cJSON_Delete(user);
-                    cJSON_Delete(payload);
-                    return;
                 }
-
-                char msg[2000] = "";
-                snprintf(msg, sizeof(msg), "{\"event_type\":\"load\", \"payload\":{\"services\":[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":{\"user\":%s, \"count\": %d}}]}}", user_json_str, count);
-                addServerMessageToQueue(msg);
-
-                free(user_json_str);
-                cJSON_Delete(user);
             }
-            cJSON_Delete(payload);
-            return;
-        }
 
-        if (strcmp(property, "addUser") == 0) {
+        } else if (strcmp(property, "addUser") == 0) {
             cJSON *value = cJSON_GetObjectItem(payload, "value");
-            char name[MAX_NAME_SIZE] = "";
-            char pin[MAX_PIN_SIZE] = "";
-            if (cJSON_GetObjectItem(value, "name") && cJSON_GetObjectItem(value, "pin")) {
-              sprintf(uuid, "%s", cJSON_GetObjectItem(value, "uuid")->valuestring);
-              sprintf(name, "%s", cJSON_GetObjectItem(value, "name")->valuestring);
-              sprintf(pin, "%s", cJSON_GetObjectItem(value, "pin")->valuestring);
+            if (value && cJSON_GetObjectItem(value, "name") && cJSON_GetObjectItem(value, "pin")) {
+                sprintf(uuid, "%s", cJSON_GetObjectItem(value, "uuid")->valuestring);
+                char name[MAX_NAME_SIZE];
+                sprintf(name, "%s", cJSON_GetObjectItem(value, "name")->valuestring);
+                char pin[MAX_PIN_SIZE];
+                sprintf(pin, "%s", cJSON_GetObjectItem(value, "pin")->valuestring);
+                addUser(uuid, name, pin);
             }
-            addUser(uuid, name, pin);
-            cJSON_free(payload);
-            return;
-        }
 
-        if (strcmp(property, "modifyUser") == 0) {
+        } else if (strcmp(property, "modifyUser") == 0) {
             cJSON *value = cJSON_GetObjectItem(payload, "value");
-            char uuid[MAX_NAME_SIZE] = "";
-            char newName[MAX_NAME_SIZE] = "";
-            char newPin[MAX_PIN_SIZE] = "";
-            if (cJSON_GetObjectItem(value, "uuid") && 
-                cJSON_GetObjectItem(value, "newName") && 
-                cJSON_GetObjectItem(value, "newPin")) {
-              sprintf(uuid, "%s", cJSON_GetObjectItem(value, "uuid")->valuestring);
-              sprintf(newName, "%s", cJSON_GetObjectItem(value, "newName")->valuestring);
-              sprintf(newPin, "%s", cJSON_GetObjectItem(value, "newPin")->valuestring);
+            if (value) {
+                sprintf(uuid, "%s", cJSON_GetObjectItem(value, "uuid")->valuestring);
+                char newName[MAX_NAME_SIZE];
+                sprintf(newName, "%s", cJSON_GetObjectItem(value, "newName")->valuestring);
+                char newPin[MAX_PIN_SIZE];
+                sprintf(newPin, "%s", cJSON_GetObjectItem(value, "newPin")->valuestring);
+                modify_user_from_flash(uuid, newName, newPin);
             }
-            // modifyUser(uuid, newName, newPin);
-            modify_user_from_flash(uuid, newName, newPin);
-            cJSON_free(payload);
-            return;
+
+        } else if (strcmp(property, "removeUser") == 0) {
+            cJSON *value = cJSON_GetObjectItem(payload, "value");
+            if (value) {
+                sprintf(uuid, "%s", value->valuestring);
+                delete_user_from_flash(uuid);
+            }
         }
-
-        if (strcmp(property, "removeUser") == 0) {
-          cJSON *value = cJSON_GetObjectItem(payload, "value");
-          ESP_LOGI(TAG, "remove user: %s\n",value->valuestring);
-          sprintf(uuid, "%s", value->valuestring);
-          delete_user_from_flash(uuid);
-        //   removeUser(uuid);
-          cJSON_free(payload);
-          return; 
-        }
-    }
-
-	if (cJSON_GetObjectItem(payload,"getState")) {
-        return;
-	}
-
-    if (cJSON_GetObjectItem(payload,"uuid")) {
+    } else if (cJSON_GetObjectItem(payload,"uuid")) {
         sprintf(device_id, "%s", cJSON_GetObjectItem(payload,"uuid")->valuestring);
-        ESP_LOGI(TAG, "device ID received: %s\n", device_id);
         store_char("device_id", device_id);
-        cJSON_free(payload);
-        return;
-    }
-
-    if (cJSON_GetObjectItem(payload,"token")) {
-        sprintf(token, "%s", cJSON_GetObjectItem(payload,"token")->valuestring);
-        ESP_LOGI(TAG, "token received: %s\n", token);
-        store_char("token",token);
-        cJSON_free(payload);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
         esp_restart();
-        return;
-    }
 
-    if (cJSON_GetObjectItem(payload,"wifiName")) {
+    } else if (cJSON_GetObjectItem(payload,"token")) {
+        sprintf(token, "%s", cJSON_GetObjectItem(payload,"token")->valuestring);
+        store_char("token",token);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        esp_restart();
+
+    } else if (cJSON_GetObjectItem(payload,"wifiName")) {
         char wifiName[MAX_SSID_SIZE] = "";
         char wifiPassword[MAX_PASS_SIZE] = "";
         if (cJSON_GetObjectItem(payload, "wifiName") && cJSON_GetObjectItem(payload, "wifiPassword")) {
             snprintf(wifiName, sizeof(wifiName), "%s", cJSON_GetObjectItem(payload, "wifiName")->valuestring);
             snprintf(wifiPassword, sizeof(wifiPassword), "%s", cJSON_GetObjectItem(payload, "wifiPassword")->valuestring);
             store_wifi_credentials_to_flash(wifiName, wifiPassword);
+            vTaskDelay(100 / portTICK_PERIOD_MS);
             esp_restart();
         }
-        cJSON_Delete(payload);
-        return;
     }
 
     cJSON_Delete(payload);
@@ -247,5 +203,5 @@ void auth_main()
 {
   ESP_LOGI(TAG, "starting auth service");
   TaskHandle_t auth_service_task;
-  xTaskCreate(&auth_service, "auth_service_task", 9 * 1000, NULL, 5, NULL);
+  xTaskCreate(&auth_service, "auth_service_task", 25 * 1000, NULL, 5, NULL);
 }

@@ -97,6 +97,10 @@ void app_main(void)
 	#endif
 	server_main();
 	ws_client_main();
+
+    if (initialize_spiffs() == ESP_OK) {
+        ESP_LOGI(TAG, "SPIFFS Initialized successfully");
+    }
     send_user_count();
 
     TaskHandle_t serviceMessageTaskHandle = NULL;
@@ -109,7 +113,6 @@ void app_main(void)
 
     int cnt = 0;
     TaskStatus_t *pxTaskStatusArray;
-    
     while (1) {
         // Get system information
         int64_t uptime_us = esp_timer_get_time();

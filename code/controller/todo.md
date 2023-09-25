@@ -1,8 +1,9 @@
-store atleast 1000 users in flash by storing multiple users per entry
-upload csv to details component with 1000 users to add
-
 contact and signal alerts
 add device id to local page
+
+build 3 boards with ext. wifi
+build new housings with wifi adapter to sma(?)
+system test
 
 add toggles from local page to card details component
 add enable/disable user based on schedule'd event from automator

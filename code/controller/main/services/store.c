@@ -1,8 +1,11 @@
 #include "storage.c"
 #include <inttypes.h>
+#include "esp_spiffs.h"
+#include "esp_system.h"
 
 #define USERS_PER_INDEX   8
-#define MAX_USER_COUNT 1000
+#define MAX_USER_COUNT    10 * 1000
+#define FILE_PATH_MAX_LENGTH 100
 
 char store_service_message[1000];
 bool store_service_message_ready = false;
@@ -40,208 +43,171 @@ int restoreSetting (char *key) {
 	return 0;
 }
 
-void store_user_to_flash(char *uuid, char *name, char *pin) {
-    ESP_LOGI(TAG, "Storing user to flash: UUID=%s, Name=%s", uuid, name);   
-    nvs_handle my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to open NVS with error: %d", err);
-        return;
+esp_err_t initialize_spiffs(void) {
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = "/spiffs",
+        .partition_label = NULL,
+        .max_files = 5,
+        .format_if_mount_failed = true
+    };
+
+    // Use settings defined above to initialize and mount SPIFFS filesystem.
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+
+    // Check if SPIFFS was mounted
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE(TAG, "Failed to mount or format filesystem");
+        } else if (ret == ESP_ERR_NOT_FOUND) {
+            ESP_LOGE(TAG, "Failed to find SPIFFS partition");
+        } else {
+            ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        }
+        return ret;
     }
+
+    // Print SPIFFS size info (optional)
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+    } else {
+        ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+    }
+
+    return ESP_OK;
+}
+
+void store_user_to_flash(char *uuid, char *name, char *pin) {
+    ESP_LOGI(TAG, "Storing user to flash: UUID=%s, Name=%s", uuid, name);
 
     size_t user_index = get_u32("auth_user_count", 0);
-    if (err != ESP_OK && err == ESP_ERR_NVS_NOT_FOUND) {
-        user_index = 0;
-        store_u32("auth_user_count", user_index);
-    } else if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to get user count with error: %d", err);
-        nvs_close(my_handle);
-        return;
-    }
-
     if (user_index >= MAX_USER_COUNT) {
         ESP_LOGE(TAG, "Reached maximum user count");
-        nvs_close(my_handle);
         return;
     }
 
-    UserData user_group[USERS_PER_INDEX] = {0}; // Initialize the array
-    char key[100];
-    size_t start_index = (user_index / USERS_PER_INDEX) * USERS_PER_INDEX;
+    char file_path[FILE_PATH_MAX_LENGTH];
+    snprintf(file_path, sizeof(file_path), "/spiffs/user_%zu.json", user_index);
 
-    snprintf(key, sizeof(key), "users_data_%zu", start_index / USERS_PER_INDEX);
-
-    size_t expected_size = sizeof(user_group);
-    err = nvs_get_blob(my_handle, key, user_group, &expected_size);
-    if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGE(TAG, "Failed to read users data with error: %d", err);
-        nvs_close(my_handle);
+    FILE* file = fopen(file_path, "w");
+    if (file == NULL) {
+        ESP_LOGE(TAG, "Failed to open user data file for writing.");
         return;
     }
 
-    
-    // Modify the correct user in the user_group
-    UserData *user = &user_group[user_index % USERS_PER_INDEX];
-    // print user
-    strncpy(user->uuid, uuid, sizeof(user->uuid));
-    strncpy(user->name, name, sizeof(user->name));
-    strncpy(user->pin, pin, sizeof(user->pin));
+    cJSON *user_json = cJSON_CreateObject();
+    cJSON_AddStringToObject(user_json, "uuid", uuid);
+    cJSON_AddStringToObject(user_json, "name", name);
+    cJSON_AddStringToObject(user_json, "pin", pin);
 
-    // Store the updated user_group back to NVS
-    err = nvs_set_blob(my_handle, key, user_group, sizeof(user_group));
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to store users data with error: %d", err);
-    }
-    
-    // Update user count
+    fprintf(file, "%s", cJSON_PrintUnformatted(user_json));
+
+    cJSON_Delete(user_json);
+    fclose(file);
+
     store_u32("auth_user_count", user_index + 1);
-
-    nvs_commit(my_handle);
-    nvs_close(my_handle);
 }
 
 cJSON* load_user_from_flash(uint32_t user_id) {
     user_id -= 1; // Convert to 0-based index
     if (user_id >= MAX_USER_COUNT) return NULL;
 
-    nvs_handle my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READONLY, &my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to open NVS with error: %d", err);
+    char file_path[FILE_PATH_MAX_LENGTH];
+    snprintf(file_path, sizeof(file_path), "/spiffs/user_%lu.json", user_id);
+
+    FILE* file = fopen(file_path, "r");
+    if (file == NULL) {
+        ESP_LOGE(TAG, "Failed to open user data file for reading.");
         return NULL;
     }
 
-    // Allocate user_group on the heap instead of the stack
-    UserData* user_group = malloc(USERS_PER_INDEX * sizeof(UserData));
-    if (user_group == NULL) {
-        ESP_LOGE(TAG, "Failed to allocate memory for user group.");
-        nvs_close(my_handle);
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* buffer = malloc(length + 1);
+    if (!buffer) {
+        ESP_LOGE(TAG, "Failed to allocate memory.");
+        fclose(file);
         return NULL;
     }
 
-    char key[100];
-    size_t start_index = (user_id / USERS_PER_INDEX) * USERS_PER_INDEX;
+    fread(buffer, 1, length, file);
+    buffer[length] = '\0';
 
-    snprintf(key, sizeof(key), "users_data_%zu", start_index / USERS_PER_INDEX);
-
-    size_t expected_size = sizeof(UserData) * USERS_PER_INDEX;
-    err = nvs_get_blob(my_handle, key, user_group, &expected_size);
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to read users data with error: %d", err);
-        free(user_group);  // Free the allocated memory
-        nvs_close(my_handle);
-        return NULL;
-    }
-
-    UserData *user = &user_group[user_id % USERS_PER_INDEX];
-
-    // Convert the user structure to cJSON and return
-    cJSON *user_json = cJSON_CreateObject();
-    cJSON_AddStringToObject(user_json, "uuid", user->uuid);
-    cJSON_AddStringToObject(user_json, "name", user->name);
-    cJSON_AddStringToObject(user_json, "pin", user->pin);
-
-    free(user_group);  // Free the allocated memory
-    nvs_close(my_handle);
+    cJSON *user_json = cJSON_Parse(buffer);
+    free(buffer);
+    fclose(file);
 
     return user_json;
 }
 
-void delete_user_from_flash(const char *uuid) {
-    ESP_LOGI(TAG, "Deleting user from flash: UUID=%s", uuid);
-    nvs_handle my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to open NVS with error: %d", err);
-        return;
-    }
-
+void delete_user_from_flash(const char *uuid_to_delete) {
+    ESP_LOGI(TAG, "Deleting user from flash: UUID=%s", uuid_to_delete);
     size_t user_count = get_u32("auth_user_count", 0);
-    bool user_found = false;
 
-    UserData user_group[USERS_PER_INDEX];
+    for (size_t i = 0; i < user_count; i++) {
+        cJSON* user = load_user_from_flash(i + 1);
+        if (user) {
+            cJSON* uuid_json = cJSON_GetObjectItem(user, "uuid");
+            if (uuid_json && (strcmp(uuid_json->valuestring, uuid_to_delete) == 0)) {
+                char file_path[FILE_PATH_MAX_LENGTH];
+                snprintf(file_path, sizeof(file_path), "/spiffs/user_%zu.json", i);
+                remove(file_path);
 
-    for (size_t start_index = 0; start_index < user_count && !user_found; start_index += USERS_PER_INDEX) {
-        char key[100];
-        snprintf(key, sizeof(key), "users_data_%" PRIuPTR, start_index / USERS_PER_INDEX);
-        size_t expected_size = sizeof(user_group);
-        err = nvs_get_blob(my_handle, key, user_group, &expected_size);
-
-        for (size_t i = 0; i < USERS_PER_INDEX && start_index + i < user_count; i++) {
-            if (strcmp(user_group[i].uuid, uuid) == 0) {
-                user_found = true;
-
-                // Shift subsequent users to overwrite the deleted user
-                for (size_t j = i; j < USERS_PER_INDEX - 1; j++) {
-                    user_group[j] = user_group[j+1];
+                // Move remaining files to fill the gap
+                for (size_t j = i; j < user_count - 1; j++) {
+                    char src_path[FILE_PATH_MAX_LENGTH];
+                    char dest_path[FILE_PATH_MAX_LENGTH];
+                    snprintf(src_path, sizeof(src_path), "/spiffs/user_%zu.json", j + 1);
+                    snprintf(dest_path, sizeof(dest_path), "/spiffs/user_%zu.json", j);
+                    rename(src_path, dest_path);
                 }
-                memset(&user_group[USERS_PER_INDEX - 1], 0, sizeof(UserData)); // Clear the last element
-                err = nvs_set_blob(my_handle, key, user_group, sizeof(user_group));
-                if (err != ESP_OK) {
-                    ESP_LOGE(TAG, "Failed to store updated users data with error: %d", err);
-                }
-                break;
+
+                store_u32("auth_user_count", user_count - 1);
+                cJSON_Delete(user);
+                return;
             }
+            cJSON_Delete(user);
         }
     }
 
-    // Update the user count if a user was deleted
-    if (user_found) {
-        store_u32("auth_user_count", user_count - 1);
-        ESP_LOGI(TAG, "Deleted user with UUID: %s. Total users: %lu", uuid, get_u32("auth_user_count", 0));
-    } else {
-        ESP_LOGW(TAG, "User with UUID: %s not found", uuid);
-    }
-
-    nvs_commit(my_handle);
-    nvs_close(my_handle);
+    ESP_LOGE(TAG, "User with UUID=%s not found.", uuid_to_delete);
 }
 
 void modify_user_from_flash(const char *uuid, const char *newName, const char *newPin) {
     ESP_LOGI(TAG, "Modifying user in flash: UUID=%s", uuid);
-    nvs_handle my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to open NVS with error: %d", err);
-        return;
-    }
-
     size_t user_count = get_u32("auth_user_count", 0);
-    bool user_modified = false;
 
-    UserData user_group[USERS_PER_INDEX];
+    for (size_t i = 0; i < user_count; i++) {
+        cJSON* user = load_user_from_flash(i + 1);
+        if (user) {
+            cJSON* uuid_json = cJSON_GetObjectItem(user, "uuid");
+            if (uuid_json && (strcmp(uuid_json->valuestring, uuid) == 0)) {
+                cJSON_ReplaceItemInObject(user, "name", cJSON_CreateString(newName));
+                cJSON_ReplaceItemInObject(user, "pin", cJSON_CreateString(newPin));
 
-    for (size_t start_index = 0; start_index < user_count && !user_modified; start_index += USERS_PER_INDEX) {
-        char key[100];
-        snprintf(key, sizeof(key), "users_data_%" PRIuPTR, start_index / USERS_PER_INDEX);
-        size_t expected_size = sizeof(user_group);
-        err = nvs_get_blob(my_handle, key, user_group, &expected_size);
+                char file_path[FILE_PATH_MAX_LENGTH];
+                snprintf(file_path, sizeof(file_path), "/spiffs/user_%zu.json", i);
 
-        for (size_t i = 0; i < USERS_PER_INDEX && start_index + i < user_count; i++) {
-            if (strcmp(user_group[i].uuid, uuid) == 0) {
-                // Modify the user
-                strncpy(user_group[i].name, newName, sizeof(user_group[i].name));
-                strncpy(user_group[i].pin, newPin, sizeof(user_group[i].pin));
-
-                // Store the modified user_group back to NVS
-                err = nvs_set_blob(my_handle, key, user_group, sizeof(user_group));
-                if (err != ESP_OK) {
-                    ESP_LOGE(TAG, "Failed to store modified users data with error: %d", err);
-                } else {
-                    ESP_LOGI(TAG, "Modified user with UUID: %s", uuid);
+                FILE* file = fopen(file_path, "w");
+                if (file == NULL) {
+                    ESP_LOGE(TAG, "Failed to open user data file for writing.");
+                    cJSON_Delete(user);
+                    return;
                 }
-                user_modified = true;
-                break;
+
+                fprintf(file, "%s", cJSON_PrintUnformatted(user));
+                fclose(file);
+                cJSON_Delete(user);
+                return;
             }
+            cJSON_Delete(user);
         }
     }
 
-    if (!user_modified) {
-        ESP_LOGW(TAG, "User with UUID: %s not found", uuid);
-    }
-
-    nvs_commit(my_handle);
-    nvs_close(my_handle);
+    ESP_LOGE(TAG, "User with UUID=%s not found.", uuid);
 }
 
 void store_wifi_credentials_to_flash(const char *ssid, const char *password) 
@@ -280,8 +246,10 @@ char* find_pin_in_flash(const char* pin)
         cJSON *pin_json = cJSON_GetObjectItem(user, "pin");
         if (pin_json && (strcmp(pin_json->valuestring, pin) == 0)) {
             char *uuid = strdup(cJSON_GetObjectItem(user, "uuid")->valuestring);
+            char *name = strdup(cJSON_GetObjectItem(user, "name")->valuestring);
             cJSON_Delete(user);
-            return uuid;
+            free(uuid);
+            return name;
         }
         cJSON_Delete(user);
     }

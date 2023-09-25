@@ -1,26 +1,22 @@
 #define LOCK_MCP_IO_1       A0
 #define LOCK_MCP_IO_2       B0
-
-// #define OPEN_IO_1           B1
-// #define OPEN_IO_2           A2
 #define NUM_OF_LOCKS        2
 
 const uint8_t LOCK_CONTACT_PIN_1 = B1;
 const uint8_t LOCK_CONTACT_PIN_2 = B1;
 
 bool ARM = false;
-bool DISARM = true;
 bool ALERT = true;
-char lock_service_message[1000]; // Reduced size, assuming you don't actually need 2000 characters
+char lock_service_message[1000];
 bool lock_service_message_ready = false;
 int relock_delay = 2 * 1000;
 int button_disabled = false;
-cJSON * lock_payload = NULL; // Make sure to manage this appropriately
+cJSON *lock_payload = NULL;
 int LOCK_DEBOUNCE_DELAY = 5;
 bool lock_contact_timer_1_expired = true;
 int lock_count = 0;
 
-struct lock {
+typedef struct {
     uint8_t controlPin;
     uint8_t contactPin;
     uint8_t openPin;
@@ -28,7 +24,7 @@ struct lock {
     bool isContact;
     bool isLocked;
     bool pulse;
-	bool polarity;
+    bool polarity;
     bool expired;
     bool enable;
     bool enableContactAlert;
@@ -36,110 +32,77 @@ struct lock {
     int delay;
     int count;
     bool alert;
-    cJSON *payload; // Make sure to manage this appropriately
-    char settings[200]; // Reduced size
+    cJSON *payload;
+    char settings[200];
     char key[50];
     char type[40];
-};
+} Lock;
 
-struct lock locks[NUM_OF_LOCKS];
+Lock locks[NUM_OF_LOCKS];
 
-void start_lock_contact_timer(struct lock *lck, bool val) {
-  if (val) {
+void start_lock_contact_timer(Lock *lck, bool val) {
     lck->expired = !val;
-    lck->count = 0;
-  } else {
-    lck->expired = val;
-  }
+    if (!val) {
+        lck->count = 0;
+    }
 }
 
-void check_lock_contact_timer (struct lock *lck) {
-	if (lck >= lck->delay
-		&& lck->enableContactAlert
-		&& !lck->isContact
-		&& lck->isLocked
-		&& lck->enable
-		&& !lck->expired) {
-		ESP_LOGI(TAG, "Contact delay expired for door %d, sounding alert.\n", lck->channel);
-		longBeep(1);
-	} else lck->count++;
+void check_lock_contact_timer(Lock *lck) {
+    if (lck->count >= lck->delay && lck->enableContactAlert && !lck->isContact && lck->isLocked && lck->enable && !lck->expired) {
+        ESP_LOGI(TAG, "Contact delay expired for door %d, sounding alert.", lck->channel);
+        longBeep(1);
+    } else {
+        lck->count++;
+    }
 }
 
-static void lock_contact_timer (void *pvParameter) {
-  while (1) {
-		for (int i=0; i < NUM_OF_LOCKS; i++)
-			check_lock_contact_timer(&locks[i]);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-  }
+static void lock_contact_timer(void *pvParameter) {
+    while (1) {
+        for (int i = 0; i < NUM_OF_LOCKS; i++)
+            check_lock_contact_timer(&locks[i]);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 }
 
-void createLockServiceMessage(bool value)
-{
-  char value_str[10];
-  if (value) {
-    strcpy(value_str,"true");
-  } else {
-    strcpy(value_str,"false");
-  }
-
-  snprintf(lock_service_message,sizeof(lock_service_message),""
-  "{\"event_type\":\"service/state\","
-  " \"payload\":{\"service_id\":\"locks[0]\",\"state\":{\"locked\":%s}}}"
-  , value_str);
-  lock_service_message_ready = true;
+void createLockServiceMessage(bool value) {
+    snprintf(lock_service_message, sizeof(lock_service_message),
+             "{\"event_type\":\"service/state\",\"payload\":{\"service_id\":\"locks[0]\",\"state\":{\"locked\":%s}}}",
+             value ? "true" : "false");
+    lock_service_message_ready = true;
 }
 
-void enableLock (int ch, bool val)
-{
-	for (int i=0; i < NUM_OF_LOCKS; i++)
-		if (locks[i].channel == ch) locks[i].enable = val;
+void enableLock(int ch, bool val) {
+    for (int i = 0; i < NUM_OF_LOCKS; i++)
+        if (locks[i].channel == ch) locks[i].enable = val;
 }
 
-void arm_lock (int channel, bool arm, bool alert)
-{
-	int ch = channel - 1;
-	if (!locks[ch].enable) return;
-	locks[ch].alert = alert;
+void arm_lock(int channel, bool arm, bool alert) {
+    int ch = channel - 1;
+    if (!locks[ch].enable) return;
+    locks[ch].alert = alert;
 
-	set_io(locks[ch].controlPin, arm);
-	start_lock_contact_timer(&locks[ch], false);
-	if (locks[ch].alert) {
-		beep(1);
-		beep_keypad(1, locks[ch].channel);
-	}
-	locks[ch].isLocked = arm;
+    set_io(locks[ch].controlPin, arm);
+    start_lock_contact_timer(&locks[ch], false);
+    if (locks[ch].alert) {
+        beep(1);
+        beep_keypad(1, locks[ch].channel);
+    }
+    locks[ch].isLocked = arm;
 }
 
-void lock_init()
-{
-    locks[0].channel = 1;
-    locks[0].controlPin = USE_MCP23017 ? LOCK_MCP_IO_1 : LOCK_IO_1;
-    locks[0].isLocked = true;
-	locks[0].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1;
-	locks[0].openPin = OPEN_IO_1;
-	locks[0].enable = true;
-	locks[0].delay = 4;
-	locks[0].alert = true;
-	locks[0].enableContactAlert = false;
-	strcpy(locks[0].type, "lock");
-
-    locks[1].channel = 2;
-    locks[1].controlPin = USE_MCP23017 ? LOCK_MCP_IO_2 : LOCK_IO_2;
-    locks[1].isLocked = true;
-	locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
-	locks[1].openPin = OPEN_IO_2;
-	locks[1].enable = true;
-	locks[1].delay = 4;
-	locks[1].alert = true;
-	locks[1].enableContactAlert = false;
-	strcpy(locks[1].type, "lock");
-
-	for (int i=0; i < NUM_OF_LOCKS; i++) {
-		if (USE_MCP23017) {
-			set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
-			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
-		}
-	}
+void lock_init() {
+    for (int i = 0; i < NUM_OF_LOCKS; i++) {
+        locks[i].channel = i + 1;
+        locks[i].controlPin = (i == 0) ? (USE_MCP23017 ? LOCK_MCP_IO_1 : LOCK_IO_1) : (USE_MCP23017 ? LOCK_MCP_IO_2 : LOCK_IO_2);
+        locks[i].isLocked = true;
+        locks[i].contactPin = (i == 0) ? (USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1) : (USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2);
+        locks[i].openPin = (i == 0) ? OPEN_IO_1 : OPEN_IO_2;
+        locks[i].enable = true;
+        locks[i].delay = 4;
+        locks[i].alert = true;
+        locks[i].enableContactAlert = false;
+        strcpy(locks[i].type, "lock");
+    }
 }
 
 int storeLockSettings()
@@ -274,25 +237,21 @@ void handle_lock_message(cJSON * payload) {
 	}
 }
 
-static void
-lock_service(void *pvParameter)
-{
-  int cnt = 0;
+static void lock_service(void *pvParameter) {
+    while (1) {
+        for (int i = 0; i < NUM_OF_LOCKS; i++) {
+            locks[i].isContact = !get_io(locks[i].contactPin);
+        }
 
-  while (1) {
-		for (int i=0; i < NUM_OF_LOCKS; i++) {
-			locks[i].isContact = !get_io(locks[i].contactPin);
-		}
+        handle_lock_message(checkServiceMessage("lock"));
+        handle_lock_message(checkServiceMessageByAction("ac_1", "pulseLock"));
 
-		handle_lock_message(checkServiceMessage("lock"));
-		handle_lock_message(checkServiceMessageByAction("ac_1", "pulseLock"));
-
-    vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
-  }
+        vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
+    }
 }
 
 void lock_main() {
-	ESP_LOGI(TAG, "Starting lock service.\n");
+    ESP_LOGI(TAG, "Starting lock service.");
     TaskHandle_t lock_service_task;
 
     lock_init();
