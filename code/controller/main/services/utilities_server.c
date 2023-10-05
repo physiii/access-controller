@@ -1,17 +1,26 @@
-static void ws_utilities_task(void)
-{
-	char headers[900];
-	snprintf(headers, sizeof(headers),
-	"x-device-id: %s\r\n"
-	"x-device-token: %s\r\n"
-	"x-device-type: generic\r\n",
-	device_id,
-	token);
+typedef struct {
+    char server_ip[32];
+    char server_port[8];
+} ServerInfo;
 
-	const esp_websocket_client_config_t websocket_cfg = {
-		.uri = "ws://192.168.1.42:5050/utilities",
-				.headers = headers,
-	};
+static void ws_utilities_task(void *param) {
+    ServerInfo *serverInfo = (ServerInfo *)param;
+
+    char headers[900];
+    snprintf(headers, sizeof(headers),
+    "x-device-id: %s\r\n"
+    "x-device-token: %s\r\n"
+    "x-device-type: generic\r\n",
+    device_id,
+    token);
+    
+    char uri[256];
+    snprintf(uri, sizeof(uri), "ws://%s:%s/utilities", serverInfo->server_ip, serverInfo->server_port);
+
+    const esp_websocket_client_config_t websocket_cfg = {
+        .uri = uri,
+        .headers = headers,
+    };
 
     ESP_LOGI(TAG, "Connecting to %s...", websocket_cfg.uri);
 

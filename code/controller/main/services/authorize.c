@@ -94,6 +94,14 @@ void send_user_count() {
     addServerMessageToQueue(msg);
 }
 
+void sendInfo()
+{
+    printf("Sending info\n");
+    char msg[200] = "";
+    sprintf(msg, "{\"eventType\":\"authorize\", \"payload\":{\"uuid\":\"%s\"}}", device_id);
+    addClientMessageToQueue(msg);
+}
+
 void handle_authorize_message(cJSON * payload) {
     if (payload == NULL) return;
 
@@ -166,6 +174,17 @@ void handle_authorize_message(cJSON * payload) {
         vTaskDelay(100 / portTICK_PERIOD_MS);
         esp_restart();
 
+    } else if (cJSON_GetObjectItem(payload,"serverIp")) {
+        char serverIp[32] = "";
+        char serverPort[8] = "";
+        if (cJSON_GetObjectItem(payload, "serverIp") && cJSON_GetObjectItem(payload, "serverPort")) {
+            snprintf(serverIp, sizeof(serverIp), "%s", cJSON_GetObjectItem(payload, "serverIp")->valuestring);
+            snprintf(serverPort, sizeof(serverPort), "%s", cJSON_GetObjectItem(payload, "serverPort")->valuestring);
+            store_server_info_to_flash(serverIp, serverPort);
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            esp_restart();
+        }
+
     } else if (cJSON_GetObjectItem(payload,"wifiName")) {
         char wifiName[MAX_SSID_SIZE] = "";
         char wifiPassword[MAX_PASS_SIZE] = "";
@@ -176,7 +195,10 @@ void handle_authorize_message(cJSON * payload) {
             vTaskDelay(100 / portTICK_PERIOD_MS);
             esp_restart();
         }
-    }
+
+    } else if (cJSON_GetObjectItem(payload,"getInfo")) {
+		sendInfo();
+	}
 
     cJSON_Delete(payload);
 }
@@ -193,6 +215,8 @@ static void auth_service (void *pvParameter)
     handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserCount"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserByCount"));
     handle_authorize_message(checkServiceMessage("setWifiCredentials"));
+    handle_authorize_message(checkServiceMessage("setServerInfo"));
+    handle_authorize_message(checkServiceMessage("getInfo"));
     handle_authorize_message(checkServiceMessageByKey("uuid"));
     handle_authorize_message(checkServiceMessageByKey("token"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);

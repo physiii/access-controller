@@ -1,16 +1,78 @@
+/* General styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  font-family:
+      "HelveticaNeue-Light",
+      "Helvetica Neue Light",
+      "Helvetica Neue",
+      Helvetica,
+      Arial,
+      "Lucida Grande",
+      sans-serif;
+  background-color: #f4f4f4;
+}
+
 .titleDiv {
-	width:100%;
-	text-align:left;
-	padding:20px 20px 30px 20px;
+  width:100%;
+  text-align:center; /* Centering the title */
+  padding:20px 20px 30px 20px;
+  background-color: #222;
+  color: #ffffff;
 }
 
-.panel.top {
-	padding:20px;
-	border-bottom: 1px solid #444;
+.table-container {
+  max-width: 800px; /* Setting a maximum width for tables */
+  margin: 20px auto; /* Centering the tables */
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.panel.bottom {
-		padding:20px;
+table {
+  width: 100%; /* Making tables full width of their container */
+  margin: 20px 0;
+}
+
+th, td {
+  padding: 15px;
+  border: 1px solid #ddd; /* Lighter border color for tables */
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+input {
+  padding: 5px;
+  font-size: 20px;
+  width: 100%; /* Full width for inputs */
+  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+button {
+  padding: 5px 15px;
+  font-size: 20px;
+  background-color: #2196F3;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #186bb0;
 }
 
 .switch {
@@ -22,7 +84,7 @@
 
 .switch input {
   opacity: 0;
-  width: 100%;
+  width: 0;
   height: 0;
 }
 
@@ -71,54 +133,4 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-table, th, td {
-	padding: 15px;
-  border: 1px solid black;
-  border-collapse: collapse;
-}
-
-table {
-	margin: 40px 20px 40px 20px;
-}
-
-input {
-	padding: 5px;
-	font-size: 20px;
-	width: 80px;
-	height: 40px;
-}
-
-button {
-	padding: 5px;
-	font-size: 20px;
-	width: 100px;
-	height: 40px;
-}
-
-html {
-  font-weight: 300;
-  -webkit-font-smoothing: antialiased;
-}
-
-html, input {
-  font-family:
-    "HelveticaNeue-Light",
-    "Helvetica Neue Light",
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    "Lucida Grande",
-    sans-serif;
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
 }

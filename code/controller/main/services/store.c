@@ -210,6 +210,28 @@ void modify_user_from_flash(const char *uuid, const char *newName, const char *n
     ESP_LOGE(TAG, "User with UUID=%s not found.", uuid);
 }
 
+char* find_pin_in_flash(const char* pin) 
+{
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    ESP_LOGI(TAG, "Total User Count: %" PRIu32, user_count);
+
+    for (uint32_t i = 0; i < user_count; i++) { 
+        cJSON *user = load_user_from_flash(i + 1); // Convert to 1-based index when loading user
+        if (!user) continue;
+
+        cJSON *pin_json = cJSON_GetObjectItem(user, "pin");
+        if (pin_json && (strcmp(pin_json->valuestring, pin) == 0)) {
+            char *uuid = strdup(cJSON_GetObjectItem(user, "uuid")->valuestring);
+            char *name = strdup(cJSON_GetObjectItem(user, "name")->valuestring);
+            cJSON_Delete(user);
+            free(uuid);
+            return name;
+        }
+        cJSON_Delete(user);
+    }
+    return NULL;
+}
+
 void store_wifi_credentials_to_flash(const char *ssid, const char *password) 
 {
     store_char("wifi_ssid", ssid);
@@ -234,24 +256,25 @@ void load_wifi_credentials_from_flash(char *ssid, char *password)
 	strcpy(password, get_char("wifi_password"));
 }
 
-char* find_pin_in_flash(const char* pin) 
+void store_server_info_to_flash(const char *server_ip, const char *server_port) 
 {
-    uint32_t user_count = get_u32("auth_user_count", 0);
-    ESP_LOGI(TAG, "Total User Count: %" PRIu32, user_count);
+    store_char("server_ip", server_ip);
+    store_char("server_port", server_port);
+    ESP_LOGI(TAG, "Server info stored: IP: %s, Port: %s", server_ip, server_port);
+}
 
-    for (uint32_t i = 0; i < user_count; i++) { // Start from 0 as it's 0-based
-        cJSON *user = load_user_from_flash(i);
-        if (!user) continue;
+void load_server_info_from_flash(char *server_ip, char *server_port) 
+{
+    ESP_LOGI(TAG, "Loading Server info from flash");
+    strcpy(server_ip, get_char("server_ip"));
+    strcpy(server_port, get_char("server_port"));
 
-        cJSON *pin_json = cJSON_GetObjectItem(user, "pin");
-        if (pin_json && (strcmp(pin_json->valuestring, pin) == 0)) {
-            char *uuid = strdup(cJSON_GetObjectItem(user, "uuid")->valuestring);
-            char *name = strdup(cJSON_GetObjectItem(user, "name")->valuestring);
-            cJSON_Delete(user);
-            free(uuid);
-            return name;
-        }
-        cJSON_Delete(user);
+    if (strcmp(server_ip, "")==0) {
+        ESP_LOGI(TAG, "No server IP found in flash, setting to default.");
+        strcpy(server_ip, "192.168.1.42");
     }
-    return NULL;
+    if (strcmp(server_port, "")==0) {
+        ESP_LOGI(TAG, "No server port found in flash, setting to default.");
+        strcpy(server_port, "5050");
+    }
 }

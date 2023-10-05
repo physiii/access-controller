@@ -92,8 +92,17 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
 }
 
-static void ws_client_task(void)
+static void ws_client_task(void *pvParameters)
 {
+    char* server_info = (char*)pvParameters;
+    char server_ip[32];
+    char server_port[6];
+    
+    sscanf(server_info, "%31[^:]:%5s", server_ip, server_port);
+
+    char uri[256];
+    snprintf(uri, sizeof(uri), "ws://%s:%s/device-relay", server_ip, server_port);
+
 	char headers[900];
 	snprintf(headers, sizeof(headers),
 	"x-device-id: %s\r\n"
@@ -103,8 +112,8 @@ static void ws_client_task(void)
 	token);
 
 	const esp_websocket_client_config_t websocket_cfg = {
-		.uri = "ws://192.168.1.42:5050/device-relay",
-				.headers = headers,
+		.uri = uri,
+		.headers = headers,
 	};
 
     ESP_LOGI(TAG, "Connecting to %s...", websocket_cfg.uri);
@@ -136,9 +145,13 @@ static void ws_client_task(void)
     esp_websocket_client_destroy(client);
 }
 
-void ws_client_main(void)
-{
-  	printf("starting websocket client service\n");
 
-  	xTaskCreate(&ws_client_task, "ws_client_task", 9 * 1000, NULL, 5, NULL);
+void ws_client_main(const char* ip, const char* port)
+{
+    printf("starting websocket client service\n");
+
+    static char server_info[40];  // Static so it remains valid for the lifetime of the task
+    snprintf(server_info, sizeof(server_info), "%s:%s", ip, port);
+
+    xTaskCreate(&ws_client_task, "ws_client_task", 9 * 1000, server_info, 5, NULL);
 }

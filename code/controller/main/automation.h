@@ -14,7 +14,7 @@ void beep_keypad(int, int);
 #define SERVICE_LOOP 100
 #define SERVICE_LOOP_SHORT 10
 #define STRIKE 0
-#define MAX_QUEUE_SIZE 20 // Define a constant for the maximum queue size
+#define MAX_QUEUE_SIZE 20
 
 #if STRIKE
 #define USE_MCP23017 0
@@ -74,31 +74,28 @@ bool get_mcp_io(uint8_t);
 
 cJSON *checkServiceMessage(char *eventType)
 {
-    cJSON *null_payload = NULL;
     if (serviceMessage.read)
-        return null_payload;
+        return NULL;
 
     if (serviceMessage.message == NULL)
-        return null_payload;
+        return NULL;
 
     cJSON *eventTypeItem = cJSON_GetObjectItem(serviceMessage.message, "eventType");
     if (!eventTypeItem)
-        return null_payload;
+        return NULL;
 
     char type[50] = "";
     strncpy(type, eventTypeItem->valuestring, sizeof(type) - 1);
 
     if (strcmp(type, eventType))
-        return null_payload;
+        return NULL;
 
     cJSON *payloadItem = cJSON_GetObjectItem(serviceMessage.message, "payload");
     if (!payloadItem)
-        return null_payload;
-
-    cJSON *payload = payloadItem;
+        return NULL;
 
     serviceMessage.read = true;
-    return payload;
+    return cJSON_Duplicate(payloadItem, 1);
 }
 
 cJSON *checkServiceMessageByAction(char *id, char *action)

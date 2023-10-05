@@ -2,8 +2,14 @@
 #define LOCK_MCP_IO_2       B0
 #define NUM_OF_LOCKS        2
 
-const uint8_t LOCK_CONTACT_PIN_1 = B1;
-const uint8_t LOCK_CONTACT_PIN_2 = B1;
+const uint8_t LOCK_CONTACT_PIN_1 = A1;
+const uint8_t LOCK_CONTACT_PIN_2 = B2;
+
+const uint8_t LOCK_SIGNAL_PIN_1 = B1;
+const uint8_t LOCK_SIGNAL_PIN_2 = A2;
+
+// const uint8_t LOCK_CONTACT_PIN_1 = B1;
+// const uint8_t LOCK_CONTACT_PIN_2 = B1;
 
 bool ARM = false;
 bool ALERT = true;
@@ -19,19 +25,23 @@ int lock_count = 0;
 typedef struct {
     uint8_t controlPin;
     uint8_t contactPin;
-    uint8_t openPin;
+	uint8_t signalPin;
     uint8_t channel;
     bool isContact;
+    bool prevIsContact;
+	bool shouldLock;
     bool isLocked;
+	bool isSignal;
     bool pulse;
     bool polarity;
     bool expired;
     bool enable;
     bool enableContactAlert;
-    bool arm;
     int delay;
     int count;
     bool alert;
+	bool sentSignalAlert;
+	bool sentContactAlert;
     cJSON *payload;
     char settings[200];
     char key[50];
@@ -48,12 +58,80 @@ void start_lock_contact_timer(Lock *lck, bool val) {
 }
 
 void check_lock_contact_timer(Lock *lck) {
-    if (lck->count >= lck->delay && lck->enableContactAlert && !lck->isContact && lck->isLocked && lck->enable && !lck->expired) {
-        ESP_LOGI(TAG, "Contact delay expired for door %d, sounding alert.", lck->channel);
+	if (!lck->enable) return;
+	char log_msg[500];
+
+    if (lck->count >= lck->delay
+        && lck->shouldLock
+        && (!lck->isSignal || !lck->isContact)
+        && lck->enableContactAlert
+        && lck->enable
+        && !lck->expired)
+    {
+        if (!lck->isSignal) {
+            if (!lck->sentSignalAlert) {
+                snprintf(log_msg, sizeof(log_msg), 
+                    "{\"event_type\":\"log\",\"payload\":"
+                    "{\"service_id\":\"ac_1\", "
+                    "\"type\":\"access-control\", "
+                    "\"description\":\"No armed status coming from lock.\", "
+                    "\"event\":\"authentication\", "
+                    "\"value\":\"true\"}"
+                    "}");
+                addServerMessageToQueue(log_msg);
+                lck->sentSignalAlert = true;
+            }
+            ESP_LOGI(TAG, "No signal from lock %d, sounding alert.", lck->channel);
+        }
+        if (!lck->isContact) {
+            if (!lck->sentContactAlert) {
+                snprintf(log_msg, sizeof(log_msg), 
+                    "{\"event_type\":\"log\",\"payload\":"
+                    "{\"service_id\":\"ac_1\", "
+                    "\"type\":\"access-control\", "
+                    "\"description\":\"Door is still open when armed.\", "
+                    "\"event\":\"authentication\", "
+                    "\"value\":\"true\"}"
+                    "}");
+                addServerMessageToQueue(log_msg);
+                lck->sentContactAlert = true;
+            }
+            ESP_LOGI(TAG, "No contact from lock %d, sounding alert.", lck->channel);
+        }
         longBeep(1);
     } else {
+        lck->sentSignalAlert = false;
+        lck->sentContactAlert = false;
         lck->count++;
     }
+
+    // check for contact change and send opened or closed event depending on the contact state
+    if (lck->isContact != lck->prevIsContact) {
+		if (lck->isContact) {
+			snprintf(log_msg, sizeof(log_msg), 
+				"{\"event_type\":\"log\",\"payload\":"
+				"{\"service_id\":\"ac_1\", "
+				"\"type\":\"access-control\", "
+				"\"description\":\"Door closed.\", "
+				"\"event\":\"authentication\", "
+				"\"value\":\"true\"}"
+				"}");
+			addServerMessageToQueue(log_msg);
+			ESP_LOGI(TAG, "Door closed.");
+		} else {
+			snprintf(log_msg, sizeof(log_msg), 
+				"{\"event_type\":\"log\",\"payload\":"
+				"{\"service_id\":\"ac_1\", "
+				"\"type\":\"access-control\", "
+				"\"description\":\"Door opened.\", "
+				"\"event\":\"authentication\", "
+				"\"value\":\"true\"}"
+				"}");
+			addServerMessageToQueue(log_msg);
+			ESP_LOGI(TAG, "Door opened.");
+		}
+    }
+	lck->prevIsContact = lck->isContact;
 }
 
 static void lock_contact_timer(void *pvParameter) {
@@ -80,28 +158,13 @@ void arm_lock(int channel, bool arm, bool alert) {
     int ch = channel - 1;
     if (!locks[ch].enable) return;
     locks[ch].alert = alert;
+	locks[ch].shouldLock = arm;
 
     set_io(locks[ch].controlPin, arm);
-    start_lock_contact_timer(&locks[ch], false);
+    start_lock_contact_timer(&locks[ch], true);
     if (locks[ch].alert) {
         beep(1);
         beep_keypad(1, locks[ch].channel);
-    }
-    locks[ch].isLocked = arm;
-}
-
-void lock_init() {
-    for (int i = 0; i < NUM_OF_LOCKS; i++) {
-        locks[i].channel = i + 1;
-        locks[i].controlPin = (i == 0) ? (USE_MCP23017 ? LOCK_MCP_IO_1 : LOCK_IO_1) : (USE_MCP23017 ? LOCK_MCP_IO_2 : LOCK_IO_2);
-        locks[i].isLocked = true;
-        locks[i].contactPin = (i == 0) ? (USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1) : (USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2);
-        locks[i].openPin = (i == 0) ? OPEN_IO_1 : OPEN_IO_2;
-        locks[i].enable = true;
-        locks[i].delay = 4;
-        locks[i].alert = true;
-        locks[i].enableContactAlert = false;
-        strcpy(locks[i].type, "lock");
     }
 }
 
@@ -140,7 +203,6 @@ int restoreLockSettings()
 
 int sendLockState()
 {
-
 	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
 		char type[25] = "";
 		strcpy(type, locks[i].type);
@@ -237,10 +299,48 @@ void handle_lock_message(cJSON * payload) {
 	}
 }
 
+void lock_init()
+{
+    locks[0].channel = 1;
+    locks[0].controlPin = USE_MCP23017 ? LOCK_MCP_IO_1 : LOCK_IO_1;
+    locks[0].isLocked = true;
+	locks[0].shouldLock = true;
+	locks[0].isSignal = true;
+	locks[0].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1;
+	locks[0].signalPin = USE_MCP23017 ? LOCK_SIGNAL_PIN_1 : SIGNAL_IO_1;
+	locks[0].enable = true;
+	locks[0].delay = 4;
+	locks[0].alert = true;
+	locks[0].enableContactAlert = false;
+	strcpy(locks[0].type, "lock");
+
+    locks[1].channel = 2;
+    locks[1].controlPin = USE_MCP23017 ? LOCK_MCP_IO_2 : LOCK_IO_2;
+    locks[1].isLocked = true;
+	locks[1].shouldLock = true;
+	locks[1].isSignal = true;
+	locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
+	locks[1].signalPin = USE_MCP23017 ? LOCK_SIGNAL_PIN_2 : SIGNAL_IO_2;
+	locks[1].enable = true;
+	locks[1].delay = 4;
+	locks[1].alert = true;
+	locks[1].enableContactAlert = false;
+	strcpy(locks[1].type, "lock");
+
+	for (int i=0; i < NUM_OF_LOCKS; i++) {
+		if (USE_MCP23017) {
+			set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
+			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
+			set_mcp_io_dir(locks[i].signalPin, MCP_INPUT);
+		}
+	}
+}
+
 static void lock_service(void *pvParameter) {
     while (1) {
         for (int i = 0; i < NUM_OF_LOCKS; i++) {
             locks[i].isContact = !get_io(locks[i].contactPin);
+			locks[i].isSignal = get_io(locks[i].signalPin);
         }
 
         handle_lock_message(checkServiceMessage("lock"));
@@ -258,5 +358,5 @@ void lock_main() {
     restoreLockSettings();
 
     xTaskCreate(&lock_service, "lock_service_task", 8 * 1000, NULL, 5, NULL);
-    xTaskCreate(lock_contact_timer, "lock_contact_timer", 2048, NULL, 10, NULL);
+    xTaskCreate(lock_contact_timer, "lock_contact_timer", 4 * 1000, NULL, 10, NULL);
 }

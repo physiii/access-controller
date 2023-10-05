@@ -44,12 +44,22 @@ void beep_keypad (int count, int ch)
 {
 	if (ch < 1 || ch > NUM_OF_WIEGANDS) return;
 
+
+	// for (int i=0; i < count; i++) {
+	// 	vTaskDelay(30 / portTICK_PERIOD_MS);
+	// 	set_io(wg[ch - 1].pin_push, true);
+	// 	vTaskDelay(240 / portTICK_PERIOD_MS);
+	// 	set_io(wg[ch - 1].pin_push, false);
+	// 	vTaskDelay(30 / portTICK_PERIOD_MS);
+	// 	set_io(wg[ch - 1].pin_push, true);
+	// }
+
 	for (int i=0; i < count; i++) {
-		vTaskDelay(30 / portTICK_PERIOD_MS);
+		vTaskDelay(1 * 30 / portTICK_PERIOD_MS);
 		set_io(wg[ch - 1].pin_push, true);
-		vTaskDelay(240 / portTICK_PERIOD_MS);
+		vTaskDelay(2 * 240 / portTICK_PERIOD_MS);
 		set_io(wg[ch - 1].pin_push, false);
-		vTaskDelay(30 / portTICK_PERIOD_MS);
+		vTaskDelay(1 * 30 / portTICK_PERIOD_MS);
 		set_io(wg[ch - 1].pin_push, true);
 	}
 }
@@ -160,11 +170,9 @@ void handleKeyCode(struct wiegand *wg) {
         // wg->code[strlen(wg->code)] = '#';
 
         if (is_pin_authorized(wg->code)) {
-			printf("Authorized pin %s\n", wg->code);
 			arm_lock(wg->channel, false, wg->alert);
 			start_wiegand_timer(wg, true);
 		} else {
-			printf("Unauthorized pin %s\n", wg->code);
 			beep_keypad(2, wg->channel);
 		}
 		memset(wg->code, 0, sizeof(wg->code));

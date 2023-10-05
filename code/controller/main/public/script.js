@@ -17,6 +17,10 @@ webSocket.onopen = function (event) {
 	setTimeout(() => {
 		webSocket.send("{ \"eventType\":\"radar\", \"payload\": {\"getState\": true}}");
 	}, 1000);
+
+	setTimeout(() => {
+		webSocket.send("{ \"eventType\":\"getInfo\", \"payload\": {\"getInfo\": true}}");
+	}, 1250);
 };
 
 let armDelay = (channel, value) => {
@@ -81,28 +85,42 @@ document.getElementById('alertFob_2').onclick = function() {
 			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
 };
 
-document.getElementById('wifi-submit').addEventListener('click', function() {
-    const wifiName = document.getElementById('wifi-name').value;
-    const wifiPassword = document.getElementById('wifi-password').value;
+document.getElementById('wifiForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents the default form submission behavior
+    const wifiName = document.getElementById('wifiName').value;
+    const wifiPassword = document.getElementById('wifiPassword').value;
 
-    // Sending WiFi credentials through WebSocket
-    let msg = `{
-        "eventType": "setWifiCredentials",
-        "payload": {
-            "wifiName": "${wifiName}",
-            "wifiPassword": "${wifiPassword}"
+    // Send the WiFi credentials to your server using WebSocket
+    webSocket.send(JSON.stringify({
+        eventType: "setWifiCredentials",
+        payload: {
+            wifiName: wifiName,
+            wifiPassword: wifiPassword
         }
-    }`;
+    }));
+});
 
-    webSocket.send(msg);
+document.getElementById('serverForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents the default form submission behavior
+    const ipAddress = document.getElementById('ipAddress').value;
+    const port = document.getElementById('port').value;
+
+    // Send the server info to your server using WebSocket
+    webSocket.send(JSON.stringify({
+        eventType: "setServerInfo",
+        payload: {
+            serverIp: ipAddress,
+            serverPort: port
+        }
+    }));
 });
 
 webSocket.onmessage = function (event) {
 	let state = JSON.parse(event.data);
 	let pl = state.payload;
-	let ch = state.payload.channel;
+	let ch = 1;
+	if (pl.channel) ch = pl.channel;
 	if (!event.data) return;
-
 
 	function removeUser(user) {
 			console.log(users[i]);
@@ -110,7 +128,6 @@ webSocket.onmessage = function (event) {
 			webSocket.send(msg);
 	}
 
-	console.log("Incoming: ", event.data, pl);
 	if (state.eventType == "exit") {
 		if (pl.enable) document.getElementById('enableExit_' + ch).checked = pl.enable;
 		if (pl.alert) document.getElementById('alertExit_' + ch).checked = pl.alert;
@@ -126,6 +143,10 @@ webSocket.onmessage = function (event) {
 	if (state.eventType == "fob") {
 		if (pl.enable) document.getElementById('enableFob_' + ch).checked = pl.enable;
 		if (pl.alert) document.getElementById('alertFob_' + ch).checked = pl.alert;
+	}
+
+	if (state.eventType == "authorize") {
+		document.getElementById('uuid').textContent = pl.uuid;
 	}
 
 	if (state.eventType == "users") {

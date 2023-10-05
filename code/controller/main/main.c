@@ -30,43 +30,42 @@ void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
     }
 }
 
-void app_main(void)
-{
-	ESP_ERROR_CHECK(esp_netif_init());
-	ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-	esp_err_t ret = nvs_flash_init();
-	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-		ESP_ERROR_CHECK(nvs_flash_erase());
-		ret = nvs_flash_init();
-	}
-	ESP_ERROR_CHECK(ret);
+void app_main(void) {
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-	strcpy(device_id, get_char("device_id"));
-	if (strcmp(device_id, "")==0) {
-		ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
-		// store_char("device_id", "69696909-a5e5-401c-8da7-184fe2d5c844");
-	  	xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
-	} else {
-		ESP_LOGI(TAG, "Device ID : %s", device_id);
-	}
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
 
-	strcpy(token, get_char("token"));
-	if (strcmp(token,"")==0) {
-		strcpy(token, device_id);
-		ESP_LOGI(TAG, "No token found, setting as device id");
-	} else {
-		ESP_LOGI(TAG, "Token: %s", token);
-	}
+    strcpy(device_id, get_char("device_id"));
+    if (strcmp(device_id, "") == 0) {
+        ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
+        xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
+    } else {
+        ESP_LOGI(TAG, "Device ID : %s", device_id);
+    }
 
-	serviceMessage.read = true;
-	serviceMessage.message = NULL;
+    strcpy(token, get_char("token"));
+    if (strcmp(token, "") == 0) {
+        strcpy(token, device_id);
+        ESP_LOGI(TAG, "No token found, setting as device id");
+    } else {
+        ESP_LOGI(TAG, "Token: %s", token);
+    }
 
-	clientMessage.readyToSend = false;
-	serverMessage.readyToSend = false;
+    serviceMessage.read = true;
+    serviceMessage.message = NULL;
+
+    clientMessage.readyToSend = false;
+    serverMessage.readyToSend = false;
 
     char wifi_ssid[32];
-    char wifi_password[64];    
+    char wifi_password[64];
     snprintf(wifi_ssid, sizeof(wifi_ssid), "pyfitech");
     snprintf(wifi_password, sizeof(wifi_password), "pyfitech");
 
@@ -79,24 +78,34 @@ void app_main(void)
         
         ap_main(ap_ssid, "pyfitech");
     }
-	
-	gpio_main();
-	i2c_main();
-	mcp23x17_main();
-	auth_main();
-	lock_main();
-	buzzer_main();
-	wiegand_main();
 
-	// exit_main();
-	// keypad_main();
-	#if STRIKE
-		radar_main();
-	#else
-		// fob_main();
-	#endif
-	server_main();
-	ws_client_main();
+    gpio_main();
+    i2c_main();
+    mcp23x17_main();
+    auth_main();
+    lock_main();
+    buzzer_main();
+    wiegand_main();
+
+    // exit_main();
+    // keypad_main();
+    #if STRIKE
+        radar_main();
+    #else
+        // fob_main();
+    #endif
+    server_main();
+
+    char server_ip[32];
+    char server_port[8];
+    load_server_info_from_flash(server_ip, server_port);
+    
+    ServerInfo serverInfo;
+    strcpy(serverInfo.server_ip, server_ip);
+    strcpy(serverInfo.server_port, server_port);
+    xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, &serverInfo, 5, NULL);
+    
+    ws_client_main(server_ip, server_port);
 
     if (initialize_spiffs() == ESP_OK) {
         ESP_LOGI(TAG, "SPIFFS Initialized successfully");

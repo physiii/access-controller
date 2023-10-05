@@ -11,11 +11,14 @@
 #define MCP_INTA_GPIO 	34
 #define MCP_INTB_GPIO 	35
 
-#define LOCK_IO_1 	18
-#define LOCK_IO_2 	19
+#define LOCK_IO_1 		18
+#define LOCK_IO_2 		19
 
 #define CONTACT_IO_1 	15
 #define CONTACT_IO_2 	16
+
+#define SIGNAL_IO_1 	15
+#define SIGNAL_IO_2 	16
 
 #if STRIKE
 	#define OPEN_IO_1				4
@@ -40,7 +43,7 @@
 	#define EXIT_BUTTON_IO_2		35
 	#define KEYPAD_IO_1				13
 	#define KEYPAD_IO_2				27
-	#define BUZZER_IO 				22
+	#define BUZZER_IO 				14
 	#define WG0_DATA0_IO			16
 	#define WG0_DATA1_IO			4
 	#define WG1_DATA0_IO			32
@@ -89,7 +92,7 @@ void set_io (uint8_t io, bool val)
 		// printf("set_mcp_io io:%d\tval: %d\n", io, val);
 		set_mcp_io(io, val);
 	} else {
-		// printf("gpio_set_level io:%d\tval: %d\n", io, val);
+		printf("gpio_set_level io:%d\tval: %d\n", io, val);
 		gpio_set_level(io, val);
 	}
 }
