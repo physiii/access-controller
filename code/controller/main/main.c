@@ -18,7 +18,7 @@
 #include "services/utilities_server.c"
 
 void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
-    if (strlen(device_id) >= 5) {
+    if (device_id && strlen(device_id) >= 5) {
         // Use the last 5 characters from device_id
         snprintf(ssid, size, "ac_%s", device_id + strlen(device_id) - 5);
     } else if (strcmp(device_id, "") == 0) {
@@ -30,7 +30,6 @@ void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
     }
 }
 
-
 void app_main(void) {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -41,14 +40,7 @@ void app_main(void) {
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-
     strcpy(device_id, get_char("device_id"));
-    if (strcmp(device_id, "") == 0) {
-        ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
-        xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, NULL, 5, NULL);
-    } else {
-        ESP_LOGI(TAG, "Device ID : %s", device_id);
-    }
 
     strcpy(token, get_char("token"));
     if (strcmp(token, "") == 0) {
@@ -96,16 +88,18 @@ void app_main(void) {
     #endif
     server_main();
 
-    char server_ip[32];
-    char server_port[8];
+
     load_server_info_from_flash(server_ip, server_port);
     
-    ServerInfo serverInfo;
-    strcpy(serverInfo.server_ip, server_ip);
-    strcpy(serverInfo.server_port, server_port);
-    xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10000, &serverInfo, 5, NULL);
-    
     ws_client_main(server_ip, server_port);
+    
+    if (strcmp(device_id, "") == 0) {
+        ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
+        xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10 * 1000, NULL, 5, NULL);
+    } else {
+        ESP_LOGI(TAG, "Device ID : %s", device_id);
+    }
+
 
     if (initialize_spiffs() == ESP_OK) {
         ESP_LOGI(TAG, "SPIFFS Initialized successfully");

@@ -31,8 +31,14 @@ bool wss_data_out_ready = false;
 bool run_relay = true;
 bool get_time = false;
 
-char token[700];
-char device_id[100];
+char token[700] = {0};
+char device_id[100] = {0};
+
+char wifi_ssid[32];
+char wifi_password[64];
+char server_ip[32];
+char server_port[8];
+
 bool disconnect_from_relay = false;
 bool connect_to_relay = false;
 

@@ -275,6 +275,6 @@ void load_server_info_from_flash(char *server_ip, char *server_port)
     }
     if (strcmp(server_port, "")==0) {
         ESP_LOGI(TAG, "No server port found in flash, setting to default.");
-        strcpy(server_port, "5050");
+        strcpy(server_port, "80");
     }
 }
