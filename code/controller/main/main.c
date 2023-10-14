@@ -69,6 +69,16 @@ void app_main(void) {
         generate_ssid_from_device_id(device_id, ap_ssid, sizeof(ap_ssid));
         
         ap_main(ap_ssid, "pyfitech");
+    } else {
+        load_server_info_from_flash(server_ip, server_port);
+        ws_client_main(server_ip, server_port);
+
+        if (strcmp(device_id, "") == 0) {
+            ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
+            xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10 * 1000, NULL, 5, NULL);
+        } else {
+            ESP_LOGI(TAG, "Device ID : %s", device_id);
+        }
     }
 
     gpio_main();
@@ -79,27 +89,14 @@ void app_main(void) {
     buzzer_main();
     wiegand_main();
 
-    // exit_main();
-    // keypad_main();
+    exit_main();
+    keypad_main();
     #if STRIKE
         radar_main();
     #else
-        // fob_main();
+        fob_main();
     #endif
     server_main();
-
-
-    load_server_info_from_flash(server_ip, server_port);
-    
-    ws_client_main(server_ip, server_port);
-    
-    if (strcmp(device_id, "") == 0) {
-        ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
-        xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10 * 1000, NULL, 5, NULL);
-    } else {
-        ESP_LOGI(TAG, "Device ID : %s", device_id);
-    }
-
 
     if (initialize_spiffs() == ESP_OK) {
         ESP_LOGI(TAG, "SPIFFS Initialized successfully");

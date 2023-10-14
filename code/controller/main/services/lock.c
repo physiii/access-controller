@@ -160,6 +160,7 @@ void arm_lock(int channel, bool arm, bool alert) {
     locks[ch].alert = alert;
 	locks[ch].shouldLock = arm;
 
+	if (locks[ch].polarity == 1) arm = !arm;
     set_io(locks[ch].controlPin, arm);
     start_lock_contact_timer(&locks[ch], true);
     if (locks[ch].alert) {
@@ -312,6 +313,7 @@ void lock_init()
 	locks[0].delay = 4;
 	locks[0].alert = true;
 	locks[0].enableContactAlert = false;
+	locks[0].polarity = 1;
 	strcpy(locks[0].type, "lock");
 
     locks[1].channel = 2;
@@ -325,6 +327,7 @@ void lock_init()
 	locks[1].delay = 4;
 	locks[1].alert = true;
 	locks[1].enableContactAlert = false;
+	locks[0].polarity = 1;
 	strcpy(locks[1].type, "lock");
 
 	for (int i=0; i < NUM_OF_LOCKS; i++) {
