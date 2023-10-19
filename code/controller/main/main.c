@@ -1,3 +1,4 @@
+#include "esp_https_ota.h"
 #include "automation.h"
 #include "services/station.c"
 #include "services/drivers/i2c.c"
@@ -16,6 +17,10 @@
 #include "services/ap.c"
 #include "services/ws_client.c"
 #include "services/utilities_server.c"
+#include "esp_http_client.h"
+
+char stored_firmware_md5[33];
+bool need_to_update_firmware = true;
 
 void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
     if (device_id && strlen(device_id) >= 5) {
@@ -29,6 +34,67 @@ void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
         snprintf(ssid, size, "ac_%s", device_id);
     }
 }
+
+void perform_ota_update(const char *ota_url) {
+    esp_http_client_config_t http_config = {
+        .url = ota_url,
+    };
+
+    esp_https_ota_config_t ota_config = {
+        .http_config = &http_config,
+    };
+
+    esp_err_t ret = esp_https_ota(&ota_config);
+    if (ret == ESP_OK) {
+        esp_restart();
+    } else {
+        ESP_LOGE(TAG, "Firmware upgrade failed");
+    }
+}
+
+esp_err_t http_event_handle(esp_http_client_event_t *evt) {
+    switch (evt->event_id) {
+        case HTTP_EVENT_ON_DATA:
+            if (strcmp((char*)evt->data, stored_firmware_md5) != 0) {
+                need_to_update_firmware = true;
+            }
+            break;
+        default:
+            break;
+    }
+    return ESP_OK;
+}
+
+void fetch_firmware_md5_from_server(char *buffer, size_t buffer_size, const char *server_ip, const char *server_port) {
+    esp_http_client_config_t http_config = {
+        .url = NULL,
+    };
+
+    char url[256];
+    snprintf(url, sizeof(url), "http://%s:%s/firmware-md5", server_ip, server_port);
+    http_config.url = url;
+
+    esp_http_client_handle_t client = esp_http_client_init(&http_config);
+    
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTPS Status = %d", esp_http_client_get_status_code(client));
+        
+        int read_len = esp_http_client_read(client, buffer, buffer_size - 1);
+        if (read_len <= 0) {
+            // Handle the error, maybe set buffer to an empty string or a known value.
+            buffer[0] = '\0';
+            ESP_LOGE(TAG, "Failed to read response or response is empty");
+        } else {
+            buffer[read_len] = '\0'; // Null-terminate the buffer
+        }
+    } else {
+        ESP_LOGE(TAG, "HTTP GET request failed: %s", esp_err_to_name(err));
+    }
+    
+    esp_http_client_cleanup(client);
+}
+
 
 void app_main(void) {
     ESP_ERROR_CHECK(esp_netif_init());
@@ -71,6 +137,21 @@ void app_main(void) {
         ap_main(ap_ssid, "pyfitech");
     } else {
         load_server_info_from_flash(server_ip, server_port);
+        char ota_url[256];
+
+        get_md5_from_flash(stored_firmware_md5, sizeof(stored_firmware_md5));
+        // Fetch the latest firmware MD5 hash from the server
+        char latest_firmware_md5[33];
+        fetch_firmware_md5_from_server(latest_firmware_md5, sizeof(latest_firmware_md5), server_ip, server_port);
+
+        snprintf(ota_url, sizeof(ota_url), "http://%s:%s/firmware.bin", server_ip, server_port);
+        // Compare the latest firmware MD5 hash with the stored one
+        bool need_to_update_firmware = strcmp(stored_firmware_md5, latest_firmware_md5) != 0;
+
+        if (need_to_update_firmware) {
+            perform_ota_update(ota_url);
+        }
+
         ws_client_main(server_ip, server_port);
 
         if (strcmp(device_id, "") == 0) {

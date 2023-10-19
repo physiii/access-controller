@@ -138,17 +138,17 @@ static void wiegand_timer (void *pvParameter)
 void handleKeyCode(struct wiegand *wg) {
 	uint8_t key[12] = {
         0b00000000, // 0
-        0b00000011, // 1
-        0b00001100, // 2
-        0b00001111, // 3
-        0b00110000, // 4
-        0b00110011, // 5
+        0b11000000, // 1
+        0b00110000, // 2
+        0b11110000, // 3
+        0b00001100, // 4
+        0b11001100, // 5
         0b00111100, // 6
-        0b00111111, // 7
-        0b11000000, // 8
+        0b11111100, // 7
+        0b00000011, // 8
         0b11000011, // 9
-        0b11001100, // *
-        0b11001111  // #
+        0b00110011, // *
+        0b11110011  // #
     };
     uint8_t incomingByte = (uint8_t) strtol(wg->incomingCode, NULL, 2);
     int keyIndex = -1;
@@ -196,27 +196,35 @@ void handleKeyCode(struct wiegand *wg) {
 static void wiegand_task(void *pvParameter) {
     gpio_event_t event;
     char codeStr[25];
-
     for (;;) {
         if(xQueueReceive(gpio_evt_queue, &event, portMAX_DELAY)) {
             struct wiegand *current_wg = &wg[event.wg_index];
             if (!current_wg->enable) continue;
 
-            if(event.gpio_num == current_wg->pin0 && event.gpio_val == 0) {
-                current_wg->incomingCodeCount++;
-                current_wg->incomingCode[current_wg->incomingCodeCount - 1] = '0';
-            } else if(event.gpio_num == current_wg->pin1 && event.gpio_val == 0) {
-                current_wg->incomingCodeCount++;
-                current_wg->incomingCode[current_wg->incomingCodeCount - 1] = '1';
+            // Initialize incomingCode with zeros if count is zero
+            if(current_wg->incomingCodeCount == 0) {
+                memset(current_wg->incomingCode, '0', 8); // initialize all 8 bits to '0'
             }
 
+            // Update the correct bit position
+            int bitPosition = 8 - current_wg->incomingCodeCount - 1;
+            if(event.gpio_num == current_wg->pin0 && event.gpio_val == 0) {
+                current_wg->incomingCode[bitPosition] = '0';
+            } else if(event.gpio_num == current_wg->pin1 && event.gpio_val == 0) {
+                current_wg->incomingCode[bitPosition] = '1';
+            }
+
+            // Increment the bit count
+            current_wg->incomingCodeCount++;
+
+            // Log keypress and handle full 8-bit code
             if(current_wg->incomingCodeCount >= 8) {
-                current_wg->incomingCode[current_wg->incomingCodeCount] = '\0';
+                current_wg->incomingCode[8] = '\0'; // Null-terminate the 8-bit code
+                printf("Keypress detected on pin of wg %d. Current code: %s\n", current_wg->channel, current_wg->incomingCode);
                 handleKeyCode(current_wg);
 
                 // Reset for the next round
-				current_wg->incomingCodeCount = 0;
-				memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
+                current_wg->incomingCodeCount = 0;
             }
         }
     }

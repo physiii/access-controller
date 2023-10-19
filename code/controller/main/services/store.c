@@ -278,3 +278,12 @@ void load_server_info_from_flash(char *server_ip, char *server_port)
         strcpy(server_port, "80");
     }
 }
+
+char* get_md5_from_flash() {
+    return get_char("firmware_md5");
+}
+
+void store_md5_to_flash(const char *md5_hash) {
+    store_char("firmware_md5", md5_hash);
+    ESP_LOGI(TAG, "Stored MD5 hash to flash: %s", md5_hash);
+}

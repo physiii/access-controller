@@ -313,7 +313,7 @@ void lock_init()
 	locks[0].delay = 4;
 	locks[0].alert = true;
 	locks[0].enableContactAlert = false;
-	locks[0].polarity = 1;
+	locks[0].polarity = 0;
 	strcpy(locks[0].type, "lock");
 
     locks[1].channel = 2;
@@ -327,7 +327,7 @@ void lock_init()
 	locks[1].delay = 4;
 	locks[1].alert = true;
 	locks[1].enableContactAlert = false;
-	locks[0].polarity = 1;
+	locks[0].polarity = 0;
 	strcpy(locks[1].type, "lock");
 
 	for (int i=0; i < NUM_OF_LOCKS; i++) {
