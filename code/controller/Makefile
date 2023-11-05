@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := ethernet_basic
+PROJECT_NAME := access-controller
 
 EXTRA_COMPONENT_DIRS = $(IDF_PATH)/examples/common_components/protocol_examples_common
 EXTRA_COMPONENT_DIRS += /home/andy/esp/esp-idf-lib/components

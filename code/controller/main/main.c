@@ -193,7 +193,7 @@ void app_main(void) {
     xTaskCreate(serverMessageTask, "serverMessageTask", 5000, NULL, 10, &serverMessageTaskHandle);
 
     int cnt = 0;
-    TaskStatus_t *pxTaskStatusArray;
+    // TaskStatus_t *pxTaskStatusArray;
     while (1) {
         // Get system information
         int64_t uptime_us = esp_timer_get_time();
@@ -216,10 +216,10 @@ void app_main(void) {
 
         // Get Task Status
         UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
-        pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t));
-        if (pxTaskStatusArray != NULL) {
-            uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, NULL);
-        }
+        // pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t));
+        // if (pxTaskStatusArray != NULL) {
+        //     uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, NULL);
+        // }
 
         // Log system status
         ESP_LOGI(TAG, "------ SYSTEM STATUS ------");
@@ -236,7 +236,7 @@ void app_main(void) {
         ESP_LOGI(TAG, "----------------------------");
 
         // Cleanup
-        vPortFree(pxTaskStatusArray);
+        // vPortFree(pxTaskStatusArray);
 
         // Delay for 10 seconds
         vTaskDelay(10 * 1000 / portTICK_PERIOD_MS);
