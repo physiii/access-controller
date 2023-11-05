@@ -171,37 +171,40 @@ void arm_lock(int channel, bool arm, bool alert) {
     }
 }
 
-int storeLockSettings()
-{
-	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-		char type[25] = "";
-		strcpy(type, locks[i].type);
+int storeLockSettings() {
+    for (uint8_t i = 0; i < NUM_OF_LOCKS; i++) {
+        sprintf(locks[i].settings,
+                "{\"eventType\":\"lock\", "
+				"\"payload\":{\"channel\":%d, \"enable\":%s, \"arm\":%s, \"enableContactAlert\":%s, \"polarity\":%s}}",
+                i + 1,
+                locks[i].enable ? "true" : "false",
+                locks[i].shouldLock ? "true" : "false",
+                locks[i].enableContactAlert ? "true" : "false",
+                locks[i].polarity ? "true" : "false");
 
-		sprintf(locks[i].settings,
-			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"arm\": %s, \"enableContactAlert\": %s}}",
-			type,
-			i+1,
-			(locks[i].enable) ? "true" : "false",
-			(locks[i].isLocked) ? "true" : "false",
-			(locks[i].enableContactAlert) ? "true" : "false");
-
-		sprintf(locks[i].key, "%s%d", type, i);
-		storeSetting(locks[i].key, cJSON_Parse(locks[i].settings));
-	}
-	return 0;
+        sprintf(locks[i].key, "lock%d", i);
+        storeSetting(locks[i].key, cJSON_Parse(locks[i].settings));
+    }
+    return 0;
 }
 
-int restoreLockSettings()
-{
-	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-		char type[25] = "";
-		strcpy(type, locks[i].type);
-		sprintf(locks[i].key, "%s%d", type, i);
-		restoreSetting(locks[i].key);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-	}
-	return 0;
+int restoreLockSettings() {
+    for (uint8_t i = 0; i < NUM_OF_LOCKS; i++) {
+        sprintf(locks[i].key, "lock%d", i);
+        cJSON *json = restoreSetting(locks[i].key);
+		printf("Lock %d key is %s\n", i+1, locks[i].key);
+        if (json) {
+			printf("Restoring lock settings for channel %d\n", i+1);
+            locks[i].enable = cJSON_GetObjectItem(json, "enable")->type == cJSON_True;
+            locks[i].shouldLock = cJSON_GetObjectItem(json, "arm")->type == cJSON_True;
+            locks[i].enableContactAlert = cJSON_GetObjectItem(json, "enableContactAlert")->type == cJSON_True;
+            locks[i].polarity = cJSON_GetObjectItem(json, "polarity")->type == cJSON_True;
+			printf("Lock %d polarity is %d\n", i+1, locks[i].polarity);
+            cJSON_Delete(json);
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    return 0;
 }
 
 int sendLockState()
@@ -247,18 +250,21 @@ void handle_lock_message(cJSON * payload) {
 	 	if (arm_item) {
 	 		val = arm_item->type == cJSON_True;
 	 		arm_lock(ch, val, true);
+			printf("Arming lock %d\n", ch);
 	 	}
 
 		if (enable_item) {
 			if (enable_item->type == cJSON_False || enable_item->type == cJSON_True) {
 				val = cJSON_IsTrue(enable_item);
 				enableLock(ch, val);
+				printf("Enabling lock %d\n", ch);
 			}
 		}
 
 		if (enableContactAlert_item) {
 	 		val = enableContactAlert_item->type == cJSON_True;
 			locks[ch - 1].enableContactAlert = val;
+			printf("Enabling contact alert for lock %d\n", ch);
 	 	}
 
 		if (polarity_item) {
