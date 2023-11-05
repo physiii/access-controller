@@ -160,9 +160,11 @@ void arm_lock(int channel, bool arm, bool alert) {
     locks[ch].alert = alert;
 	locks[ch].shouldLock = arm;
 
-	if (locks[ch].polarity == 1) arm = !arm;
+	if (locks[ch].polarity) arm = !arm;
+
     set_io(locks[ch].controlPin, arm);
     start_lock_contact_timer(&locks[ch], true);
+
     if (locks[ch].alert) {
         beep(1);
         beep_keypad(1, locks[ch].channel);
@@ -231,6 +233,7 @@ void handle_lock_message(cJSON * payload) {
 	cJSON *channel_item = cJSON_GetObjectItem(payload, "channel");
 	cJSON *enable_item = cJSON_GetObjectItem(payload, "enable");
 	cJSON *enableContactAlert_item = cJSON_GetObjectItem(payload, "enableContactAlert");
+	cJSON *polarity_item = cJSON_GetObjectItem(payload, "polarity");
 	cJSON *arm_item = cJSON_GetObjectItem(payload, "arm");
 	cJSON *property_item = cJSON_GetObjectItem(payload,"property");
 
@@ -257,6 +260,11 @@ void handle_lock_message(cJSON * payload) {
 	 		val = enableContactAlert_item->type == cJSON_True;
 			locks[ch - 1].enableContactAlert = val;
 	 	}
+
+		if (polarity_item) {
+			locks[ch - 1].polarity = polarity_item->type == cJSON_True;
+			printf("Polarity for lock %d is %d\n", ch, locks[ch - 1].polarity);
+		}
 
 		storeLockSettings();
 	}

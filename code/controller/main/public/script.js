@@ -33,6 +33,10 @@ document.getElementById('enableLock_1').onclick = function() {
 			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
 };
 
+document.getElementById('polarity_1').onclick = function() {
+	webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"polarity\": " + this.checked + "}}");
+};
+
 document.getElementById('arm_1').onclick = function() {
 			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"arm\": " + this.checked + "}}");
 };
@@ -59,6 +63,10 @@ document.getElementById('alertFob_1').onclick = function() {
 
 document.getElementById('enableLock_2').onclick = function() {
 			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
+};
+
+document.getElementById('polarity_2').onclick = function() {
+	webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"polarity\": " + this.checked + "}}");
 };
 
 document.getElementById('arm_2').onclick = function() {
