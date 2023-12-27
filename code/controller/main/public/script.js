@@ -146,6 +146,7 @@ webSocket.onmessage = function (event) {
 		if (pl.enable) document.getElementById('enableLock_' + ch).checked = pl.enable;
 		if (pl.arm) document.getElementById('arm_' + ch).checked = pl.arm;
 		if (pl.enableContactAlert) document.getElementById('enableContactAlert_' + ch).checked = pl.enableContactAlert;
+		if (pl.polarity) document.getElementById('polarity_' + ch).checked = pl.polarity;
 	}
 
 	if (state.eventType == "fob") {

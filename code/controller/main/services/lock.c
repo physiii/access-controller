@@ -191,17 +191,18 @@ int storeLockSettings() {
 int restoreLockSettings() {
     for (uint8_t i = 0; i < NUM_OF_LOCKS; i++) {
         sprintf(locks[i].key, "lock%d", i);
-        cJSON *json = restoreSetting(locks[i].key);
+        // cJSON *json = restoreSetting(locks[i].key);
+		restoreSetting(locks[i].key);
 		printf("Lock %d key is %s\n", i+1, locks[i].key);
-        if (json) {
-			printf("Restoring lock settings for channel %d\n", i+1);
-            locks[i].enable = cJSON_GetObjectItem(json, "enable")->type == cJSON_True;
-            locks[i].shouldLock = cJSON_GetObjectItem(json, "arm")->type == cJSON_True;
-            locks[i].enableContactAlert = cJSON_GetObjectItem(json, "enableContactAlert")->type == cJSON_True;
-            locks[i].polarity = cJSON_GetObjectItem(json, "polarity")->type == cJSON_True;
-			printf("Lock %d polarity is %d\n", i+1, locks[i].polarity);
-            cJSON_Delete(json);
-        }
+        // if (json) {
+		// 	printf("Restoring lock settings for channel %d\n", i+1);
+        //     locks[i].enable = cJSON_GetObjectItem(json, "enable")->type == cJSON_True;
+        //     locks[i].shouldLock = cJSON_GetObjectItem(json, "arm")->type == cJSON_True;
+        //     locks[i].enableContactAlert = cJSON_GetObjectItem(json, "enableContactAlert")->type == cJSON_True;
+        //     locks[i].polarity = cJSON_GetObjectItem(json, "polarity")->type == cJSON_True;
+		// 	printf("Lock %d polarity is %d\n", i+1, locks[i].polarity);
+        //     cJSON_Delete(json);
+        // }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     return 0;
@@ -214,11 +215,12 @@ int sendLockState()
 		strcpy(type, locks[i].type);
 		sprintf(locks[i].settings,
 			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"arm\": %s, \"enableContactAlert\": %s}}",
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"arm\": %s, \"polarity\": %s, \"enableContactAlert\": %s}}",
 			type,
 			i+1,
 			(locks[i].enable) ? "true" : "false",
 			(locks[i].isLocked) ? "true" : "false",
+			(locks[i].polarity) ? "true" : "false",
 			(locks[i].enableContactAlert) ? "true" : "false");
 
 		addClientMessageToQueue(locks[i].settings);
