@@ -2,7 +2,7 @@
 <export version="E">
   <design>
     <source>/home/andy/devices/access-controller/circuits/controller/access-controller.kicad_sch</source>
-    <date>Wed 27 Dec 2023 07:28:51 AM CST</date>
+    <date>Thu 28 Dec 2023 07:42:33 AM CST</date>
     <tool>Eeschema 7.0.9-7.0.9~ubuntu23.04.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -1055,7 +1055,7 @@
       <property name="ki_description" value="Quad DC Optocoupler, Vce 80V, CTR 50-100%, SOP16"/>
       <property name="ki_keywords" value="NPN DC Quad Optocoupler"/>
       <sheetpath names="/Push / Motion/" tstamps="/00000000-0000-0000-0000-00005ffe7b4a/"/>
-      <tstamps>00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
+      <tstamps>00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
     </comp>
     <comp ref="C9">
       <value>1uF</value>
@@ -1774,7 +1774,7 @@
       <property name="ki_description" value="Quad DC Optocoupler, Vce 80V, CTR 50-100%, SOP16"/>
       <property name="ki_keywords" value="NPN DC Quad Optocoupler"/>
       <sheetpath names="/Keypad / FOB/" tstamps="/00000000-0000-0000-0000-0000601a4f03/"/>
-      <tstamps>00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
+      <tstamps>00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
     </comp>
     <comp ref="R45">
       <value>R_1K</value>
@@ -1920,7 +1920,7 @@
       <property name="ki_description" value="Quad DC Optocoupler, Vce 80V, CTR 50-100%, SOP16"/>
       <property name="ki_keywords" value="NPN DC Quad Optocoupler"/>
       <sheetpath names="/Lock / Aux/" tstamps="/00000000-0000-0000-0000-00006021992a/"/>
-      <tstamps>00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
+      <tstamps>00000000-0000-0000-0000-00005fddc69b 00000000-0000-0000-0000-00005fddc6a1 00000000-0000-0000-0000-00005fddc695 00000000-0000-0000-0000-00005fddc68f</tstamps>
     </comp>
     <comp ref="D14">
       <value>Red</value>
