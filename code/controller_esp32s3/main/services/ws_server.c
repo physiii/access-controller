@@ -1,3 +1,4 @@
+// ws_server.c
 #include <esp_event.h>
 #include <esp_log.h>
 #include <esp_system.h>
@@ -6,6 +7,9 @@
 #include "protocol_examples_common.h"
 
 #include <esp_http_server.h>
+
+#define CONFIG_ESP_WIFI_CHANNEL 1 // Set your desired channel
+#define CONFIG_ESP_MAX_STA_CONN 4 // Set your desired max STA connections
 
 bool should_send_data = 0; // wait for data to be received so hd an fd can be initialized
 

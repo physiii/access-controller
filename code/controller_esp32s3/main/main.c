@@ -1,18 +1,12 @@
+// main.c
 #include "esp_https_ota.h"
 #include "automation.h"
 #include "services/station.c"
 #include "services/drivers/i2c.c"
-#include "services/drivers/mcp23x17.c"
 #include "services/gpio.c"
 #include "services/store.c"
 #include "services/authorize.c"
-#include "services/buzzer.c"
-#include "services/lock.c"
-#include "services/wiegand.c"
-#include "services/exit.c"
-#include "services/radar.c"
-#include "services/keypad.c"
-#include "services/fob.c"
+
 #include "services/server.c"
 #include "services/ap.c"
 #include "services/ws_client.c"
@@ -164,19 +158,19 @@ void app_main(void) {
 
     gpio_main();
     i2c_main();
-    mcp23x17_main();
+    // mcp23x17_main();
     auth_main();
-    lock_main();
-    buzzer_main();
-    wiegand_main();
+    // hvac_main();
+    // buzzer_main();
+    // wiegand_main();
+    // exit_main();
+    // keypad_main();
 
-    exit_main();
-    keypad_main();
-    #if STRIKE
-        radar_main();
-    #else
-        fob_main();
-    #endif
+    // #if STRIKE
+    //     radar_main();
+    // #else
+    //     fob_main();
+    // #endif
     server_main();
 
     if (initialize_spiffs() == ESP_OK) {
