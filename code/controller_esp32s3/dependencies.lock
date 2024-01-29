@@ -10,6 +10,6 @@ dependencies:
       path: /home/andy/esp/esp-idf/examples/common_components/protocol_examples_common
       type: local
     version: '*'
-manifest_hash: 8c83649e56fd38fc62afa1a9660affc715779be90c55616329589b09fcac7ec6
-target: esp32
+manifest_hash: dff748b1aa0128938b6e6834a68ca87ce80d4bf26176f99b24323c1a720520a7
+target: esp32s3
 version: 1.0.0
