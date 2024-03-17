@@ -2,14 +2,12 @@
 #define LOCK_MCP_IO_2       B0
 #define NUM_OF_LOCKS        2
 
-const uint8_t LOCK_CONTACT_PIN_1 = A1;
-const uint8_t LOCK_CONTACT_PIN_2 = B2;
 
 const uint8_t LOCK_SIGNAL_PIN_1 = B1;
 const uint8_t LOCK_SIGNAL_PIN_2 = A2;
 
-// const uint8_t LOCK_CONTACT_PIN_1 = B1;
-// const uint8_t LOCK_CONTACT_PIN_2 = B1;
+const uint8_t LOCK_CONTACT_PIN_1 = A1;
+const uint8_t LOCK_CONTACT_PIN_2 = B2;
 
 bool ARM = false;
 bool ALERT = true;
@@ -167,7 +165,7 @@ void arm_lock(int channel, bool arm, bool alert) {
 
     if (locks[ch].alert) {
         beep(1);
-        beep_keypad(1, locks[ch].channel);
+        // beep_keypad(1, locks[ch].channel);
     }
 }
 
@@ -351,6 +349,13 @@ void lock_init()
 			set_mcp_io_dir(locks[i].controlPin, MCP_OUTPUT);
 			set_mcp_io_dir(locks[i].contactPin, MCP_INPUT);
 			set_mcp_io_dir(locks[i].signalPin, MCP_INPUT);
+		}
+	}
+
+	for (int i=0; i < NUM_OF_LOCKS; i++) {
+		if (USE_MCP23017) {
+			set_io(OPEN_IO_1, false);
+			set_io(OPEN_IO_2, false);
 		}
 	}
 }

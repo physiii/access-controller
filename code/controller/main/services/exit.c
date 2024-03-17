@@ -1,6 +1,6 @@
-#define EXIT_BUTTON_MCP_IO_1         A3
-#define EXIT_BUTTON_MCP_IO_2         B3
-#define NUM_OF_EXITS						 2
+#define EXIT_BUTTON_MCP_IO_1         A5
+#define EXIT_BUTTON_MCP_IO_2         B5
+#define NUM_OF_EXITS				 2
 
 char exit_service_message[2000];
 bool exit_service_message_ready = false;

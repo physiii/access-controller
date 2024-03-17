@@ -1,6 +1,6 @@
-#define KEYPAD_MCP_IO_1         A6
-#define KEYPAD_MCP_IO_2         B6
-#define NUM_OF_KEYPADS			    2
+#define KEYPAD_MCP_IO_1         A3
+#define KEYPAD_MCP_IO_2         B3
+#define NUM_OF_KEYPADS		    2
 
 char keypad_service_message[2000];
 bool keypad_service_message_ready = false;
@@ -139,6 +139,7 @@ void check_keypads (struct keypadButton *pad)
 
 	if (pad->isPressed && !pad->prevPress) {
 		printf("Disarming lock from pad %d service. Alert %d\n", pad->channel, pad->alert);
+		// beep_keypad(1, pad->channel);
 		arm_lock(pad->channel, false, pad->alert);
 		start_keypad_timer(pad, true);
 	}

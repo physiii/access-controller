@@ -1,3 +1,5 @@
+// main.c
+
 #include "esp_https_ota.h"
 #include "automation.h"
 #include "services/station.c"
@@ -166,17 +168,11 @@ void app_main(void) {
     i2c_main();
     mcp23x17_main();
     auth_main();
-    lock_main();
     buzzer_main();
     wiegand_main();
-
     exit_main();
+    lock_main();
     keypad_main();
-    #if STRIKE
-        radar_main();
-    #else
-        fob_main();
-    #endif
     server_main();
 
     if (initialize_spiffs() == ESP_OK) {
