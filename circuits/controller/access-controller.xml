@@ -2,7 +2,7 @@
 <export version="E">
   <design>
     <source>/home/andy/devices/access-controller/circuits/controller/access-controller.kicad_sch</source>
-    <date>Thu 28 Dec 2023 07:42:33 AM CST</date>
+    <date>Mon 25 Mar 2024 09:00:18 AM CDT</date>
     <tool>Eeschema 7.0.9-7.0.9~ubuntu23.04.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -222,6 +222,329 @@
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-000061d3aaf5</tstamps>
     </comp>
+    <comp ref="D2">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>8d5c68f7-eece-4f43-a6f9-e6f37fc04ead</tstamps>
+    </comp>
+    <comp ref="D13">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>ae9fbe6a-8744-44a6-b9fd-a575061e524b</tstamps>
+    </comp>
+    <comp ref="D18">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>20fa2150-dce2-4882-964d-e0fa390ce03f</tstamps>
+    </comp>
+    <comp ref="D19">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f9fbc8ff-3972-4d4a-902f-9b01247bfafc</tstamps>
+    </comp>
+    <comp ref="D20">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>164c793d-b4d9-4660-b0a3-a95c13777e40</tstamps>
+    </comp>
+    <comp ref="D21">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>edc93615-e058-4fbd-ad4a-f27350b323bc</tstamps>
+    </comp>
+    <comp ref="D22">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>5be58c65-bad4-429d-a62d-dd644bc4eddb</tstamps>
+    </comp>
+    <comp ref="D23">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>cff93ca4-df68-4889-8507-40ec3d111c1f</tstamps>
+    </comp>
+    <comp ref="D24">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>fcd52a18-d415-440f-b0fe-c5a23c189aa4</tstamps>
+    </comp>
+    <comp ref="D25">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>a2bc4ae6-b69a-4de2-8371-1927013ad3fb</tstamps>
+    </comp>
+    <comp ref="D26">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2916b902-b2df-4dd5-a82f-d2d408f997e4</tstamps>
+    </comp>
+    <comp ref="D27">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b5254c2b-363a-4041-9286-de72446afad6</tstamps>
+    </comp>
+    <comp ref="D28">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>fa357b6c-8df6-4fd8-aec3-d656884722b5</tstamps>
+    </comp>
+    <comp ref="D29">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>4f923d37-7555-4213-8719-d687b74eb44f</tstamps>
+    </comp>
+    <comp ref="D30">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>efae6f50-6c90-4f06-859a-072fdda3ee58</tstamps>
+    </comp>
+    <comp ref="D31">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e562d5f6-aae3-4509-95a9-9fd5ae8a5882</tstamps>
+    </comp>
+    <comp ref="D32">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>6985a57f-7d32-481b-adba-9b0a235602dc</tstamps>
+    </comp>
+    <comp ref="D33">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>61427815-9489-406c-a9a3-da1ea3afc526</tstamps>
+    </comp>
+    <comp ref="D34">
+      <value>White</value>
+      <footprint>LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
+      <datasheet>https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0603W/C2290</datasheet>
+      <fields>
+        <field name="LCSC">C2290</field>
+        <field name="Part Number">KT-0603W</field>
+      </fields>
+      <libsource lib="open_automation" part="LED-0603-W" description="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <property name="Part Number" value="KT-0603W"/>
+      <property name="LCSC" value="C2290"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <property name="ki_description" value="White 0603 Light Emitting Diodes (LED) ROHS&#xA;"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3069353f-7642-4b1f-befd-b4074f7c8d12</tstamps>
+    </comp>
     <comp ref="J1">
       <value>Conn_01x01_Female</value>
       <footprint>Open_Automation:Mount_Hole</footprint>
@@ -408,10 +731,16 @@
     <comp ref="J13">
       <value>Conn_02x06_Odd_Even</value>
       <footprint>Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD</footprint>
-      <libsource lib="Connector_Generic" part="Conn_02x06_Odd_Even" description="Generic connector, double row, 02x06, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <fields>
+        <field name="LCSC">C2884015</field>
+        <field name="Part Number">X6521WVS-2x06H-C60D74</field>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_02x06_Odd_Even" description="Gold 250V 3A Brick nogging Square Pins 2.5mm 12P 260℃ 6mm -40℃~+105℃ 2.54mm 双排 Black Brass 2x6P SMD,P=2.54mm,Surface Mount，Right Angle Pin Headers ROHS&#xA;"/>
+      <property name="Part Number" value="X6521WVS-2x06H-C60D74"/>
+      <property name="LCSC" value="C2884015"/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="access-controller.kicad_sch"/>
-      <property name="ki_description" value="Generic connector, double row, 02x06, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="ki_description" value="Gold 250V 3A Brick nogging Square Pins 2.5mm 12P 260℃ 6mm -40℃~+105℃ 2.54mm 双排 Black Brass 2x6P SMD,P=2.54mm,Surface Mount，Right Angle Pin Headers ROHS&#xA;"/>
       <property name="ki_keywords" value="connector"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000621f037f</tstamps>
@@ -556,6 +885,86 @@
       <sheetpath names="/" tstamps="/"/>
       <tstamps>487e41fd-e3b7-4573-9890-85d1245e5a58</tstamps>
     </comp>
+    <comp ref="R1">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>550b2368-e09f-41eb-a359-569ca15bf1c5</tstamps>
+    </comp>
+    <comp ref="R2">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>587b789d-1603-4da7-82ec-1d22e4a3f436</tstamps>
+    </comp>
+    <comp ref="R3">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>614e81e6-c10e-4b86-bcb4-1457d533d123</tstamps>
+    </comp>
+    <comp ref="R4">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>023377ae-7508-457c-a1f4-207d318f568b</tstamps>
+    </comp>
+    <comp ref="R5">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>ed3d44be-ed80-4004-8eed-34067c1d6ec6</tstamps>
+    </comp>
     <comp ref="R31">
       <value>R_100</value>
       <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
@@ -572,6 +981,230 @@
       <property name="ki_description" value="CHIP RESISTOR - SURFACE MOUNT 100OHMS ±1% 1/16W 0402 ROHS"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>a109b3e9-3af9-4e44-84fa-27480bb63f40</tstamps>
+    </comp>
+    <comp ref="R32">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>9eb35121-3e78-461b-b4ea-78d9b67b9851</tstamps>
+    </comp>
+    <comp ref="R33">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>342a3173-82bc-4905-9cd1-bcf8bec0ce6b</tstamps>
+    </comp>
+    <comp ref="R34">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>0a1d6e48-4768-4ea8-a005-2edadf5cc84d</tstamps>
+    </comp>
+    <comp ref="R35">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>dba651c3-a2c1-48fe-a412-eb3dea7c36dd</tstamps>
+    </comp>
+    <comp ref="R36">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>babcc399-22cd-4e7f-912d-aaf5127e3300</tstamps>
+    </comp>
+    <comp ref="R74">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2042939d-5207-4c3d-9213-06675063ba69</tstamps>
+    </comp>
+    <comp ref="R75">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>da1eb780-3361-4477-aa26-f3ea9feb8f3f</tstamps>
+    </comp>
+    <comp ref="R76">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c44cc9e0-17e9-4764-9fc6-7c6bd37bec8c</tstamps>
+    </comp>
+    <comp ref="R77">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f800535f-d9a2-4245-bcd4-96c766327689</tstamps>
+    </comp>
+    <comp ref="R78">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>62402662-73b4-4c4d-846c-cc6dde98ee4e</tstamps>
+    </comp>
+    <comp ref="R79">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>6138b54a-8807-4732-9cec-efeb706b04e2</tstamps>
+    </comp>
+    <comp ref="R80">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>75da3a6b-4896-4ad8-a962-8368f3cc49c4</tstamps>
+    </comp>
+    <comp ref="R81">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>bad9a121-3bff-4792-8f96-0d5e91df46c9</tstamps>
+    </comp>
+    <comp ref="R82">
+      <value>10K</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder</footprint>
+      <datasheet>https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0402WGF1002TCE_C25744.pdf</datasheet>
+      <fields>
+        <field name="LCSC">C25744</field>
+        <field name="Part Number">0402WGF1002TCE</field>
+      </fields>
+      <libsource lib="" part="R_10K_0402_3" description=""/>
+      <property name="Part Number" value="0402WGF1002TCE"/>
+      <property name="LCSC" value="C25744"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="access-controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>25b22138-53cf-4de0-9e96-3f0aa868fb7a</tstamps>
     </comp>
     <comp ref="U1">
       <value>MCP23017_SS</value>
@@ -2803,15 +3436,19 @@
       </pins>
     </libpart>
     <libpart lib="Connector_Generic" part="Conn_02x06_Odd_Even">
-      <description>Generic connector, double row, 02x06, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <description>Gold 250V 3A Brick nogging Square Pins 2.5mm 12P 260℃ 6mm -40℃~+105℃ 2.54mm 双排 Black Brass 2x6P SMD,P=2.54mm,Surface Mount，Right Angle Pin Headers ROHS
+</description>
       <docs>~</docs>
       <footprints>
         <fp>Connector*:*_2x??_*</fp>
       </footprints>
       <fields>
-        <field name="Reference">J</field>
+        <field name="Reference">J13</field>
         <field name="Value">Conn_02x06_Odd_Even</field>
+        <field name="Footprint">Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD</field>
         <field name="Datasheet">~</field>
+        <field name="Part Number">X6521WVS-2x06H-C60D74</field>
+        <field name="LCSC">C2884015</field>
       </fields>
       <pins>
         <pin num="1" name="Pin_1" type="passive"/>
@@ -4026,6 +4663,7 @@
       <node ref="J13" pin="7" pinfunction="Pin_7" pintype="passive"/>
     </net>
     <net code="6" name="/EXIT0">
+      <node ref="D20" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J8" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R13" pin="2" pintype="passive"/>
     </net>
@@ -4035,6 +4673,7 @@
       <node ref="U5" pin="14" pintype="passive"/>
     </net>
     <net code="8" name="/EXIT1">
+      <node ref="D13" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J15" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R38" pin="2" pintype="passive"/>
     </net>
@@ -4060,6 +4699,7 @@
       <node ref="U12" pin="2" pinfunction="TXP" pintype="output"/>
     </net>
     <net code="14" name="/FOB0">
+      <node ref="D28" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J10" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R15" pin="2" pintype="passive"/>
     </net>
@@ -4069,6 +4709,7 @@
       <node ref="U5" pin="10" pintype="passive"/>
     </net>
     <net code="16" name="/FOB1">
+      <node ref="D22" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J17" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R40" pin="2" pintype="passive"/>
     </net>
@@ -4084,6 +4725,7 @@
       <node ref="U1" pin="20" pinfunction="INTA" pintype="tri_state"/>
     </net>
     <net code="20" name="/KEYPAD0">
+      <node ref="D18" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J7" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R12" pin="2" pintype="passive"/>
     </net>
@@ -4093,6 +4735,7 @@
       <node ref="U5" pin="16" pintype="passive"/>
     </net>
     <net code="22" name="/KEYPAD1">
+      <node ref="D19" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J14" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R37" pin="2" pintype="passive"/>
     </net>
@@ -4102,6 +4745,7 @@
       <node ref="U9" pin="16" pintype="passive"/>
     </net>
     <net code="24" name="/LOCK0_CLOSE">
+      <node ref="D34" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J11" pin="4" pinfunction="Pin_4" pintype="passive"/>
       <node ref="R46" pin="2" pintype="passive"/>
     </net>
@@ -4117,6 +4761,7 @@
     <net code="27" name="/LOCK0_OUT">
       <node ref="J11" pin="2" pinfunction="Pin_2" pintype="passive"/>
       <node ref="Q8" pin="3" pinfunction="D" pintype="passive"/>
+      <node ref="R80" pin="1" pintype="passive"/>
     </net>
     <net code="28" name="/LOCK0_SENSE">
       <node ref="R49" pin="2" pintype="passive"/>
@@ -4124,10 +4769,12 @@
       <node ref="U10" pin="16" pintype="passive"/>
     </net>
     <net code="29" name="/LOCK0_STATE">
+      <node ref="D33" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J11" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R45" pin="2" pintype="passive"/>
     </net>
     <net code="30" name="/LOCK1_CLOSE">
+      <node ref="D31" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J18" pin="4" pinfunction="Pin_4" pintype="passive"/>
       <node ref="R48" pin="2" pintype="passive"/>
     </net>
@@ -4143,6 +4790,7 @@
     <net code="33" name="/LOCK1_OUT">
       <node ref="J18" pin="2" pinfunction="Pin_2" pintype="passive"/>
       <node ref="Q9" pin="3" pinfunction="D" pintype="passive"/>
+      <node ref="R34" pin="1" pintype="passive"/>
     </net>
     <net code="34" name="/LOCK1_SENSE">
       <node ref="R51" pin="2" pintype="passive"/>
@@ -4150,6 +4798,7 @@
       <node ref="U10" pin="12" pintype="passive"/>
     </net>
     <net code="35" name="/LOCK1_STATE">
+      <node ref="D25" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J18" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R47" pin="2" pintype="passive"/>
     </net>
@@ -4162,6 +4811,7 @@
       <node ref="U7" pin="19" pinfunction="GPIO11/TOUCH11/ADC2_CH0/FSPID/FSPIIO5/SUBSPID" pintype="bidirectional"/>
     </net>
     <net code="38" name="/MOTION0">
+      <node ref="D27" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J9" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R14" pin="2" pintype="passive"/>
     </net>
@@ -4171,6 +4821,7 @@
       <node ref="U5" pin="12" pintype="passive"/>
     </net>
     <net code="40" name="/MOTION1">
+      <node ref="D21" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J16" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R39" pin="2" pintype="passive"/>
     </net>
@@ -4307,10 +4958,12 @@
     </net>
     <net code="76" name="/POWER">
       <node ref="C1" pin="1" pintype="passive"/>
-      <node ref="C16" pin="1" pintype="passive"/>
       <node ref="C2" pin="1" pintype="passive"/>
       <node ref="C5" pin="1" pintype="passive"/>
       <node ref="D1" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="D2" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="D23" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="D32" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J11" pin="1" pinfunction="Pin_1" pintype="passive"/>
       <node ref="J13" pin="2" pinfunction="Pin_2" pintype="passive"/>
       <node ref="J18" pin="1" pinfunction="Pin_1" pintype="passive"/>
@@ -4321,8 +4974,6 @@
       <node ref="R68" pin="2" pintype="passive"/>
       <node ref="U4" pin="1" pinfunction="EN" pintype="input"/>
       <node ref="U4" pin="2" pinfunction="IN" pintype="input"/>
-      <node ref="U8" pin="4" pinfunction="EN" pintype="input"/>
-      <node ref="U8" pin="5" pinfunction="VIN" pintype="power_in"/>
     </net>
     <net code="77" name="/PROG">
       <node ref="J13" pin="9" pinfunction="Pin_9" pintype="passive"/>
@@ -4346,6 +4997,7 @@
       <node ref="U1" pin="5" pinfunction="GPB4" pintype="bidirectional"/>
     </net>
     <net code="83" name="/REG_POWER">
+      <node ref="C16" pin="1" pintype="passive"/>
       <node ref="C8" pin="1" pintype="passive"/>
       <node ref="D4" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J10" pin="1" pinfunction="Pin_1" pintype="passive"/>
@@ -4363,6 +5015,8 @@
       <node ref="R56" pin="2" pintype="passive"/>
       <node ref="R9" pin="1" pintype="passive"/>
       <node ref="U4" pin="4" pinfunction="Output" pintype="power_out"/>
+      <node ref="U8" pin="4" pinfunction="EN" pintype="input"/>
+      <node ref="U8" pin="5" pinfunction="VIN" pintype="power_in"/>
     </net>
     <net code="84" name="/RXD">
       <node ref="J13" pin="8" pinfunction="Pin_8" pintype="passive"/>
@@ -4385,10 +5039,12 @@
       <node ref="J13" pin="10" pinfunction="Pin_10" pintype="passive"/>
     </net>
     <net code="89" name="/WG0_DATA0">
+      <node ref="D26" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J12" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R57" pin="2" pintype="passive"/>
     </net>
     <net code="90" name="/WG0_DATA1">
+      <node ref="D30" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J12" pin="4" pinfunction="Pin_4" pintype="passive"/>
       <node ref="R60" pin="2" pintype="passive"/>
     </net>
@@ -4401,10 +5057,12 @@
       <node ref="R61" pin="1" pintype="passive"/>
     </net>
     <net code="93" name="/WG1_DATA0">
+      <node ref="D24" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J19" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="R65" pin="2" pintype="passive"/>
     </net>
     <net code="94" name="/WG1_DATA1">
+      <node ref="D29" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J19" pin="4" pinfunction="Pin_4" pintype="passive"/>
       <node ref="R62" pin="2" pintype="passive"/>
     </net>
@@ -4478,16 +5136,33 @@
       <node ref="Q7" pin="2" pinfunction="E" pintype="passive"/>
       <node ref="Q8" pin="2" pinfunction="S" pintype="passive"/>
       <node ref="Q9" pin="2" pinfunction="S" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
       <node ref="R10" pin="2" pintype="passive"/>
       <node ref="R11" pin="1" pintype="passive"/>
+      <node ref="R2" pin="1" pintype="passive"/>
       <node ref="R26" pin="1" pintype="passive"/>
       <node ref="R28" pin="2" pintype="passive"/>
+      <node ref="R3" pin="1" pintype="passive"/>
+      <node ref="R32" pin="1" pintype="passive"/>
+      <node ref="R33" pin="1" pintype="passive"/>
+      <node ref="R35" pin="1" pintype="passive"/>
+      <node ref="R36" pin="1" pintype="passive"/>
+      <node ref="R4" pin="1" pintype="passive"/>
+      <node ref="R5" pin="1" pintype="passive"/>
       <node ref="R7" pin="2" pintype="passive"/>
       <node ref="R70" pin="2" pintype="passive"/>
       <node ref="R71" pin="2" pintype="passive"/>
       <node ref="R72" pin="2" pintype="passive"/>
       <node ref="R73" pin="2" pintype="passive"/>
+      <node ref="R74" pin="1" pintype="passive"/>
+      <node ref="R75" pin="1" pintype="passive"/>
+      <node ref="R76" pin="1" pintype="passive"/>
+      <node ref="R77" pin="1" pintype="passive"/>
+      <node ref="R78" pin="1" pintype="passive"/>
+      <node ref="R79" pin="1" pintype="passive"/>
       <node ref="R8" pin="1" pintype="passive"/>
+      <node ref="R81" pin="1" pintype="passive"/>
+      <node ref="R82" pin="1" pintype="passive"/>
       <node ref="U1" pin="10" pinfunction="VSS" pintype="power_in"/>
       <node ref="U1" pin="15" pinfunction="A0" pintype="input"/>
       <node ref="U1" pin="16" pinfunction="A1" pintype="input"/>
@@ -4540,299 +5215,375 @@
       <node ref="U9" pin="8" pintype="passive"/>
       <node ref="U9" pin="9" pintype="passive"/>
     </net>
-    <net code="98" name="Net-(D3-K)">
+    <net code="98" name="Net-(D2-K)">
+      <node ref="D2" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+    </net>
+    <net code="99" name="Net-(D3-K)">
       <node ref="D3" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R8" pin="2" pintype="passive"/>
     </net>
-    <net code="99" name="Net-(D4-K)">
+    <net code="100" name="Net-(D4-K)">
       <node ref="D4" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R11" pin="2" pintype="passive"/>
     </net>
-    <net code="100" name="Net-(D8-A)">
+    <net code="101" name="Net-(D8-A)">
       <node ref="D8" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J20" pin="1" pinfunction="VBUS" pintype="power_out"/>
     </net>
-    <net code="101" name="Net-(D10-A)">
+    <net code="102" name="Net-(D10-A)">
       <node ref="D10" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="J21" pin="1" pinfunction="VBUS" pintype="power_out"/>
     </net>
-    <net code="102" name="Net-(D14-A)">
+    <net code="103" name="Net-(D13-K)">
+      <node ref="D13" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+    </net>
+    <net code="104" name="Net-(D14-A)">
       <node ref="D14" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="U12" pin="24" pinfunction="SPDLED" pintype="output"/>
     </net>
-    <net code="103" name="Net-(D14-K)">
+    <net code="105" name="Net-(D14-K)">
       <node ref="D14" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R70" pin="1" pintype="passive"/>
     </net>
-    <net code="104" name="Net-(D15-A)">
+    <net code="106" name="Net-(D15-A)">
       <node ref="D15" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="U12" pin="25" pinfunction="LINKLED" pintype="output"/>
     </net>
-    <net code="105" name="Net-(D15-K)">
+    <net code="107" name="Net-(D15-K)">
       <node ref="D15" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R71" pin="1" pintype="passive"/>
     </net>
-    <net code="106" name="Net-(D16-A)">
+    <net code="108" name="Net-(D16-A)">
       <node ref="D16" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="U12" pin="26" pinfunction="DUPLED" pintype="output"/>
     </net>
-    <net code="107" name="Net-(D16-K)">
+    <net code="109" name="Net-(D16-K)">
       <node ref="D16" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R72" pin="1" pintype="passive"/>
     </net>
-    <net code="108" name="Net-(D17-A)">
+    <net code="110" name="Net-(D17-A)">
       <node ref="D17" pin="2" pinfunction="A" pintype="passive"/>
       <node ref="U12" pin="27" pinfunction="ACTLED" pintype="output"/>
     </net>
-    <net code="109" name="Net-(D17-K)">
+    <net code="111" name="Net-(D17-K)">
       <node ref="D17" pin="1" pinfunction="K" pintype="passive"/>
       <node ref="R73" pin="1" pintype="passive"/>
     </net>
-    <net code="110" name="Net-(J23-Pad10)">
+    <net code="112" name="Net-(D18-K)">
+      <node ref="D18" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R3" pin="2" pintype="passive"/>
+    </net>
+    <net code="113" name="Net-(D19-K)">
+      <node ref="D19" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R4" pin="2" pintype="passive"/>
+    </net>
+    <net code="114" name="Net-(D20-K)">
+      <node ref="D20" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R5" pin="2" pintype="passive"/>
+    </net>
+    <net code="115" name="Net-(D21-K)">
+      <node ref="D21" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R32" pin="2" pintype="passive"/>
+    </net>
+    <net code="116" name="Net-(D22-K)">
+      <node ref="D22" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R33" pin="2" pintype="passive"/>
+    </net>
+    <net code="117" name="Net-(D23-K)">
+      <node ref="D23" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R34" pin="2" pintype="passive"/>
+    </net>
+    <net code="118" name="Net-(D24-K)">
+      <node ref="D24" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R35" pin="2" pintype="passive"/>
+    </net>
+    <net code="119" name="Net-(D25-K)">
+      <node ref="D25" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R36" pin="2" pintype="passive"/>
+    </net>
+    <net code="120" name="Net-(D26-K)">
+      <node ref="D26" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R74" pin="2" pintype="passive"/>
+    </net>
+    <net code="121" name="Net-(D27-K)">
+      <node ref="D27" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R75" pin="2" pintype="passive"/>
+    </net>
+    <net code="122" name="Net-(D28-K)">
+      <node ref="D28" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R76" pin="2" pintype="passive"/>
+    </net>
+    <net code="123" name="Net-(D29-K)">
+      <node ref="D29" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R77" pin="2" pintype="passive"/>
+    </net>
+    <net code="124" name="Net-(D30-K)">
+      <node ref="D30" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R78" pin="2" pintype="passive"/>
+    </net>
+    <net code="125" name="Net-(D31-K)">
+      <node ref="D31" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R79" pin="2" pintype="passive"/>
+    </net>
+    <net code="126" name="Net-(D32-K)">
+      <node ref="D32" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R80" pin="2" pintype="passive"/>
+    </net>
+    <net code="127" name="Net-(D33-K)">
+      <node ref="D33" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R81" pin="2" pintype="passive"/>
+    </net>
+    <net code="128" name="Net-(D34-K)">
+      <node ref="D34" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R82" pin="2" pintype="passive"/>
+    </net>
+    <net code="129" name="Net-(J23-Pad10)">
       <node ref="J23" pin="10" pintype="passive"/>
       <node ref="R68" pin="1" pintype="passive"/>
     </net>
-    <net code="111" name="Net-(J23-Pad12)">
+    <net code="130" name="Net-(J23-Pad12)">
       <node ref="J23" pin="12" pintype="passive"/>
       <node ref="R67" pin="1" pintype="passive"/>
     </net>
-    <net code="112" name="Net-(Q1-B)">
+    <net code="131" name="Net-(Q1-B)">
       <node ref="Q1" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R29" pin="2" pintype="passive"/>
     </net>
-    <net code="113" name="Net-(Q2-B)">
+    <net code="132" name="Net-(Q2-B)">
       <node ref="Q2" pin="1" pinfunction="B" pintype="input"/>
       <node ref="R30" pin="2" pintype="passive"/>
     </net>
-    <net code="114" name="Net-(Q3-B)">
+    <net code="133" name="Net-(Q3-B)">
       <node ref="Q3" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R31" pin="2" pintype="passive"/>
     </net>
-    <net code="115" name="Net-(Q3-C)">
+    <net code="134" name="Net-(Q3-C)">
       <node ref="LS1" pin="2" pinfunction="2" pintype="input"/>
       <node ref="Q3" pin="3" pinfunction="C" pintype="passive"/>
     </net>
-    <net code="116" name="Net-(Q6-B)">
+    <net code="135" name="Net-(Q6-B)">
       <node ref="Q6" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R53" pin="1" pintype="passive"/>
     </net>
-    <net code="117" name="Net-(Q6-C)">
+    <net code="136" name="Net-(Q6-C)">
       <node ref="Q6" pin="3" pinfunction="C" pintype="passive"/>
       <node ref="Q8" pin="1" pinfunction="G" pintype="input"/>
       <node ref="R56" pin="1" pintype="passive"/>
     </net>
-    <net code="118" name="Net-(Q7-B)">
+    <net code="137" name="Net-(Q7-B)">
       <node ref="Q7" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R54" pin="1" pintype="passive"/>
     </net>
-    <net code="119" name="Net-(Q7-C)">
+    <net code="138" name="Net-(Q7-C)">
       <node ref="Q7" pin="3" pinfunction="C" pintype="passive"/>
       <node ref="Q9" pin="1" pinfunction="G" pintype="input"/>
       <node ref="R55" pin="1" pintype="passive"/>
     </net>
-    <net code="120" name="Net-(Q10-B)">
+    <net code="139" name="Net-(Q10-B)">
       <node ref="Q10" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R57" pin="1" pintype="passive"/>
     </net>
-    <net code="121" name="Net-(Q11-B)">
+    <net code="140" name="Net-(Q11-B)">
       <node ref="Q11" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R59" pin="2" pintype="passive"/>
     </net>
-    <net code="122" name="Net-(Q12-B)">
+    <net code="141" name="Net-(Q12-B)">
       <node ref="Q12" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R60" pin="1" pintype="passive"/>
     </net>
-    <net code="123" name="Net-(Q13-B)">
+    <net code="142" name="Net-(Q13-B)">
       <node ref="Q13" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R62" pin="1" pintype="passive"/>
     </net>
-    <net code="124" name="Net-(Q14-B)">
+    <net code="143" name="Net-(Q14-B)">
       <node ref="Q14" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R63" pin="2" pintype="passive"/>
     </net>
-    <net code="125" name="Net-(Q15-B)">
+    <net code="144" name="Net-(Q15-B)">
       <node ref="Q15" pin="1" pinfunction="B" pintype="passive"/>
       <node ref="R65" pin="1" pintype="passive"/>
     </net>
-    <net code="126" name="Net-(R12-Pad1)">
+    <net code="145" name="Net-(R12-Pad1)">
       <node ref="R12" pin="1" pintype="passive"/>
       <node ref="U5" pin="1" pintype="passive"/>
     </net>
-    <net code="127" name="Net-(R13-Pad1)">
+    <net code="146" name="Net-(R13-Pad1)">
       <node ref="R13" pin="1" pintype="passive"/>
       <node ref="U5" pin="3" pintype="passive"/>
     </net>
-    <net code="128" name="Net-(R14-Pad1)">
+    <net code="147" name="Net-(R14-Pad1)">
       <node ref="R14" pin="1" pintype="passive"/>
       <node ref="U5" pin="5" pintype="passive"/>
     </net>
-    <net code="129" name="Net-(R15-Pad1)">
+    <net code="148" name="Net-(R15-Pad1)">
       <node ref="R15" pin="1" pintype="passive"/>
       <node ref="U5" pin="7" pintype="passive"/>
     </net>
-    <net code="130" name="Net-(R37-Pad1)">
+    <net code="149" name="Net-(R37-Pad1)">
       <node ref="R37" pin="1" pintype="passive"/>
       <node ref="U9" pin="1" pintype="passive"/>
     </net>
-    <net code="131" name="Net-(R38-Pad1)">
+    <net code="150" name="Net-(R38-Pad1)">
       <node ref="R38" pin="1" pintype="passive"/>
       <node ref="U9" pin="3" pintype="passive"/>
     </net>
-    <net code="132" name="Net-(R39-Pad1)">
+    <net code="151" name="Net-(R39-Pad1)">
       <node ref="R39" pin="1" pintype="passive"/>
       <node ref="U9" pin="5" pintype="passive"/>
     </net>
-    <net code="133" name="Net-(R40-Pad1)">
+    <net code="152" name="Net-(R40-Pad1)">
       <node ref="R40" pin="1" pintype="passive"/>
       <node ref="U9" pin="7" pintype="passive"/>
     </net>
-    <net code="134" name="Net-(R45-Pad1)">
+    <net code="153" name="Net-(R45-Pad1)">
       <node ref="R45" pin="1" pintype="passive"/>
       <node ref="U10" pin="1" pintype="passive"/>
     </net>
-    <net code="135" name="Net-(R46-Pad1)">
+    <net code="154" name="Net-(R46-Pad1)">
       <node ref="R46" pin="1" pintype="passive"/>
       <node ref="U10" pin="3" pintype="passive"/>
     </net>
-    <net code="136" name="Net-(R47-Pad1)">
+    <net code="155" name="Net-(R47-Pad1)">
       <node ref="R47" pin="1" pintype="passive"/>
       <node ref="U10" pin="5" pintype="passive"/>
     </net>
-    <net code="137" name="Net-(R48-Pad1)">
+    <net code="156" name="Net-(R48-Pad1)">
       <node ref="R48" pin="1" pintype="passive"/>
       <node ref="U10" pin="7" pintype="passive"/>
     </net>
-    <net code="138" name="Net-(U4-Feedback)">
+    <net code="157" name="Net-(U4-Feedback)">
       <node ref="R10" pin="1" pintype="passive"/>
       <node ref="R9" pin="2" pintype="passive"/>
       <node ref="U4" pin="5" pinfunction="Feedback" pintype="input"/>
     </net>
-    <net code="139" name="Net-(U6-VBUS)">
+    <net code="158" name="Net-(U6-VBUS)">
       <node ref="C13" pin="1" pintype="passive"/>
       <node ref="R25" pin="1" pintype="passive"/>
       <node ref="R26" pin="2" pintype="passive"/>
       <node ref="U6" pin="8" pinfunction="VBUS" pintype="input"/>
     </net>
-    <net code="140" name="Net-(U6-~{RST})">
+    <net code="159" name="Net-(U6-~{RST})">
       <node ref="R27" pin="2" pintype="passive"/>
       <node ref="U6" pin="9" pinfunction="~{RST}" pintype="input"/>
     </net>
-    <net code="141" name="Net-(U6-~{SUSPEND})">
+    <net code="160" name="Net-(U6-~{SUSPEND})">
       <node ref="R28" pin="1" pintype="passive"/>
       <node ref="U6" pin="11" pinfunction="~{SUSPEND}" pintype="output"/>
     </net>
-    <net code="142" name="Net-(U8-BS)">
+    <net code="161" name="Net-(U8-BS)">
       <node ref="C17" pin="1" pintype="passive"/>
       <node ref="U8" pin="1" pinfunction="BS" pintype="input"/>
     </net>
-    <net code="143" name="Net-(U8-FB)">
+    <net code="162" name="Net-(U8-FB)">
       <node ref="R6" pin="2" pintype="passive"/>
       <node ref="R7" pin="1" pintype="passive"/>
       <node ref="U8" pin="3" pinfunction="FB" pintype="input"/>
     </net>
-    <net code="144" name="Net-(U8-SW)">
+    <net code="163" name="Net-(U8-SW)">
       <node ref="C17" pin="2" pintype="passive"/>
       <node ref="L1" pin="1" pinfunction="1" pintype="passive"/>
       <node ref="U8" pin="6" pinfunction="SW" pintype="power_out"/>
     </net>
-    <net code="145" name="Net-(U12-~{RST})">
+    <net code="164" name="Net-(U12-~{RST})">
       <node ref="R69" pin="1" pintype="passive"/>
       <node ref="U12" pin="37" pinfunction="~{RST}" pintype="input"/>
     </net>
-    <net code="146" name="unconnected-(J20-ID-Pad4)">
+    <net code="165" name="unconnected-(J20-ID-Pad4)">
       <node ref="J20" pin="4" pinfunction="ID" pintype="passive"/>
     </net>
-    <net code="147" name="unconnected-(J21-ID-Pad4)">
+    <net code="166" name="unconnected-(J21-ID-Pad4)">
       <node ref="J21" pin="4" pinfunction="ID" pintype="passive"/>
     </net>
-    <net code="148" name="unconnected-(U1-NC-Pad11)">
+    <net code="167" name="unconnected-(U1-NC-Pad11)">
       <node ref="U1" pin="11" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="149" name="unconnected-(U1-NC-Pad14)">
+    <net code="168" name="unconnected-(U1-NC-Pad14)">
       <node ref="U1" pin="14" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="150" name="unconnected-(U6-CHR0-Pad15)">
+    <net code="169" name="unconnected-(U6-CHR0-Pad15)">
       <node ref="U6" pin="15" pinfunction="CHR0" pintype="output+no_connect"/>
     </net>
-    <net code="151" name="unconnected-(U6-CHR1-Pad14)">
+    <net code="170" name="unconnected-(U6-CHR1-Pad14)">
       <node ref="U6" pin="14" pinfunction="CHR1" pintype="output+no_connect"/>
     </net>
-    <net code="152" name="unconnected-(U6-CHREN-Pad13)">
+    <net code="171" name="unconnected-(U6-CHREN-Pad13)">
       <node ref="U6" pin="13" pinfunction="CHREN" pintype="output+no_connect"/>
     </net>
-    <net code="153" name="unconnected-(U6-GPIO.4-Pad22)">
+    <net code="172" name="unconnected-(U6-GPIO.4-Pad22)">
       <node ref="U6" pin="22" pinfunction="GPIO.4" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="154" name="unconnected-(U6-GPIO.5-Pad21)">
+    <net code="173" name="unconnected-(U6-GPIO.5-Pad21)">
       <node ref="U6" pin="21" pinfunction="GPIO.5" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="155" name="unconnected-(U6-GPIO.6-Pad20)">
+    <net code="174" name="unconnected-(U6-GPIO.6-Pad20)">
       <node ref="U6" pin="20" pinfunction="GPIO.6" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="156" name="unconnected-(U6-NC-Pad10)">
+    <net code="175" name="unconnected-(U6-NC-Pad10)">
       <node ref="U6" pin="10" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="157" name="unconnected-(U6-RS485{slash}GPIO.2-Pad17)">
+    <net code="176" name="unconnected-(U6-RS485{slash}GPIO.2-Pad17)">
       <node ref="U6" pin="17" pinfunction="RS485/GPIO.2" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="158" name="unconnected-(U6-SUSPEND-Pad12)">
+    <net code="177" name="unconnected-(U6-SUSPEND-Pad12)">
       <node ref="U6" pin="12" pinfunction="SUSPEND" pintype="output"/>
     </net>
-    <net code="159" name="unconnected-(U6-~{CTS}-Pad23)">
+    <net code="178" name="unconnected-(U6-~{CTS}-Pad23)">
       <node ref="U6" pin="23" pinfunction="~{CTS}" pintype="input+no_connect"/>
     </net>
-    <net code="160" name="unconnected-(U6-~{DCD}-Pad1)">
+    <net code="179" name="unconnected-(U6-~{DCD}-Pad1)">
       <node ref="U6" pin="1" pinfunction="~{DCD}" pintype="input+no_connect"/>
     </net>
-    <net code="161" name="unconnected-(U6-~{DSR}-Pad27)">
+    <net code="180" name="unconnected-(U6-~{DSR}-Pad27)">
       <node ref="U6" pin="27" pinfunction="~{DSR}" pintype="input+no_connect"/>
     </net>
-    <net code="162" name="unconnected-(U6-~{RI}{slash}CLK-Pad2)">
+    <net code="181" name="unconnected-(U6-~{RI}{slash}CLK-Pad2)">
       <node ref="U6" pin="2" pinfunction="~{RI}/CLK" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="163" name="unconnected-(U6-~{RXT}{slash}GPIO.1-Pad18)">
+    <net code="182" name="unconnected-(U6-~{RXT}{slash}GPIO.1-Pad18)">
       <node ref="U6" pin="18" pinfunction="~{RXT}/GPIO.1" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="164" name="unconnected-(U6-~{TXT}{slash}GPIO.0-Pad19)">
+    <net code="183" name="unconnected-(U6-~{TXT}{slash}GPIO.0-Pad19)">
       <node ref="U6" pin="19" pinfunction="~{TXT}/GPIO.0" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="165" name="unconnected-(U6-~{WAKEUP}{slash}GPIO.3-Pad16)">
+    <net code="184" name="unconnected-(U6-~{WAKEUP}{slash}GPIO.3-Pad16)">
       <node ref="U6" pin="16" pinfunction="~{WAKEUP}/GPIO.3" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="166" name="unconnected-(U12-1V2O-Pad22)">
+    <net code="185" name="unconnected-(U12-1V2O-Pad22)">
       <node ref="U12" pin="22" pinfunction="1V2O" pintype="output+no_connect"/>
     </net>
-    <net code="167" name="unconnected-(U12-DNC-Pad7)">
+    <net code="186" name="unconnected-(U12-DNC-Pad7)">
       <node ref="U12" pin="7" pinfunction="DNC" pintype="no_connect"/>
     </net>
-    <net code="168" name="unconnected-(U12-EXRES1-Pad10)">
+    <net code="187" name="unconnected-(U12-EXRES1-Pad10)">
       <node ref="U12" pin="10" pinfunction="EXRES1" pintype="passive+no_connect"/>
     </net>
-    <net code="169" name="unconnected-(U12-NC-Pad12)">
+    <net code="188" name="unconnected-(U12-NC-Pad12)">
       <node ref="U12" pin="12" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="170" name="unconnected-(U12-NC-Pad13)">
+    <net code="189" name="unconnected-(U12-NC-Pad13)">
       <node ref="U12" pin="13" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="171" name="unconnected-(U12-NC-Pad46)">
+    <net code="190" name="unconnected-(U12-NC-Pad46)">
       <node ref="U12" pin="46" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="172" name="unconnected-(U12-NC-Pad47)">
+    <net code="191" name="unconnected-(U12-NC-Pad47)">
       <node ref="U12" pin="47" pinfunction="NC" pintype="no_connect"/>
     </net>
-    <net code="173" name="unconnected-(U12-TOCAP-Pad20)">
+    <net code="192" name="unconnected-(U12-TOCAP-Pad20)">
       <node ref="U12" pin="20" pinfunction="TOCAP" pintype="passive"/>
     </net>
-    <net code="174" name="unconnected-(U12-VBG-Pad18)">
+    <net code="193" name="unconnected-(U12-VBG-Pad18)">
       <node ref="U12" pin="18" pinfunction="VBG" pintype="passive"/>
     </net>
-    <net code="175" name="unconnected-(U12-XI{slash}CLKIN-Pad30)">
+    <net code="194" name="unconnected-(U12-XI{slash}CLKIN-Pad30)">
       <node ref="U12" pin="30" pinfunction="XI/CLKIN" pintype="input"/>
     </net>
-    <net code="176" name="unconnected-(U12-XO-Pad31)">
+    <net code="195" name="unconnected-(U12-XO-Pad31)">
       <node ref="U12" pin="31" pinfunction="XO" pintype="output"/>
     </net>
-    <net code="177" name="unconnected-(U12-~{INT}-Pad36)">
+    <net code="196" name="unconnected-(U12-~{INT}-Pad36)">
       <node ref="U12" pin="36" pinfunction="~{INT}" pintype="input+no_connect"/>
     </net>
   </nets>

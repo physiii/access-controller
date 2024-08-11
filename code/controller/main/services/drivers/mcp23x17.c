@@ -1,3 +1,7 @@
+#include "automation.h"
+#include "drivers/i2c.c"
+#include "driver/i2c.h"
+
 #define A0	0
 #define A1	1
 #define A2	2
@@ -193,6 +197,6 @@ static void mcp23x17_task(void* arg)
 void mcp23x17_main(void)
 {
 	if (!USE_MCP23017) return;
-
+    ESP_ERROR_CHECK(i2c_master_init());
 	xTaskCreate(mcp23x17_task, "mcp23x17_task", 2048, NULL, 10, NULL);
 }

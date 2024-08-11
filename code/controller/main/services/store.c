@@ -1,7 +1,9 @@
+#include "store.h"
 #include "storage.c"
 #include <inttypes.h>
 #include "esp_spiffs.h"
 #include "esp_system.h"
+#include "automation.h"
 
 #define USERS_PER_INDEX   8
 #define MAX_USER_COUNT    10 * 1000
@@ -9,6 +11,8 @@
 
 char store_service_message[1000];
 bool store_service_message_ready = false;
+
+const char *STORE_TAG = "store";
 
 struct Setting {
     char str[1000];
@@ -28,19 +32,43 @@ typedef struct {
 int storeSetting(char *key, cJSON *payload)
 {
     store_char(key, cJSON_PrintUnformatted(payload));
+    ESP_LOGI(STORE_TAG, "Stored setting: %s", cJSON_PrintUnformatted(payload));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
     return 0;
 }
 
 int restoreSetting (char *key) {
 	strcpy(setting.str, get_char(key));
-	if (strcmp(setting.str, "")==0) return 1;
+	if (strcmp(setting.str, "")==0) return 0;
 
 	cJSON *msg;
 	msg = cJSON_Parse(setting.str);
-	if (msg) addServiceMessageToQueue(msg);
 
-	return 0;
+	return msg;
+}
+
+// Load a string from the store
+esp_err_t load_string_from_store(const char *key, char *value, size_t max_len) {
+    char *stored_value = get_char(key);
+    if (strcmp(stored_value, "") == 0) {
+        ESP_LOGE(STORE_TAG, "Failed to read key '%s'", key);
+        return ESP_ERR_NOT_FOUND;
+    }
+
+    if (strlen(stored_value) >= max_len) {
+        ESP_LOGE(STORE_TAG, "Buffer too small for key '%s'", key);
+        return ESP_ERR_NO_MEM;
+    }
+
+    strncpy(value, stored_value, max_len);
+    return ESP_OK;
+}
+
+// Save a string to the store
+esp_err_t save_string_to_store(const char *key, const char *value) {
+    store_char(key, value);
+    ESP_LOGI(STORE_TAG, "Saved key '%s' with value '%s'", key, value);
+    return ESP_OK;
 }
 
 esp_err_t initialize_spiffs(void) {
@@ -57,11 +85,11 @@ esp_err_t initialize_spiffs(void) {
     // Check if SPIFFS was mounted
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
-            ESP_LOGE(TAG, "Failed to mount or format filesystem");
+            ESP_LOGE(STORE_TAG, "Failed to mount or format filesystem");
         } else if (ret == ESP_ERR_NOT_FOUND) {
-            ESP_LOGE(TAG, "Failed to find SPIFFS partition");
+            ESP_LOGE(STORE_TAG, "Failed to find SPIFFS partition");
         } else {
-            ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+            ESP_LOGE(STORE_TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
         }
         return ret;
     }
@@ -70,20 +98,20 @@ esp_err_t initialize_spiffs(void) {
     size_t total = 0, used = 0;
     ret = esp_spiffs_info(NULL, &total, &used);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+        ESP_LOGE(STORE_TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
     } else {
-        ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+        ESP_LOGI(STORE_TAG, "Partition size: total: %d, used: %d", total, used);
     }
 
     return ESP_OK;
 }
 
 void store_user_to_flash(char *uuid, char *name, char *pin) {
-    ESP_LOGI(TAG, "Storing user to flash: UUID=%s, Name=%s", uuid, name);
+    ESP_LOGI(STORE_TAG, "Storing user to flash: UUID=%s, Name=%s", uuid, name);
 
     size_t user_index = get_u32("auth_user_count", 0);
     if (user_index >= MAX_USER_COUNT) {
-        ESP_LOGE(TAG, "Reached maximum user count");
+        ESP_LOGE(STORE_TAG, "Reached maximum user count");
         return;
     }
 
@@ -92,7 +120,7 @@ void store_user_to_flash(char *uuid, char *name, char *pin) {
 
     FILE* file = fopen(file_path, "w");
     if (file == NULL) {
-        ESP_LOGE(TAG, "Failed to open user data file for writing.");
+        ESP_LOGE(STORE_TAG, "Failed to open user data file for writing.");
         return;
     }
 
@@ -118,7 +146,7 @@ cJSON* load_user_from_flash(uint32_t user_id) {
 
     FILE* file = fopen(file_path, "r");
     if (file == NULL) {
-        ESP_LOGE(TAG, "Failed to open user data file for reading.");
+        ESP_LOGE(STORE_TAG, "Failed to open user data file for reading.");
         return NULL;
     }
 
@@ -128,7 +156,7 @@ cJSON* load_user_from_flash(uint32_t user_id) {
 
     char* buffer = malloc(length + 1);
     if (!buffer) {
-        ESP_LOGE(TAG, "Failed to allocate memory.");
+        ESP_LOGE(STORE_TAG, "Failed to allocate memory.");
         fclose(file);
         return NULL;
     }
@@ -144,7 +172,7 @@ cJSON* load_user_from_flash(uint32_t user_id) {
 }
 
 void delete_user_from_flash(const char *uuid_to_delete) {
-    ESP_LOGI(TAG, "Deleting user from flash: UUID=%s", uuid_to_delete);
+    ESP_LOGI(STORE_TAG, "Deleting user from flash: UUID=%s", uuid_to_delete);
     size_t user_count = get_u32("auth_user_count", 0);
 
     for (size_t i = 0; i < user_count; i++) {
@@ -173,11 +201,11 @@ void delete_user_from_flash(const char *uuid_to_delete) {
         }
     }
 
-    ESP_LOGE(TAG, "User with UUID=%s not found.", uuid_to_delete);
+    ESP_LOGE(STORE_TAG, "User with UUID=%s not found.", uuid_to_delete);
 }
 
 void modify_user_from_flash(const char *uuid, const char *newName, const char *newPin) {
-    ESP_LOGI(TAG, "Modifying user in flash: UUID=%s", uuid);
+    ESP_LOGI(STORE_TAG, "Modifying user in flash: UUID=%s", uuid);
     size_t user_count = get_u32("auth_user_count", 0);
 
     for (size_t i = 0; i < user_count; i++) {
@@ -193,7 +221,7 @@ void modify_user_from_flash(const char *uuid, const char *newName, const char *n
 
                 FILE* file = fopen(file_path, "w");
                 if (file == NULL) {
-                    ESP_LOGE(TAG, "Failed to open user data file for writing.");
+                    ESP_LOGE(STORE_TAG, "Failed to open user data file for writing.");
                     cJSON_Delete(user);
                     return;
                 }
@@ -207,13 +235,13 @@ void modify_user_from_flash(const char *uuid, const char *newName, const char *n
         }
     }
 
-    ESP_LOGE(TAG, "User with UUID=%s not found.", uuid);
+    ESP_LOGE(STORE_TAG, "User with UUID=%s not found.", uuid);
 }
 
 char* find_pin_in_flash(const char* pin) 
 {
     uint32_t user_count = get_u32("auth_user_count", 0);
-    ESP_LOGI(TAG, "Total User Count: %" PRIu32, user_count);
+    ESP_LOGI(STORE_TAG, "Total User Count: %" PRIu32, user_count);
 
     for (uint32_t i = 0; i < user_count; i++) { 
         cJSON *user = load_user_from_flash(i + 1); // Convert to 1-based index when loading user
@@ -236,22 +264,22 @@ void store_wifi_credentials_to_flash(const char *ssid, const char *password)
 {
     store_char("wifi_ssid", ssid);
     store_char("wifi_password", password);
-    ESP_LOGI(TAG, "wifi credentials stored: %s, %s", ssid, password);
+    ESP_LOGI(STORE_TAG, "wifi credentials stored: %s, %s", ssid, password);
 }
 
 void load_wifi_credentials_from_flash(char *ssid, char *password) 
 {
-    ESP_LOGI(TAG, "Loading WiFi credentials from flash");
+    ESP_LOGI(STORE_TAG, "Loading WiFi credentials from flash");
 	//init ssid and password and check if get_char returns null
 	char *ssid_str = get_char("wifi_ssid");
 	char *password_str = get_char("wifi_password");
 
 	if (strcmp(ssid_str, "")==0 || strcmp(password_str, "")==0) {
-		ESP_LOGI(TAG, "No WiFi credentials found in flash");
+		ESP_LOGI(STORE_TAG, "No WiFi credentials found in flash");
 		return;
 	}
 	
-	ESP_LOGI(TAG, "WiFi credentials found in flash: %s, %s.", ssid_str, password_str);
+	ESP_LOGI(STORE_TAG, "WiFi credentials found in flash: %s, %s.", ssid_str, password_str);
 	strcpy(ssid, get_char("wifi_ssid"));
 	strcpy(password, get_char("wifi_password"));
 }
@@ -260,21 +288,21 @@ void store_server_info_to_flash(const char *server_ip, const char *server_port)
 {
     store_char("server_ip", server_ip);
     store_char("server_port", server_port);
-    ESP_LOGI(TAG, "Server info stored: IP: %s, Port: %s", server_ip, server_port);
+    ESP_LOGI(STORE_TAG, "Server info stored: IP: %s, Port: %s", server_ip, server_port);
 }
 
 void load_server_info_from_flash(char *server_ip, char *server_port) 
 {
-    ESP_LOGI(TAG, "Loading Server info from flash");
+    ESP_LOGI(STORE_TAG, "Loading Server info from flash");
     strcpy(server_ip, get_char("server_ip"));
     strcpy(server_port, get_char("server_port"));
 
     if (strcmp(server_ip, "")==0) {
-        ESP_LOGI(TAG, "No server IP found in flash, setting to default.");
+        ESP_LOGI(STORE_TAG, "No server IP found in flash, setting to default.");
         strcpy(server_ip, "192.168.1.42");
     }
     if (strcmp(server_port, "")==0) {
-        ESP_LOGI(TAG, "No server port found in flash, setting to default.");
+        ESP_LOGI(STORE_TAG, "No server port found in flash, setting to default.");
         strcpy(server_port, "80");
     }
 }
@@ -285,5 +313,5 @@ char* get_md5_from_flash() {
 
 void store_md5_to_flash(const char *md5_hash) {
     store_char("firmware_md5", md5_hash);
-    ESP_LOGI(TAG, "Stored MD5 hash to flash: %s", md5_hash);
+    ESP_LOGI(STORE_TAG, "Stored MD5 hash to flash: %s", md5_hash);
 }

@@ -7,3 +7,4 @@ sdkconfig*
 *_autosave*
 *cache.dcm
 *_saved_*
+*.zip

@@ -150,8 +150,8 @@ webSocket.onmessage = function (event) {
 	}
 
 	if (state.eventType == "fob") {
-		if (pl.enable) document.getElementById('enableFob_' + ch).checked = pl.enable;
-		if (pl.alert) document.getElementById('alertFob_' + ch).checked = pl.alert;
+		document.getElementById('enableFob_' + ch).checked = (pl.enable === "true" || pl.enable === true);
+		document.getElementById('alertFob_' + ch).checked = (pl.alert === "true" || pl.alert === true);		
 	}
 
 	if (state.eventType == "authorize") {
