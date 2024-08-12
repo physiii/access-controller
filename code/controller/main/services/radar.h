@@ -13,9 +13,12 @@
 typedef struct {
     int pin;
     bool alert;
-    int movement_value;  // Field to store movement value
+    int movement_value;       // Field to store movement value
     int delay;
     int channel;
+    bool presence_state;      // Field to store the presence state
+    int above_threshold_count; // Counter for holding above threshold
+    int below_threshold_count; // Counter for holding below threshold
     char settings[1000];
     char key[50];
     char type[40];
@@ -30,11 +33,11 @@ extern radarButton_t radars[NUM_OF_RADARS];
 
 // Radar functions
 void alertOnRadar(int ch, bool val);
-void check_radar(int radar_index, uint8_t avg_movement);  // Updated to match implementation
+void check_radar(int radar_index, uint8_t avg_movement);
 void handle_radar_message(cJSON *payload);
 int storeRadarSettings(void);
 int restoreRadarSettings(void);
-int sendRadarEventToClient(void);  // Corrected function signature
+int sendRadarEventToClient(void);
 void radar_main(int uart_pin_tx_1, int uart_pin_rx_1, int uart_pin_tx_2, int uart_pin_rx_2);
 void init_uart(int uart_num, int uart_pin_tx, int uart_pin_rx);
 

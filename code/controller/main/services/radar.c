@@ -19,6 +19,8 @@ radarButton_t radars[NUM_OF_RADARS];
 #define UART_NUM_2          UART_NUM_2  // UART for Radar 2
 #define MOVEMENT_THRESHOLD  10          // Threshold for triggering event
 #define RESET_THRESHOLD     5           // Threshold for resetting event
+#define HOLD_TIME_ABOVE_THRESHOLD 25    // Number of cycles to confirm presence
+#define HOLD_TIME_BELOW_THRESHOLD 100   // Number of cycles to confirm absence
 
 void sendRadarEventToServer() {
     for (uint8_t i = 0; i < NUM_OF_RADARS; i++) {
@@ -27,13 +29,12 @@ void sendRadarEventToServer() {
 
         snprintf(state_str, sizeof(state_str),
                  "{\"presence\":%s, \"exit\":false, \"keypad\":false, \"uptime\":1}",
-                 radars[i].movement_value > MOVEMENT_THRESHOLD ? "true" : "false");
+                 radars[i].presence_state ? "true" : "false");
         snprintf(msg, sizeof(msg),
                  "{\"event_type\":\"load\", \"payload\":{\"services\":"
                  "[{\"id\":\"ac_1\", \"type\":\"access-control\",\"state\":%s}]}}", state_str);
 
         addServerMessageToQueue(msg);
-        ESP_LOGI(RADAR_TAG, "sendRadarEventToServer: %s", msg);
     }
 }
 
@@ -48,14 +49,14 @@ int sendRadarEventToClient() {
                  i + 1,
                  radars[i].alert ? "true" : "false",
                  radars[i].delay,
-                 radars[i].movement_value > MOVEMENT_THRESHOLD ? "true" : "false");
+                 radars[i].presence_state ? "true" : "false");
 
         // Now copy the temporary buffer into the radar's settings
         strncpy(radars[i].settings, temp_settings, sizeof(radars[i].settings) - 1);
         radars[i].settings[sizeof(radars[i].settings) - 1] = '\0';  // Ensure null termination
 
         addClientMessageToQueue(radars[i].settings);
-        ESP_LOGI(RADAR_TAG, "sendRadarEventToClient: %s", radars[i].settings);
+        ESP_LOGV(RADAR_TAG, "sendRadarEventToClient: %s", radars[i].settings);
     }
     return 0;
 }
@@ -75,7 +76,7 @@ cJSON* createRadarStateJson() {
         cJSON_AddBoolToObject(radarObject, "alert", radars[i].alert);
         cJSON_AddNumberToObject(radarObject, "delay", radars[i].delay);
         cJSON_AddNumberToObject(radarObject, "movementValue", radars[i].movement_value);
-        cJSON_AddBoolToObject(radarObject, "presence", radars[i].movement_value > MOVEMENT_THRESHOLD);
+        cJSON_AddBoolToObject(radarObject, "presence", radars[i].presence_state);
         
         cJSON_AddItemToArray(radarArray, radarObject);
     }
@@ -156,14 +157,28 @@ int restoreRadarSettings() {
 }
 
 void check_radar(int radar_index, uint8_t avg_movement) {
-    bool new_presence_state = (avg_movement > MOVEMENT_THRESHOLD);
-    
-    if (new_presence_state != (radars[radar_index].movement_value > MOVEMENT_THRESHOLD)) {
-        radars[radar_index].movement_value = avg_movement;
-        ESP_LOGI(RADAR_TAG, "Radar %d presence changed to %s", radar_index + 1, new_presence_state ? "true" : "false");
-        sendRadarState();
+    bool above_threshold = (avg_movement > MOVEMENT_THRESHOLD);
+
+    if (above_threshold) {
+        radars[radar_index].above_threshold_count++;
+        radars[radar_index].below_threshold_count = 0;
+
+        if (radars[radar_index].above_threshold_count >= HOLD_TIME_ABOVE_THRESHOLD &&
+            !radars[radar_index].presence_state) {
+            radars[radar_index].presence_state = true;
+            radars[radar_index].movement_value = avg_movement;
+            sendRadarState();
+        }
     } else {
-        radars[radar_index].movement_value = avg_movement;
+        radars[radar_index].below_threshold_count++;
+        radars[radar_index].above_threshold_count = 0;
+
+        if (radars[radar_index].below_threshold_count >= HOLD_TIME_BELOW_THRESHOLD &&
+            radars[radar_index].presence_state) {
+            radars[radar_index].presence_state = false;
+            radars[radar_index].movement_value = avg_movement;
+            sendRadarState();
+        }
     }
 }
 
@@ -221,7 +236,13 @@ void log_data(uint8_t *data, int len, int radar_index) {
                 sum_distance += distance_buffer[radar_index][i];
                 sum_movement += movement_buffer[radar_index][i];
             }
-            uint8_t avg_movement = sum_movement / ROLLING_AVG_SIZE;
+            uint16_t avg_distance = sum_distance / ROLLING_AVG_SIZE;  // Average distance
+            uint8_t avg_movement = sum_movement / ROLLING_AVG_SIZE;   // Average movement
+
+            // Log the averages
+            if (avg_movement > 0) {
+                ESP_LOGV(RADAR_TAG, "Radar %d - Avg Distance: %d, Avg Movement: %d", radar_index + 1, avg_distance, avg_movement);
+            }
 
             // Update the buffer index
             buffer_index[radar_index] = (buffer_index[radar_index] + 1) % ROLLING_AVG_SIZE;
