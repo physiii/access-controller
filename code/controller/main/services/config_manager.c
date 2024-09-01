@@ -13,6 +13,7 @@
 
 static const char *CONFIG_TAG = "ConfigManager";
 static const char *DEFAULT_DEVICE_NAME = "ESP_Device";
+static const char *DEFAULT_ROOM_NAME = "DefaultRoom";
 
 void generate_uuid_v4(char *uuid_str, size_t max_len) {
     ESP_LOGI(CONFIG_TAG, "Generating UUID v4");
@@ -122,6 +123,40 @@ void get_device_name(char *device_name, size_t device_name_size) {
     }
 }
 
+void set_room_name(const char *room_name) {
+    ESP_LOGI(CONFIG_TAG, "Attempting to set room name to: %s", room_name);
+    
+    char current_name[50] = {0};
+    esp_err_t ret = load_string_from_store("room_name", current_name, sizeof(current_name));
+    
+    if (ret == ESP_ERR_NOT_FOUND) {
+        ESP_LOGI(CONFIG_TAG, "Room name not found, initializing with default");
+        save_string_to_store("room_name", DEFAULT_ROOM_NAME);
+    }
+    
+    ret = save_string_to_store("room_name", room_name);
+    if (ret != ESP_OK) {
+        ESP_LOGE(CONFIG_TAG, "Failed to save Room Name. Error: %s", esp_err_to_name(ret));
+    } else {
+        ESP_LOGI(CONFIG_TAG, "Room Name successfully set to: %s", room_name);
+    }
+}
+
+void get_room_name(char *room_name, size_t room_name_size) {
+    ESP_LOGI(CONFIG_TAG, "Attempting to get room name");
+    esp_err_t ret = load_string_from_store("room_name", room_name, room_name_size);
+    if (ret == ESP_ERR_NOT_FOUND) {
+        ESP_LOGW(CONFIG_TAG, "Room Name not found, initializing with default");
+        strncpy(room_name, DEFAULT_ROOM_NAME, room_name_size);
+        save_string_to_store("room_name", DEFAULT_ROOM_NAME);
+    } else if (ret != ESP_OK) {
+        ESP_LOGE(CONFIG_TAG, "Failed to load Room Name. Error: %s", esp_err_to_name(ret));
+        strncpy(room_name, DEFAULT_ROOM_NAME, room_name_size);
+    } else {
+        ESP_LOGI(CONFIG_TAG, "Successfully loaded room name: %s", room_name);
+    }
+}
+
 void handle_set_device_name(cJSON *message) {
     cJSON *deviceNameItem = cJSON_GetObjectItem(message, "deviceName");
     if (!deviceNameItem || !cJSON_IsString(deviceNameItem)) {
@@ -146,16 +181,42 @@ void handle_set_device_name(cJSON *message) {
     addServerMessageToQueue(response);
 }
 
+void handle_set_room_name(cJSON *message) {
+    cJSON *roomNameItem = cJSON_GetObjectItem(message, "roomName");
+    if (!roomNameItem || !cJSON_IsString(roomNameItem)) {
+        ESP_LOGE(CONFIG_TAG, "Invalid or missing roomName in setRoomName payload");
+        return;
+    }
+
+    const char *new_name = roomNameItem->valuestring;
+    ESP_LOGI(CONFIG_TAG, "Setting room name to: %s", new_name);
+    set_room_name(new_name);
+
+    char verified_name[50];
+    get_room_name(verified_name, sizeof(verified_name));
+
+    char response[200];
+    snprintf(response, sizeof(response), 
+        "{\"event_type\":\"load\", \"payload\":{"
+        "\"services\":[{\"id\":\"cm_1\", \"type\":\"config-manager\","
+        "\"state\":{\"room_name\":\"%s\"}}]}}", 
+        verified_name);
+    ESP_LOGI(CONFIG_TAG, "Sending confirmation: %s", response);
+    addServerMessageToQueue(response);
+}
+
 void handle_get_device_info() {
     char device_id[37];
     char mac_address[13];
     char ip_address[16];
     char device_name[50];
+    char room_name[50];
 
     get_device_id(device_id, sizeof(device_id));
     get_mac_address(mac_address, sizeof(mac_address));
     get_ip_address(ip_address, sizeof(ip_address));
     get_device_name(device_name, sizeof(device_name));
+    get_room_name(room_name, sizeof(room_name));
 
     char msg[500];
     snprintf(msg, sizeof(msg), 
@@ -165,9 +226,10 @@ void handle_get_device_info() {
         "\"device_id\":\"%s\","
         "\"mac_address\":\"%s\","
         "\"ip_address\":\"%s\","
-        "\"device_name\":\"%s\""
+        "\"device_name\":\"%s\","
+        "\"room_name\":\"%s\""
         "}}]}}", 
-        device_id, mac_address, ip_address, device_name);
+        device_id, mac_address, ip_address, device_name, room_name);
     ESP_LOGI(CONFIG_TAG, "Sending device info: %s", msg);
     addServerMessageToQueue(msg);
 }
@@ -179,6 +241,12 @@ static void config_manager_service(void *pvParameter) {
         if (message) {
             ESP_LOGI(CONFIG_TAG, "Received setDeviceName message");
             handle_set_device_name(message);
+            cJSON_Delete(message);
+        }
+        message = checkServiceMessage("setRoomName");
+        if (message) {
+            ESP_LOGI(CONFIG_TAG, "Received setRoomName message");
+            handle_set_room_name(message);
             cJSON_Delete(message);
         }
         message = checkServiceMessage("getDeviceInfo");

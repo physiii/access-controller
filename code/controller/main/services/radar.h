@@ -9,6 +9,7 @@
 #define RADAR_BUTTON_MCP_IO_1 A3
 #define RADAR_BUTTON_MCP_IO_2 B3
 #define NUM_OF_RADARS 2  // Support for two radar sensors
+#define MAX_EVENT_DESCRIPTION_LENGTH 300
 
 typedef struct {
     int pin;
@@ -23,6 +24,9 @@ typedef struct {
     char key[50];
     char type[40];
     cJSON *payload;
+    char event_description[MAX_EVENT_DESCRIPTION_LENGTH];
+    int last_avg_movement;
+    int last_avg_distance;
 } radarButton_t;
 
 // Global variables
