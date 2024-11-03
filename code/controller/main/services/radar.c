@@ -21,34 +21,12 @@ radarButton_t radars[NUM_OF_RADARS];
 #define ROLLING_AVG_SIZE           32
 #define MOVEMENT_THRESHOLD         10
 #define RESET_THRESHOLD            5
-#define HOLD_TIME_ABOVE_THRESHOLD  25
-#define HOLD_TIME_BELOW_THRESHOLD  100
+#define HOLD_TIME_ABOVE_THRESHOLD  5
+#define HOLD_TIME_BELOW_THRESHOLD  10
 #define MSG_SIZE                   2048
 
 // MQTT client handle
 static esp_mqtt_client_handle_t mqtt_client = NULL;
-
-// Helper function to safely free JSON strings if dynamically allocated
-// Ensure to only free if the memory was allocated using malloc or similar
-static void safe_free(char *str) {
-    if (str) {
-        // Implement a mechanism to check if 'str' was dynamically allocated
-        // For now, assume it is not and do not free
-        // Uncomment the following line if 'str' is confirmed to be malloc'd
-        // free(str);
-    }
-}
-
-void send_json_to_influxdb(const char *measurement, cJSON *json_data) {
-    ESP_LOGI(RADAR_TAG, "Sending data to InfluxDB: Measurement: %s", measurement);
-    char *json_string = cJSON_PrintUnformatted(json_data);
-    if (json_string) {
-        ESP_LOGI(RADAR_TAG, "Data: %s", json_string);
-        free(json_string);
-    } else {
-        ESP_LOGE(RADAR_TAG, "Failed to print JSON data.");
-    }
-}
 
 void init_uart(int uart_num, int uart_pin_tx, int uart_pin_rx) {
     const uart_config_t uart_config = {
@@ -149,30 +127,15 @@ cJSON* createRadarStateJson(void) {
         return NULL;
     }
 
-    cJSON_AddBoolToObject(state, "systemEnabled", true);
-    cJSON *radarArray = cJSON_AddArrayToObject(state, "radars");
-    if (!radarArray) {
-        ESP_LOGE(RADAR_TAG, "Failed to create JSON array for radars.");
-        cJSON_Delete(state);
-        return NULL;
-    }
+    // Add device information in the specified format
+    cJSON_AddStringToObject(state, "device_type", "radar");
 
-    for (int i = 0; i < NUM_OF_RADARS; i++) {
-        cJSON *radarObject = cJSON_CreateObject();
-        if (!radarObject) {
-            ESP_LOGE(RADAR_TAG, "Failed to create JSON object for radar %d.", i);
-            continue;
-        }
-        cJSON_AddNumberToObject(radarObject, "channel", radars[i].channel);
-        cJSON_AddBoolToObject(radarObject, "alert", radars[i].alert);
-        cJSON_AddNumberToObject(radarObject, "delay", radars[i].delay);
-        cJSON_AddNumberToObject(radarObject, "movementValue", radars[i].movement_value);
-        cJSON_AddBoolToObject(radarObject, "presence", radars[i].presence_state);
-        cJSON_AddStringToObject(radarObject, "room", radars[i].room_name);
-        cJSON_AddStringToObject(radarObject, "event_description", radars[i].event_description);
-        cJSON_AddItemToArray(radarArray, radarObject);
-    }
+    // Set up the room name
+    char room_name[50];
+    get_room_name(room_name, sizeof(room_name));
+    cJSON_AddStringToObject(state, "room", room_name);
 
+    // Populate device fields
     char device_id[37], mac_str[18], ip_str[16], device_name[32];
     get_device_id(device_id, sizeof(device_id));
     get_mac_address(mac_str, sizeof(mac_str));
@@ -183,6 +146,18 @@ cJSON* createRadarStateJson(void) {
     cJSON_AddStringToObject(state, "mac_address", mac_str);
     cJSON_AddStringToObject(state, "ip_address", ip_str);
     cJSON_AddStringToObject(state, "device_name", device_name);
+
+    // Generate a random UUID for event_id
+    char event_id[37];
+    generate_uuid_v4(event_id, sizeof(event_id));
+    cJSON_AddStringToObject(state, "event_id", event_id);
+
+    // Assuming the first radar (index 0) is the one we want to report on
+    radarButton_t *radar = &radars[0]; // Use the appropriate index or loop for specific radar if needed
+
+    // Add average distance and average movement
+    cJSON_AddNumberToObject(state, "distance", radar->last_avg_distance);
+    cJSON_AddNumberToObject(state, "movement", radar->last_avg_movement);
 
     return state;
 }
@@ -197,29 +172,6 @@ void sendRadarState(void) {
         cJSON_Delete(state);
         return;
     }
-
-    // Server message
-    size_t msg_len = strlen(state_str) + 128;
-    char *wss_data_out = malloc(msg_len);
-    if (wss_data_out) {
-        snprintf(wss_data_out, msg_len,
-                 "{\"event_type\":\"load\",\"payload\":{\"services\":[{\"id\":\"radar_1\",\"type\":\"radar\",\"state\":%s}]}}",
-                 state_str);
-        addServerMessageToQueue(wss_data_out);
-        free(wss_data_out);
-    }
-
-    // Client message
-    char *client_data_out = malloc(msg_len);
-    if (client_data_out) {
-        snprintf(client_data_out, msg_len,
-                 "{\"event_type\":\"radar\",\"payload\":%s}", state_str);
-        addClientMessageToQueue(client_data_out);
-        free(client_data_out);
-    }
-
-    ESP_LOGI(RADAR_TAG, "Sending Radar State");
-    send_json_to_influxdb("radar_state", state);
 
     if (mqtt_client) {
         int msg_id = esp_mqtt_client_publish(mqtt_client, "radar", state_str, 0, 1, 0);
@@ -266,43 +218,6 @@ void check_radar(int radar_index, uint8_t avg_movement) {
             sendRadarState();
         }
     }
-
-    // Additional event descriptions based on movement and distance
-    if (avg_movement > MOVEMENT_THRESHOLD && avg_movement < RESET_THRESHOLD) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Intermittent Movement Detected in %s. Movement Value: %d", room_name, avg_movement);
-    }
-
-    if (avg_movement > 50) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Rapid Movement Detected in %s. Movement Value: %d", room_name, avg_movement);
-    } else if (avg_movement > 0 && avg_movement <= 10) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Slow Movement Detected in %s. Movement Value: %d", room_name, avg_movement);
-    }
-
-    if (radar->last_avg_distance < 100) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Movement Detected at Close Range in %s. Distance: %d mm", room_name, radar->last_avg_distance);
-    } else if (radar->last_avg_distance < 500) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Movement Detected at Medium Range in %s. Distance: %d mm", room_name, radar->last_avg_distance);
-    } else {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Movement Detected at Long Range in %s. Distance: %d mm", room_name, radar->last_avg_distance);
-    }
-
-    // Presence re-confirmation
-    if (radar->presence_state && radar->below_threshold_count == 1) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "Presence Confirmed After Absence in %s. Movement Value: %d", room_name, avg_movement);
-    }
-
-    // No presence after prolonged absence
-    if (!radar->presence_state && radar->below_threshold_count == HOLD_TIME_BELOW_THRESHOLD) {
-        snprintf(radar->event_description, sizeof(radar->event_description),
-                 "No Presence Confirmed After Extended Absence in %s. Movement Value: %d", room_name, avg_movement);
-    }
 }
 
 void log_data(uint8_t *data, int len, int radar_index) {
@@ -348,10 +263,6 @@ void log_data(uint8_t *data, int len, int radar_index) {
                     radar->previous_distance = current_distance;
                     radar->previous_time_ms = current_time_ms;
                     radar->has_previous = true;
-
-                    // Log the distance and calculated movement
-                    // ESP_LOGI(RADAR_TAG, "Radar %d - Distance: %d mm, Movement: %d mm/s",
-                    //          radar_index + 1, current_distance, movement_value);
 
                     // Update rolling buffers
                     distance_buffer[radar_index][buffer_index[radar_index]] = current_distance;
