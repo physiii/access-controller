@@ -143,7 +143,6 @@ void set_room_name(const char *room_name) {
 }
 
 void get_room_name(char *room_name, size_t room_name_size) {
-    ESP_LOGI(CONFIG_TAG, "Attempting to get room name");
     esp_err_t ret = load_string_from_store("room_name", room_name, room_name_size);
     if (ret == ESP_ERR_NOT_FOUND) {
         ESP_LOGW(CONFIG_TAG, "Room Name not found, initializing with default");
@@ -152,8 +151,6 @@ void get_room_name(char *room_name, size_t room_name_size) {
     } else if (ret != ESP_OK) {
         ESP_LOGE(CONFIG_TAG, "Failed to load Room Name. Error: %s", esp_err_to_name(ret));
         strncpy(room_name, DEFAULT_ROOM_NAME, room_name_size);
-    } else {
-        ESP_LOGI(CONFIG_TAG, "Successfully loaded room name: %s", room_name);
     }
 }
 
@@ -179,10 +176,11 @@ void handle_set_device_name(cJSON *message) {
         verified_name);
     ESP_LOGI(CONFIG_TAG, "Sending confirmation: %s", response);
     addServerMessageToQueue(response);
+    addClientMessageToQueue(response);
 }
 
 void handle_set_room_name(cJSON *message) {
-    cJSON *roomNameItem = cJSON_GetObjectItem(message, "roomName");
+    cJSON *roomNameItem = cJSON_GetObjectItem(message, "deviceRoom");
     if (!roomNameItem || !cJSON_IsString(roomNameItem)) {
         ESP_LOGE(CONFIG_TAG, "Invalid or missing roomName in setRoomName payload");
         return;
@@ -203,6 +201,7 @@ void handle_set_room_name(cJSON *message) {
         verified_name);
     ESP_LOGI(CONFIG_TAG, "Sending confirmation: %s", response);
     addServerMessageToQueue(response);
+    addClientMessageToQueue(response);
 }
 
 void handle_get_device_info() {
@@ -232,6 +231,7 @@ void handle_get_device_info() {
         device_id, mac_address, ip_address, device_name, room_name);
     ESP_LOGI(CONFIG_TAG, "Sending device info: %s", msg);
     addServerMessageToQueue(msg);
+    addClientMessageToQueue(msg);
 }
 
 static void config_manager_service(void *pvParameter) {
@@ -243,7 +243,7 @@ static void config_manager_service(void *pvParameter) {
             handle_set_device_name(message);
             cJSON_Delete(message);
         }
-        message = checkServiceMessage("setRoomName");
+        message = checkServiceMessage("setDeviceRoom");
         if (message) {
             ESP_LOGI(CONFIG_TAG, "Received setRoomName message");
             handle_set_room_name(message);

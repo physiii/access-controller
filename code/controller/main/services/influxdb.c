@@ -8,14 +8,6 @@
 
 #define INFLUXDB_TAG "InfluxDB"
 
-// Function to get MAC address as a string
-static void get_mac_address(char *mac_str, size_t mac_str_size) {
-    uint8_t mac[6];
-    esp_read_mac(mac, ESP_MAC_WIFI_STA);
-    snprintf(mac_str, mac_str_size, "%02X%02X%02X%02X%02X%02X", 
-             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-}
-
 // Helper function to escape special characters in tag values
 static void escape_tag_value(const char* input, char* output, size_t output_size) {
     size_t i, j;
@@ -35,19 +27,21 @@ void send_data_to_influxdb(float temperature, float humidity) {
     char token[37];
     char mac_str[18];
     char device_name[32];
+    char room_name[32];
     char escaped_device_name[64];
 
     load_device_settings(device_id, sizeof(device_id), token, sizeof(token));
     get_mac_address(mac_str, sizeof(mac_str));
     get_device_name(device_name, sizeof(device_name));
+    get_room_name(room_name, sizeof(room_name));
     escape_tag_value(device_name, escaped_device_name, sizeof(escaped_device_name));
 
     snprintf(url, sizeof(url), "%s/write?db=%s", INFLUXDB_IP, INFLUXDB_DB);
     snprintf(post_data, sizeof(post_data), 
-             "temperature,device_id=%s,mac=%s,device_name=%s value=%.2f\n"
-             "humidity,device_id=%s,mac=%s,device_name=%s value=%.2f",
-             device_id, mac_str, escaped_device_name, temperature,
-             device_id, mac_str, escaped_device_name, humidity);
+             "temperature,device_id=%s,mac=%s,device_name=%s,room_name=%s value=%.2f\n"
+             "humidity,device_id=%s,mac=%s,device_name=%s,room_name=%s value=%.2f",
+             device_id, mac_str, escaped_device_name, room_name, temperature,
+             device_id, mac_str, escaped_device_name, room_name, humidity);
 
     esp_http_client_config_t config = {
         .url = url,

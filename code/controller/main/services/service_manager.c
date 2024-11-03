@@ -1,3 +1,5 @@
+// services/service_manager.c
+
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
@@ -17,6 +19,7 @@
 #include "motion.h"
 #include "server.h"
 #include "automation.h"
+#include "config_manager.h"
 
 static const char *SVC_TAG = "ServiceManager";
 
@@ -111,5 +114,6 @@ void service_manager_start_all() {
     radar_start();
     // keypad_start();
     server_start();
+    config_manager_start();
     ESP_LOGI(SVC_TAG, "All services started successfully.");
 }

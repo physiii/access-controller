@@ -1,3 +1,5 @@
+// main.c
+
 #include "esp_event.h"
 #include "nvs_flash.h"
 #include "automation.h"
