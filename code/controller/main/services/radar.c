@@ -19,7 +19,7 @@ radarButton_t radars[NUM_OF_RADARS];
 #define BUF_SIZE                   128
 #define DATA_CHUNK_SIZE            10
 #define ROLLING_AVG_SIZE           32
-#define MOVEMENT_THRESHOLD         10
+#define MOVEMENT_THRESHOLD         0
 #define RESET_THRESHOLD            5
 #define HOLD_TIME_ABOVE_THRESHOLD  5
 #define HOLD_TIME_BELOW_THRESHOLD  10
