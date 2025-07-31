@@ -95,6 +95,14 @@ window.appFunctions = {
         };
     },
 
+    sendWebSocketMessage: function(message) {
+        if (window.webSocket && window.webSocket.readyState === WebSocket.OPEN) {
+            window.webSocket.send(message);
+        } else {
+            console.warn("WebSocket is not in OPEN state. Current state:", window.webSocket ? window.webSocket.readyState : 'undefined');
+        }
+    },
+
     handleAppWebSocketMessage: function(data) {
         console.log("Handling WebSocket message", data);
 

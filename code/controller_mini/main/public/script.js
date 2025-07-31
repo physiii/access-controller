@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
             var data = JSON.parse(event.data);
             console.log("[WebSocket]", data);
 
+            if (data.eventType === "wifiConfirm") {
+                console.log("WiFi confirmation:", data.payload.message);
+                alert("WiFi credentials saved successfully! Device is restarting...");
+                return;
+            }
+
             if (data.event_type === "load" && data.payload && data.payload.services && data.payload.services.length > 0) {
                 // Extract the state object from the first service in the array
                 var deviceState = data.payload.services[0].state;
@@ -91,11 +97,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 var wifiName = document.getElementById('wifiName').value;
                 var wifiPassword = document.getElementById('wifiPassword').value;
-                webSocket.send(JSON.stringify({
-                    "eventType": "setWifiCredentials",
-                    "payload": { "wifiName": wifiName, "wifiPassword": wifiPassword }
-                }));
-                console.log("WiFi settings submitted");
+                if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+                    webSocket.send(JSON.stringify({
+                        "eventType": "setWifiCredentials",
+                        "payload": { "wifiName": wifiName, "wifiPassword": wifiPassword }
+                    }));
+                    console.log("WiFi settings submitted");
+                } else {
+                    console.warn("WebSocket is not in OPEN state. Current state:", webSocket ? webSocket.readyState : 'undefined');
+                }
             });
         }
 
@@ -104,11 +114,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 var ipAddress = document.getElementById('serverIpAddress').value;
                 var port = document.getElementById('port').value;
-                webSocket.send(JSON.stringify({
-                    "eventType": "setServerInfo",
-                    "payload": { "ipAddress": ipAddress, "port": port }
-                }));
-                console.log("Server info submitted");
+                if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+                    webSocket.send(JSON.stringify({
+                        "eventType": "setServerInfo",
+                        "payload": { "ipAddress": ipAddress, "port": port }
+                    }));
+                    console.log("Server info submitted");
+                } else {
+                    console.warn("WebSocket is not in OPEN state. Current state:", webSocket ? webSocket.readyState : 'undefined');
+                }
             });
         }
     }

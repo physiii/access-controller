@@ -171,14 +171,24 @@ void handle_authorize_message(cJSON *payload) {
         }
 
     } else if (cJSON_GetObjectItem(payload,"wifiName")) {
+        ESP_LOGI(AUTH_TAG, "Received WiFi credentials message");
         char wifiName[MAX_SSID_SIZE] = "";
         char wifiPassword[MAX_PASS_SIZE] = "";
         if (cJSON_GetObjectItem(payload, "wifiName") && cJSON_GetObjectItem(payload, "wifiPassword")) {
             snprintf(wifiName, sizeof(wifiName), "%s", cJSON_GetObjectItem(payload, "wifiName")->valuestring);
             snprintf(wifiPassword, sizeof(wifiPassword), "%s", cJSON_GetObjectItem(payload, "wifiPassword")->valuestring);
+            ESP_LOGI(AUTH_TAG, "Saving WiFi credentials: SSID='%s', Password='%s'", wifiName, wifiPassword);
             save_string_to_store("wifiName", wifiName);
             save_string_to_store("wifiPassword", wifiPassword);
-            vTaskDelay(100 / portTICK_PERIOD_MS);
+            
+            // Send confirmation message before restart
+            char confirm_msg[256];
+            snprintf(confirm_msg, sizeof(confirm_msg), 
+                     "{\"eventType\":\"wifiConfirm\", \"payload\":{\"status\":\"saved\", \"message\":\"WiFi credentials saved. Restarting...\"}}");
+            addClientMessageToQueue(confirm_msg);
+            
+            ESP_LOGI(AUTH_TAG, "WiFi credentials saved, restarting in 500ms...");
+            vTaskDelay(500 / portTICK_PERIOD_MS);
             esp_restart();
         }
 
@@ -196,7 +206,13 @@ static void auth_service(void *pvParameter) {
         handle_authorize_message(checkServiceMessageByAction("ac_1", "removeUser"));
         handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserCount"));
         handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserByCount"));
-        handle_authorize_message(checkServiceMessage("setWifiCredentials"));
+        
+        cJSON *wifi_msg = checkServiceMessage("setWifiCredentials");
+        if (wifi_msg) {
+            ESP_LOGI(AUTH_TAG, "Processing setWifiCredentials message");
+            handle_authorize_message(wifi_msg);
+        }
+        
         handle_authorize_message(checkServiceMessage("setServerInfo"));
         handle_authorize_message(checkServiceMessage("getInfo"));
         handle_authorize_message(checkServiceMessageByKey("uuid"));

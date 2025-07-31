@@ -29,7 +29,7 @@ struct async_resp_arg {
 };
 
 
-struct async_resp_arg *resp_arg;
+struct async_resp_arg *resp_arg = NULL;
 
 // Initialize resp_arg with a valid handle and invalid fd
 
@@ -44,9 +44,22 @@ static void ws_async_send(void *arg)
 
 static esp_err_t trigger_async_send(httpd_handle_t handle, httpd_req_t *req)
 {
-    struct async_resp_arg *resp_arg = malloc(sizeof(struct async_resp_arg));
+    // Free any existing resp_arg to prevent memory leaks
+    if (resp_arg) {
+        free(resp_arg);
+    }
+    
+    resp_arg = malloc(sizeof(struct async_resp_arg));
+    if (!resp_arg) {
+        ESP_LOGE(WS_TAG, "Failed to allocate memory for resp_arg");
+        return ESP_ERR_NO_MEM;
+    }
+    
     resp_arg->hd = req->handle;
     resp_arg->fd = httpd_req_to_sockfd(req);
+    should_send_data = true;
+    
+    ESP_LOGI(WS_TAG, "WebSocket connection established, fd: %d", resp_arg->fd);
     return httpd_queue_work(handle, ws_async_send, resp_arg);
 }
 
@@ -68,6 +81,12 @@ static esp_err_t echo_handler(httpd_req_t *req)
     esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "httpd_ws_recv_frame failed to get frame len with %d", ret);
+        // Clean up connection state on error
+        should_send_data = false;
+        if (resp_arg) {
+            free(resp_arg);
+            resp_arg = NULL;
+        }
         return ret;
     }
     if (ws_pkt.len) {
@@ -83,6 +102,12 @@ static esp_err_t echo_handler(httpd_req_t *req)
         if (ret != ESP_OK) {
             ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
             free(buf);
+            // Clean up connection state on error
+            should_send_data = false;
+            if (resp_arg) {
+                free(resp_arg);
+                resp_arg = NULL;
+            }
             return ret;
         }
 
@@ -102,12 +127,40 @@ static esp_err_t echo_handler(httpd_req_t *req)
     }
     ESP_LOGI(TAG, "Packet type: %d", ws_pkt.type);
 
+    // Handle WebSocket close frame
+    if (ws_pkt.type == HTTPD_WS_TYPE_CLOSE) {
+        ESP_LOGI(WS_TAG, "Received WebSocket close frame");
+        should_send_data = false;
+        if (resp_arg) {
+            free(resp_arg);
+            resp_arg = NULL;
+        }
+        return ESP_OK;
+    }
+
     ret = httpd_ws_send_frame(req, &ws_pkt);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "httpd_ws_send_frame failed with %d", ret);
+        // Clean up connection state on error
+        should_send_data = false;
+        if (resp_arg) {
+            free(resp_arg);
+            resp_arg = NULL;
+        }
     }
     free(buf);
     return ret;
+}
+
+static esp_err_t ws_close_handler(httpd_req_t *req)
+{
+    ESP_LOGI(WS_TAG, "WebSocket connection closed");
+    should_send_data = false;
+    if (resp_arg) {
+        free(resp_arg);
+        resp_arg = NULL;
+    }
+    return ESP_OK;
 }
 
 static const httpd_uri_t ws = {
@@ -116,6 +169,14 @@ static const httpd_uri_t ws = {
         .handler    = echo_handler,
         .user_ctx   = NULL,
         .is_websocket = true
+};
+
+static const httpd_uri_t ws_close = {
+        .uri        = "/ws/close",
+        .method     = HTTP_GET,
+        .handler    = ws_close_handler,
+        .user_ctx   = NULL,
+        .is_websocket = false
 };
 
 
@@ -130,6 +191,7 @@ static httpd_handle_t start_webserver(void)
         // Registering the ws handler
         ESP_LOGI(TAG, "Registering URI handlers");
         httpd_register_uri_handler(server, &ws);
+        httpd_register_uri_handler(server, &ws_close);
         return server;
     }
 
@@ -171,7 +233,7 @@ static void
 ws_service (void *pvParameter)
 {
   while (1) {
-		if (clientMessage.readyToSend && should_send_data) {
+		if (clientMessage.readyToSend && should_send_data && resp_arg && resp_arg->hd && resp_arg->fd > 0) {
 			char * data = clientMessage.message;
             httpd_handle_t hd = resp_arg->hd;
             int fd = resp_arg->fd;
@@ -181,7 +243,18 @@ ws_service (void *pvParameter)
             ws_pkt.len = strlen(data);
             ws_pkt.type = HTTPD_WS_TYPE_TEXT;
 
-            httpd_ws_send_frame_async(hd, fd, &ws_pkt);
+            esp_err_t ret = httpd_ws_send_frame_async(hd, fd, &ws_pkt);
+            if (ret != ESP_OK) {
+                ESP_LOGE(WS_TAG, "Failed to send WebSocket frame: %s", esp_err_to_name(ret));
+                // Reset connection state on error
+                should_send_data = false;
+                if (resp_arg) {
+                    free(resp_arg);
+                    resp_arg = NULL;
+                }
+            } else {
+                ESP_LOGI(WS_TAG, "WebSocket frame sent successfully");
+            }
 			clientMessage.readyToSend = false;
 		}
 
@@ -193,6 +266,7 @@ void start_ws_server(httpd_handle_t server)
 {
 	ESP_LOGI(WS_TAG, "Registering WS URI handlers");
 	httpd_register_uri_handler(server, &ws);
+	httpd_register_uri_handler(server, &ws_close);
 	xTaskCreate(ws_service, "ws_service", 5000, NULL, 10, NULL);
 	// resp_arg = malloc(sizeof(struct async_resp_arg));
 }
