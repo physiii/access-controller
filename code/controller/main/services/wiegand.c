@@ -239,8 +239,8 @@ void wiegand_main() {
 
 	gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
 
-	xTaskCreate(wiegand_timer, "wigand_timer", 2048, NULL, 10, NULL);
-	xTaskCreate(keypress_timer, "keypress_timer", 2048, NULL, 10, NULL);
+	xTaskCreate(wiegand_timer, "wigand_timer", 3072, NULL, 10, NULL);
+	xTaskCreate(keypress_timer, "keypress_timer", 3072, NULL, 10, NULL);
 	xTaskCreate(wiegand_task, "wiegand_task", 4 * 1000, NULL, 10, NULL);
 
 	for (int i=0; i < NUM_OF_WIEGANDS; i++) {

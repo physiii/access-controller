@@ -210,15 +210,15 @@ static void auth_service (void *pvParameter)
   uint8_t r;
 
   while (1) {
-    handle_authorize_message(checkServiceMessage("users"));
+    handle_authorize_message(checkServiceMessageByType("users"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "addUser"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "modifyUser"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "removeUser"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserCount"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "getUserByCount"));
-    handle_authorize_message(checkServiceMessage("setWifiCredentials"));
-    handle_authorize_message(checkServiceMessage("setServerInfo"));
-    handle_authorize_message(checkServiceMessage("getInfo"));
+    handle_authorize_message(checkServiceMessageByType("setWifiCredentials"));
+    handle_authorize_message(checkServiceMessageByType("setServerInfo"));
+    handle_authorize_message(checkServiceMessageByType("getInfo"));
     handle_authorize_message(checkServiceMessageByKey("uuid"));
     handle_authorize_message(checkServiceMessageByKey("token"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);

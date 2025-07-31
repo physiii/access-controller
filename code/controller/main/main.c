@@ -37,6 +37,7 @@
 #include "esp_spiffs.h"
 #include <time.h>
 #include "cJSON.h"
+#include "esp_timer.h"
 
 char stored_firmware_md5[33];
 bool need_to_update_firmware = true;

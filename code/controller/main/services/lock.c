@@ -212,40 +212,45 @@ void arm_lock(int channel, bool arm, bool alert) {
     }
 }
 
-int storeLockSettings() {
-    for (int i = 0; i < NUM_OF_LOCKS; i++) {
-        char key[50];
+void storeLockSettings(void)
+{
+    for (int i = 0; i < NUM_OF_LOCKS; i++)
+    {
+        char key[16]; // NVS key max is 15 chars + null terminator
+        
+        // Use shorter key names to fit NVS 15-character limit
         snprintf(key, sizeof(key), "lock_%d_enable", i + 1);
         set_bool(key, locks[i].enable);
         
         snprintf(key, sizeof(key), "lock_%d_arm", i + 1);
         set_bool(key, locks[i].shouldLock);
         
-        snprintf(key, sizeof(key), "lock_%d_contactAlert", i + 1);
+        snprintf(key, sizeof(key), "lock_%d_alert", i + 1);  // Shortened from "contactAlert"
         set_bool(key, locks[i].enableContactAlert);
         
-        snprintf(key, sizeof(key), "lock_%d_polarity", i + 1);
+        snprintf(key, sizeof(key), "lock_%d_pol", i + 1);    // Shortened from "polarity"
         set_bool(key, locks[i].polarity);
     }
-    return 0;
 }
 
-int restoreLockSettings() {
-    for (int i = 0; i < NUM_OF_LOCKS; i++) {
-        char key[50];
+void restoreLockSettings(void)
+{
+    for (int i = 0; i < NUM_OF_LOCKS; i++)
+    {
+        char key[16];
+        
         snprintf(key, sizeof(key), "lock_%d_enable", i + 1);
-        locks[i].enable = get_bool(key, true); // Default to enabled
+        locks[i].enable = get_bool(key, true);
         
         snprintf(key, sizeof(key), "lock_%d_arm", i + 1);
-        locks[i].shouldLock = get_bool(key, true); // Default to armed
+        locks[i].shouldLock = get_bool(key, true);
         
-        snprintf(key, sizeof(key), "lock_%d_contactAlert", i + 1);
-        locks[i].enableContactAlert = get_bool(key, false); // Default to disabled
+        snprintf(key, sizeof(key), "lock_%d_alert", i + 1);
+        locks[i].enableContactAlert = get_bool(key, false);
         
-        snprintf(key, sizeof(key), "lock_%d_polarity", i + 1);
-        locks[i].polarity = get_bool(key, false); // Default to normal polarity
+        snprintf(key, sizeof(key), "lock_%d_pol", i + 1);
+        locks[i].polarity = get_bool(key, true);
     }
-    return 0;
 }
 
 void sendLockState(void) {
@@ -370,7 +375,7 @@ void lock_init()
 
 static void lock_service(void *pvParameter) {
     while (1) {
-        handle_lock_message(checkServiceMessage("lock"));
+        handle_lock_message(checkServiceMessageByType("lock"));
         
         // Reduce frequency of contact checking to prevent spam
         static int contact_check_counter = 0;

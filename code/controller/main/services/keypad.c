@@ -189,7 +189,7 @@ keypad_service (void *pvParameter)
 		for (int i=0; i < NUM_OF_KEYPADS; i++)
 			check_keypads(&keypads[i]);
 
-		handle_keypad_message(checkServiceMessage("keypad"));
+		                handle_keypad_message(checkServiceMessageByType("keypad"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }

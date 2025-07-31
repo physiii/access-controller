@@ -152,7 +152,7 @@ radar_service (void *pvParameter)
 		for (int i=0; i < NUM_OF_RADARS; i++)
 			check_radar(&radars[i]);
 
-		handle_radar_message(checkServiceMessage("radar"));
+		                handle_radar_message(checkServiceMessageByType("radar"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }

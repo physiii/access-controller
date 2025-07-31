@@ -182,7 +182,7 @@ exit_service (void *pvParameter)
 		for (int i=0; i < NUM_OF_EXITS; i++)
 			check_exit(&exits[i]);
 
-		handle_exit_message(checkServiceMessage("exit"));
+		                handle_exit_message(checkServiceMessageByType("exit"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }
@@ -215,6 +215,6 @@ void exit_main()
 		gpio_set_direction(exits[1].pin, GPIO_MODE_INPUT);
 	}
 
-  	xTaskCreate(exit_timer, "exit_timer", 2048, NULL, 10, NULL);
+  	xTaskCreate(exit_timer, "exit_timer", 4096, NULL, 10, NULL);
 	xTaskCreate(exit_service, "exit_service", 5000, NULL, 10, NULL);
 }

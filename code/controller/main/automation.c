@@ -1,30 +1,23 @@
+#include <stdio.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_log.h"
+#include "esp_system.h"
+#include "cJSON.h"
 #include "automation.h"
-#include <time.h>
 
-// Definition of global variables
-#define MESSAGE_TIMEOUT 1
-char wss_data_in[1800];
-char wss_data_out[1800];
-bool wss_data_out_ready = false;
+static const char *TAG = "open-automation";
 
-bool run_relay = true;
-bool get_time = false;
-
+// Global variables needed by other modules
 char token[700] = {0};
 char device_id[100] = {0};
-char wifi_ssid[32];
-char wifi_password[64];
 char server_ip[32];
 char server_port[8];
 
-bool disconnect_from_relay = false;
-bool connect_to_relay = false;
-
-const char *TAG = "open-automation";
-
 struct ServiceMessage serviceMessage;
 struct ServiceMessage clientMessage;
-
 
 void init_automation_queues() {
     serviceMessage.queueCount = 0;
@@ -33,7 +26,34 @@ void init_automation_queues() {
     clientMessage.mutex = xSemaphoreCreateMutex();
 }
 
-cJSON *checkServiceMessage(char *eventType) {
+void checkServiceMessage(void) {
+    if (serviceMessage.queueCount > 0) {
+        if (xSemaphoreTake(serviceMessage.mutex, portMAX_DELAY)) {
+            if (serviceMessage.queueCount > 0) {
+                cJSON *message = serviceMessage.messageQueue[0];
+                
+                if (message) {
+                    cJSON *eventType = cJSON_GetObjectItem(message, "eventType");
+                    if (eventType && cJSON_IsString(eventType)) {
+                        ESP_LOGI(TAG, "Message processed for eventType: %s", eventType->valuestring);
+                    }
+                    
+                    cJSON_Delete(message);
+                    
+                    // Shift queue
+                    for (int i = 1; i < serviceMessage.queueCount; i++) {
+                        serviceMessage.messageQueue[i - 1] = serviceMessage.messageQueue[i];
+                    }
+                    serviceMessage.messageQueue[serviceMessage.queueCount - 1] = NULL;
+                    serviceMessage.queueCount--;
+                }
+            }
+            xSemaphoreGive(serviceMessage.mutex);
+        }
+    }
+}
+
+cJSON *checkServiceMessageByType(char *eventType) {
     cJSON *response = NULL;
     if (xSemaphoreTake(serviceMessage.mutex, portMAX_DELAY)) {
         for (int i = 0; i < serviceMessage.queueCount; i++) {
@@ -44,7 +64,7 @@ cJSON *checkServiceMessage(char *eventType) {
                     if (payloadItem) {
                         response = cJSON_Duplicate(payloadItem, 1);
                         ESP_LOGI(TAG, "Message processed for eventType: %s", eventType);
-
+                        
                         cJSON_Delete(serviceMessage.messageQueue[i]);
                         for (int j = i; j < serviceMessage.queueCount - 1; j++) {
                             serviceMessage.messageQueue[j] = serviceMessage.messageQueue[j + 1];
@@ -79,7 +99,7 @@ cJSON *checkServiceMessageByAction(char *id, char *action) {
         cJSON *serviceIdItem = cJSON_GetObjectItem(currentMessage, "service_id");
 
         if (!propertyItem || !serviceIdItem) {
-            continue; // Skip this iteration if the necessary items are not present
+            continue;
         }
 
         if (strcmp(propertyItem->valuestring, action) == 0 && strcmp(serviceIdItem->valuestring, id) == 0) {
@@ -90,30 +110,28 @@ cJSON *checkServiceMessageByAction(char *id, char *action) {
 }
 
 cJSON *checkServiceMessageByKey(char *key) {
-    cJSON *null_payload = NULL;
-    
     for (int i = 0; i < serviceMessage.queueCount; i++) {
         cJSON *currentMessage = serviceMessage.messageQueue[i];
         cJSON *item = cJSON_GetObjectItem(currentMessage, key);
 
         if (item) {
-            return cJSON_Duplicate(currentMessage, 1);  // Return a copy of the found message
+            return cJSON_Duplicate(currentMessage, 1);
         }
     }
-
-    return null_payload;  // Return NULL if no matching key found
+    return NULL;
 }
 
 void addServiceMessageToQueue(cJSON *message) {
     if (!message) {
-        ESP_LOGE(TAG, "Attempting to add a null message to the queue.");
+        ESP_LOGE(TAG, "Attempting to add a null message to service queue.");
         return;
     }
 
-    if (xSemaphoreTake(serviceMessage.mutex, portMAX_DELAY)) {
-        size_t free_heap = esp_get_free_heap_size();
-        if (free_heap < 10000) { // Increased threshold to 10KB
-            ESP_LOGW(TAG, "Critical memory low (%zu bytes), clearing message queue", free_heap);
+    // Emergency memory check
+    size_t free_heap = esp_get_free_heap_size();
+    if (free_heap < 10240) { // 10KB threshold
+        ESP_LOGW(TAG, "Low memory (%d bytes), clearing service queue", free_heap);
+        if (xSemaphoreTake(serviceMessage.mutex, portMAX_DELAY)) {
             for (int i = 0; i < serviceMessage.queueCount; i++) {
                 if (serviceMessage.messageQueue[i]) {
                     cJSON_Delete(serviceMessage.messageQueue[i]);
@@ -121,8 +139,12 @@ void addServiceMessageToQueue(cJSON *message) {
                 }
             }
             serviceMessage.queueCount = 0;
+            xSemaphoreGive(serviceMessage.mutex);
         }
+        return;
+    }
 
+    if (xSemaphoreTake(serviceMessage.mutex, portMAX_DELAY)) {
         if (serviceMessage.queueCount >= MAX_QUEUE_SIZE) {
             ESP_LOGW(TAG, "Service message queue full. Dropping the oldest message.");
             if (serviceMessage.messageQueue[0]) {
@@ -131,21 +153,17 @@ void addServiceMessageToQueue(cJSON *message) {
             for (int i = 1; i < serviceMessage.queueCount; i++) {
                 serviceMessage.messageQueue[i - 1] = serviceMessage.messageQueue[i];
             }
-             serviceMessage.messageQueue[serviceMessage.queueCount -1] = NULL;
+            serviceMessage.messageQueue[serviceMessage.queueCount - 1] = NULL;
             serviceMessage.queueCount--;
         }
 
         cJSON *duplicateMessage = cJSON_Duplicate(message, 1);
         if (!duplicateMessage) {
-            ESP_LOGE(TAG, "Failed to duplicate message. Potential memory issue.");
+            ESP_LOGE(TAG, "Failed to duplicate service message. Potential memory issue.");
         } else {
             serviceMessage.messageQueue[serviceMessage.queueCount] = duplicateMessage;
             serviceMessage.queueCount++;
-             char *json_string = cJSON_PrintUnformatted(duplicateMessage);
-            if (json_string) {
-                ESP_LOGI(TAG, "Added message to service queue: %s", json_string);
-                free(json_string);
-            }
+            ESP_LOGI(TAG, "Added message to service queue.");
         }
         xSemaphoreGive(serviceMessage.mutex);
     }
@@ -166,7 +184,7 @@ void addClientMessageToQueue(cJSON *message) {
             for (int i = 1; i < clientMessage.queueCount; i++) {
                 clientMessage.messageQueue[i - 1] = clientMessage.messageQueue[i];
             }
-             clientMessage.messageQueue[clientMessage.queueCount -1] = NULL;
+            clientMessage.messageQueue[clientMessage.queueCount - 1] = NULL;
             clientMessage.queueCount--;
         }
 
@@ -184,11 +202,20 @@ void addClientMessageToQueue(cJSON *message) {
         }
         xSemaphoreGive(clientMessage.mutex);
     }
-} 
+}
 
 void addServerMessageToQueue(const char *message) {
-    cJSON *msg_json = cJSON_CreateObject();
-    cJSON_AddStringToObject(msg_json, "message", message);
-    addServiceMessageToQueue(msg_json);
-    cJSON_Delete(msg_json);
+    if (!message) {
+        ESP_LOGE(TAG, "Attempting to add a null message string to server queue.");
+        return;
+    }
+
+    cJSON *json_msg = cJSON_Parse(message);
+    if (!json_msg) {
+        ESP_LOGE(TAG, "Failed to parse server message as JSON: %s", message);
+        return;
+    }
+
+    addServiceMessageToQueue(json_msg);
+    cJSON_Delete(json_msg);
 } 

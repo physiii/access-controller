@@ -37,5 +37,5 @@ void buzzer_main() {
     gpio_set_direction(bzr.pin, GPIO_MODE_OUTPUT);
     gpio_set_level(bzr.pin, 0);
 
-    xTaskCreate(buzzer_task, "buzzer_task", 2048, NULL, 10, NULL);
+    xTaskCreate(buzzer_task, "buzzer_task", 3072, NULL, 10, NULL);
 }

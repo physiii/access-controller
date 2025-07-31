@@ -169,7 +169,7 @@ fob_service (void *pvParameter)
 		for (int i=0; i < NUM_OF_FOBS; i++)
 			check_fobs(&fobs[i]);
 
-		handle_fob_message(checkServiceMessage("fob"));
+		                handle_fob_message(checkServiceMessageByType("fob"));
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }
