@@ -74,26 +74,16 @@ sendRadarEventToServer()
 	}
 }
 
-int
-sendRadarEventToClient()
-{
-	for (uint8_t i=0; i < NUM_OF_RADARS; i++) {
-		char type[25] = "";
-		strcpy(type, radars[i].type);
-		sprintf(radars[i].settings,
-			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"delay\": %d, \"presence\": %s}}",
-			type,
-			i+1,
-			(radars[i].enable) ? "true" : "false",
-			(radars[i].alert) ? "true" : "false",
-			radars[i].delay,
-			(radars[i].isPressed) ? "true" : "false");
-
-		addClientMessageToQueue(radars[i].settings);
-		printf("sendRadarEventToClient: %s\n", radars[i].settings);
-	}
-	return 0;
+void sendRadarEventToClient(int channel, bool state) {
+    for (int i=0; i<NUM_OF_RADARS; i++) {
+        if (radars[i].channel == channel) {
+            if (strlen(radars[i].settings) > 2) {
+                cJSON *json_msg = cJSON_Parse(radars[i].settings);
+                addClientMessageToQueue(json_msg);
+                cJSON_Delete(json_msg);
+            }
+        }
+    }
 }
 
 void enableRadar (int ch, bool val)
@@ -115,7 +105,7 @@ void check_radar (struct radarButton *ext)
 	ext->isPressed = get_io(ext->pin);
 
 	if (ext->isPressed != ext->prevPress) {
-		sendRadarEventToClient();
+		sendRadarEventToClient(ext->channel, ext->isPressed);
 		sendRadarEventToServer();
 	}
 
@@ -131,7 +121,7 @@ void handle_radar_message(cJSON * payload)
 	if (payload == NULL) return;
 
 	if (cJSON_GetObjectItem(payload,"getState")) {
-		sendRadarEventToClient();
+		sendRadarEventToClient(radars[0].channel, radars[0].isPressed);
 		sendRadarEventToServer();
 	}
 

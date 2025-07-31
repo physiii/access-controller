@@ -139,7 +139,7 @@ void check_lock_contact_timer(Lock *lck) {
             }
             ESP_LOGI(TAG, "No contact from lock %d, sounding alert.", lck->channel);
         }
-        longBeep(1);
+        beep_keypad(1, 50);
     } else {
         lck->sentSignalAlert = false;
         lck->sentContactAlert = false;
@@ -207,7 +207,7 @@ void arm_lock(int channel, bool arm, bool alert) {
     start_lock_contact_timer(&locks[ch], true);
 
     if (locks[ch].alert) {
-        beep(1);
+        beep_keypad(1, 50);
         beep_keypad(1, locks[ch].channel);
     }
 }
@@ -248,27 +248,21 @@ int restoreLockSettings() {
     return 0;
 }
 
-int sendLockState()
-{
-    char response[1000];
+void sendLockState(void) {
     for (int i = 0; i < NUM_OF_LOCKS; i++) {
-        snprintf(response, sizeof(response), 
-            "{\"eventType\":\"lock\",\"payload\":{"
-            "\"channel\":%d,"
-            "\"enable\":%s,"
-            "\"arm\":%s,"
-            "\"enableContactAlert\":%s,"
-            "\"polarity\":%s"
-            "}}",
-            locks[i].channel,
-            locks[i].enable ? "true" : "false",
-            locks[i].shouldLock ? "true" : "false",
-            locks[i].enableContactAlert ? "true" : "false",
-            locks[i].polarity ? "true" : "false"
-        );
-        addClientMessageToQueue(response);
+        cJSON *root = cJSON_CreateObject();
+        cJSON_AddStringToObject(root, "eventType", "lock");
+        cJSON *payload = cJSON_CreateObject();
+        cJSON_AddNumberToObject(payload, "channel", i + 1);
+        cJSON_AddBoolToObject(payload, "enable", locks[i].enable);
+        cJSON_AddBoolToObject(payload, "arm", locks[i].shouldLock);
+        cJSON_AddBoolToObject(payload, "enableContactAlert", locks[i].enableContactAlert);
+        cJSON_AddBoolToObject(payload, "polarity", locks[i].polarity);
+        cJSON_AddItemToObject(root, "payload", payload);
+        
+        addClientMessageToQueue(root);
+        cJSON_Delete(root);
     }
-    return 0;
 }
 
 void handle_lock_message(cJSON * payload) {
@@ -396,7 +390,7 @@ static void lock_service(void *pvParameter) {
                     }
                     
                     if (!hasContact) {
-                        ESP_LOGW(TAG, "No contact from lock %d, sounding alert.", i + 1);
+                        ESP_LOGI(TAG, "No contact from lock %d, sounding alert.", i + 1);
                         beep_keypad(1, 200);
                     }
                 }

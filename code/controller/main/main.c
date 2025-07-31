@@ -21,6 +21,23 @@
 #include "services/ap.c"
 #include "esp_http_client.h"
 
+#include <stdio.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_vfs_fat.h"
+#include "esp_spiffs.h"
+#include <time.h>
+#include "cJSON.h"
+
 char stored_firmware_md5[33];
 bool need_to_update_firmware = true;
 
@@ -102,12 +119,18 @@ void app_main(void) {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
+    // Initialize NVS
     esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
+    init_automation_queues();
+
+    // Get device ID
     strcpy(device_id, get_char("device_id"));
 
     strcpy(token, get_char("token"));
@@ -117,13 +140,7 @@ void app_main(void) {
     } else {
         ESP_LOGI(TAG, "Token: %s", token);
     }
-
-    serviceMessage.read = true;
-    serviceMessage.message = NULL;
-
-    clientMessage.readyToSend = false;
-    serverMessage.readyToSend = false;
-
+    
     char wifi_ssid[32];
     char wifi_password[64];
     snprintf(wifi_ssid, sizeof(wifi_ssid), "pyfitech");
@@ -148,19 +165,14 @@ void app_main(void) {
 
         snprintf(ota_url, sizeof(ota_url), "http://%s:%s/firmware.bin", server_ip, server_port);
         // Compare the latest firmware MD5 hash with the stored one
-        bool need_to_update_firmware = strcmp(stored_firmware_md5, latest_firmware_md5) != 0;
+        need_to_update_firmware = strcmp(stored_firmware_md5, latest_firmware_md5) != 0;
 
         if (need_to_update_firmware) {
             perform_ota_update(ota_url);
         }
 
-        // Start services that require credentials (some of these services use device id and token)
-        // ws_client_main(server_ip, server_port);  // Disabled - external server not available
-
         if (strcmp(device_id, "") == 0) {
-            ESP_LOGE(tag, "Device ID not found");
-        } else {
-            // xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10 * 1000, NULL, 5, NULL);  // Disabled - depends on WebSocket client
+            ESP_LOGE(TAG, "Device ID not found");
         }
     }
 
@@ -169,15 +181,11 @@ void app_main(void) {
     mcp23x17_main();
     auth_main();
     buzzer_main();
-    // wiegand_main();
+    wiegand_main();
     exit_main();
-    // keypad_main();
-
-    // #if STRIKE
+    keypad_main();
     radar_main();
-    // #else
     fob_main();
-    // #endif
     lock_main();
     server_main();
 
@@ -185,14 +193,6 @@ void app_main(void) {
         ESP_LOGI(TAG, "SPIFFS Initialized successfully");
     }
     send_user_count();
-
-    TaskHandle_t serviceMessageTaskHandle = NULL;
-    TaskHandle_t clientMessageTaskHandle = NULL;
-    TaskHandle_t serverMessageTaskHandle = NULL;
-
-    xTaskCreate(serviceMessageTask, "serviceMessageTask", 5000, NULL, 10, &serviceMessageTaskHandle);
-    xTaskCreate(clientMessageTask, "clientMessageTask", 5000, NULL, 10, &clientMessageTaskHandle);
-    xTaskCreate(serverMessageTask, "serverMessageTask", 5000, NULL, 10, &serverMessageTaskHandle);
 
     int cnt = 0;
     while (1) {
@@ -214,9 +214,6 @@ void app_main(void) {
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "Failed to get NVS stats (%s)", esp_err_to_name(err));
         }
-
-        // Get Task Status
-        UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
 
         // Log system status
         ESP_LOGI(TAG, "------ SYSTEM STATUS ------");

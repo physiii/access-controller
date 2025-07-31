@@ -90,24 +90,14 @@ int restoreExitSettings()
 	return 0;
 }
 
-int sendExitState()
-{
-	for (uint8_t i=0; i < NUM_OF_EXITS; i++) {
-		char type[25] = "";
-		strcpy(type, exits[i].type);
-		sprintf(exits[i].settings,
-			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"delay\": %d}}",
-			type,
-			i+1,
-			(exits[i].enable) ? "true" : "false",
-			(exits[i].alert) ? "true" : "false",
-			exits[i].delay);
-
-		addClientMessageToQueue(exits[i].settings);
-		// printf("sendExitState: %s\n", exits[i].settings);
-	}
-  return 0;
+void sendExitState(void) {
+    for (int i=0; i < NUM_OF_EXITS; i++) {
+        if (strlen(exits[i].settings) > 2) {
+            cJSON *json_msg = cJSON_Parse(exits[i].settings);
+            addClientMessageToQueue(json_msg);
+            cJSON_Delete(json_msg);
+        }
+    }
 }
 
 

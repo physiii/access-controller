@@ -94,12 +94,13 @@ void send_user_count() {
     addServerMessageToQueue(msg);
 }
 
-void sendInfo()
+void sendInfo(void)
 {
-    printf("Sending info\n");
-    char msg[200] = "";
+    char msg[200];
     sprintf(msg, "{\"eventType\":\"authorize\", \"payload\":{\"uuid\":\"%s\"}}", device_id);
-    addClientMessageToQueue(msg);
+    cJSON *json_msg = cJSON_Parse(msg);
+    addClientMessageToQueue(json_msg);
+    cJSON_Delete(json_msg);
 }
 
 void handle_authorize_message(cJSON * payload) {

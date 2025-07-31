@@ -9,52 +9,20 @@ struct buzzer
 
 struct buzzer bzr;
 
-void startBeep (struct buzzer *bz) {
-	if (!bz->enable) return;
+void beep_keypad(int beeps, int duration) {
+    if (!bzr.enable) return;
 
-	for (int i=0; i < bz->beepCount; i++) {
-		gpio_set_level(bz->pin, true);
-		vTaskDelay(100 / portTICK_PERIOD_MS);
-		gpio_set_level(bz->pin, false);
-		vTaskDelay(150 / portTICK_PERIOD_MS);
-	}
-
-	bz->beepCount = 0;
-}
-
-void startLongBeep (struct buzzer *bz) {
-	if (!bz->contactAlert) return;
-
-	for (int i=0; i < bz->longBeepCount; i++) {
-		gpio_set_level(bz->pin, true);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-		gpio_set_level(bz->pin, false);
-		vTaskDelay(200 / portTICK_PERIOD_MS);
-	}
-
-	bz->longBeepCount = 0;
-}
-
-void beep(int cnt) {
-	bzr.beepCount = cnt;
-}
-
-void longBeep(int cnt) {
-	bzr.longBeepCount = cnt;
-}
-
-void turn_buzzer_on (bool val) {
-	gpio_set_level(bzr.pin, val);
-}
-
-void enable_buzzer(bool val) {
-	bzr.enable = val;
+    for (int i = 0; i < beeps; i++) {
+        gpio_set_level(bzr.pin, 1);
+        vTaskDelay(duration / portTICK_PERIOD_MS);
+        gpio_set_level(bzr.pin, 0);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
 }
 
 static void buzzer_task(void *pvParameter) {
   while (1) {
-		startBeep(&bzr);
-		startLongBeep(&bzr);
+    // This task can be used for more complex patterns in the future
     vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
   }
 }
@@ -66,5 +34,8 @@ void buzzer_main() {
 	bzr.longBeepCount = 0;
 	bzr.beepCount = 0;
 
-  xTaskCreate(buzzer_task, "buzzer_task", 2048, NULL, 10, NULL);
+    gpio_set_direction(bzr.pin, GPIO_MODE_OUTPUT);
+    gpio_set_level(bzr.pin, 0);
+
+    xTaskCreate(buzzer_task, "buzzer_task", 2048, NULL, 10, NULL);
 }

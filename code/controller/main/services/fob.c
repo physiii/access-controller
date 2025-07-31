@@ -1,6 +1,4 @@
-#define FOB_IO_1         A7
-#define FOB_IO_2         B7
-#define NUM_OF_FOBS		  2
+#define NUM_OF_FOBS			    2
 #define MOMENTARY		  1
 
 char fob_service_message[2000];
@@ -125,22 +123,14 @@ int restoreFobSettings()
 	return 0;
 }
 
-int sendFobState()
-{
-	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-		char type[25] = "";
-		strcpy(type, fobs[i].type);
-		sprintf(fobs[i].settings,
-			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s}}",
-			type,
-			i+1,
-			(fobs[i].enable) ? "true" : "false",
-			(fobs[i].alert) ? "true" : "false");
-		addClientMessageToQueue(fobs[i].settings);
-		// printf("sendFobSettings: %s\n", fobs[i].settings);
-	}
-  return 0;
+void sendFobState(void) {
+    for (int i=0; i < NUM_OF_FOBS; i++) {
+        if (strlen(fobs[i].settings) > 2) {
+            cJSON *json_msg = cJSON_Parse(fobs[i].settings);
+            addClientMessageToQueue(json_msg);
+            cJSON_Delete(json_msg);
+        }
+    }
 }
 
 void handle_fob_message(cJSON * payload)

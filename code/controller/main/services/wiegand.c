@@ -40,30 +40,6 @@ struct wiegand wg[NUM_OF_WIEGANDS];
 
 static QueueHandle_t gpio_evt_queue = NULL;
 
-void beep_keypad (int count, int ch)
-{
-	if (ch < 1 || ch > NUM_OF_WIEGANDS) return;
-
-
-	// for (int i=0; i < count; i++) {
-	// 	vTaskDelay(30 / portTICK_PERIOD_MS);
-	// 	set_io(wg[ch - 1].pin_push, true);
-	// 	vTaskDelay(240 / portTICK_PERIOD_MS);
-	// 	set_io(wg[ch - 1].pin_push, false);
-	// 	vTaskDelay(30 / portTICK_PERIOD_MS);
-	// 	set_io(wg[ch - 1].pin_push, true);
-	// }
-
-	for (int i=0; i < count; i++) {
-		vTaskDelay(1 * 30 / portTICK_PERIOD_MS);
-		set_io(wg[ch - 1].pin_push, true);
-		vTaskDelay(2 * 240 / portTICK_PERIOD_MS);
-		set_io(wg[ch - 1].pin_push, false);
-		vTaskDelay(1 * 30 / portTICK_PERIOD_MS);
-		set_io(wg[ch - 1].pin_push, true);
-	}
-}
-
 static void IRAM_ATTR wiegand_isr_handler(void* arg) {
 	gpio_event_t event;
 	event.gpio_num = (uint32_t) arg;

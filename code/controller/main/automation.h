@@ -20,7 +20,7 @@ bool get_mcp_io(uint8_t);
 #define SERVICE_LOOP 100
 #define SERVICE_LOOP_SHORT 10
 #define STRIKE 0
-#define MAX_QUEUE_SIZE 10
+#define MAX_QUEUE_SIZE 20 // Increased queue size
 
 #if STRIKE
 #define USE_MCP23017 0
@@ -52,44 +52,22 @@ extern const char *TAG;
 
 struct ServiceMessage
 {
-    cJSON *message;
     cJSON *messageQueue[MAX_QUEUE_SIZE];
-    bool read;
-    int timeout;
     int queueCount;
-};
-
-struct ClientMessage
-{
-    char message[1000];
-    char messageQueue[MAX_QUEUE_SIZE][1000];
-    bool readyToSend;
-    int timeout;
-    int queueCount;
-};
-
-struct ServerMessage
-{
-    char message[1000];
-    char messageQueue[MAX_QUEUE_SIZE][1000];
-    bool readyToSend;
-    int timeout;
-    int queueCount;
+    SemaphoreHandle_t mutex;
 };
 
 extern struct ServiceMessage serviceMessage;
-extern struct ClientMessage clientMessage;
-extern struct ServerMessage serverMessage;
+extern struct ServiceMessage clientMessage;
+
 
 // Function declarations
+void init_automation_queues(void);
 cJSON *checkServiceMessage(char *eventType);
 cJSON *checkServiceMessageByAction(char *id, char *action);
 cJSON *checkServiceMessageByKey(char *key);
 void addServiceMessageToQueue(cJSON *message);
-void addServerMessageToQueue(const char *message);
-void addClientMessageToQueue(char *message);
-void serviceMessageTask(void *pvParameter);
-void serverMessageTask(void *pvParameter);
-void clientMessageTask(void *pvParameter);
+void addClientMessageToQueue(cJSON *message);
+
 
 #endif // AUTOMATION_H

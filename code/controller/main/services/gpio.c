@@ -1,54 +1,36 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/gpio.h"
-#include "driver/gpio.h"
-#include <string.h>
 
 #define MCP_INTA_GPIO 	34
 #define MCP_INTB_GPIO 	35
 
-#define LOCK_IO_1 		18
-#define LOCK_IO_2 		19
+// Onboard IO
+#define BUZZER_IO 2
+#define CONTACT_IO_1 3
+#define CONTACT_IO_2 4
+#define LOCK_IO_1 5
+#define LOCK_IO_2 6
+#define EXIT_BUTTON_IO_1 7
+#define EXIT_BUTTON_IO_2 8
+#define FOB_IO_1 9
+#define FOB_IO_2 10
+#define RADAR_BUTTON_IO_1 11
+#define RADAR_BUTTON_IO_2 12
+#define KEYPAD_IO_1 15 
+#define KEYPAD_IO_2 16 
 
-#define CONTACT_IO_1 	15
-#define CONTACT_IO_2 	16
-
-#define SIGNAL_IO_1 	15
-#define SIGNAL_IO_2 	16
-
-#if STRIKE
-	#define OPEN_IO_1				4
-	#define OPEN_IO_2				23
-	#define RADAR_BUTTON_IO_1		17
-	#define RADAR_BUTTON_IO_2		17
-	#define EXIT_BUTTON_IO_1		14
-	#define EXIT_BUTTON_IO_2		14
-	#define KEYPAD_IO_1				13
-	#define KEYPAD_IO_2				27
-	#define BUZZER_IO 				14
-	#define WG0_DATA0_IO			16
-	#define WG0_DATA1_IO			4
-	#define WG1_DATA0_IO			32
-	#define WG1_DATA1_IO			5
-#else
-	#define RADAR_BUTTON_IO_1		17
-	#define RADAR_BUTTON_IO_2		17
-	#define OPEN_IO_1				A4
-	#define OPEN_IO_2				B4
-	#define EXIT_BUTTON_IO_1		35
-	#define EXIT_BUTTON_IO_2		35
-	#define KEYPAD_IO_1				13
-	#define KEYPAD_IO_2				27
-	#define BUZZER_IO 				14
-	#define WG0_DATA0_IO			16
-	#define WG0_DATA1_IO			4
-	#define WG1_DATA0_IO			32
-	#define WG1_DATA1_IO			5
-#endif
+// Wiegand definitions
+#define WG0_DATA0_IO 17
+#define WG0_DATA1_IO 18
+#define WG1_DATA0_IO 19
+#define WG1_DATA1_IO 20
+#define OPEN_IO_1 21
+#define SIGNAL_IO_1 15
+#define SIGNAL_IO_2 16
 
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<BUZZER_IO) | (1ULL<<LOCK_IO_1) | (1ULL<<LOCK_IO_2) | (1ULL<<OPEN_IO_1))
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<WG0_DATA0_IO) | (1ULL<<WG0_DATA1_IO) | (1ULL<<CONTACT_IO_1) | (1ULL<<CONTACT_IO_2) | (1ULL<<MCP_INTA_GPIO) | (1ULL<<MCP_INTB_GPIO) | (1ULL<<KEYPAD_IO_1) | (1ULL<<EXIT_BUTTON_IO_1))

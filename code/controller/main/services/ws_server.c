@@ -74,6 +74,7 @@ static esp_err_t echo_handler(httpd_req_t *req)
 			ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
             should_send_data = true;
 			addServiceMessageToQueue(msg);
+            cJSON_Delete(msg); // Free the parsed message
 			
             if (xSemaphoreTake(ws_mutex, portMAX_DELAY)) {
                 // Add client to list if not already present
@@ -121,41 +122,53 @@ static const httpd_uri_t echo = {
         .is_websocket = true
 };
 
-static void ws_service (void *pvParameter)
+static void
+ws_service (void *pvParameter)
 {
   while (1) {
-		if (clientMessage.readyToSend && active_clients > 0) {
-			printf("Sending (%d): %s\n", clientMessage.queueCount, clientMessage.message);
-			char * data = clientMessage.message;
-            
-            if (xSemaphoreTake(ws_mutex, portMAX_DELAY)) {
-                // Send to all active clients
-                for (int i = 0; i < active_clients; i++) {
-                    httpd_handle_t hd = ws_clients[i].hd;
-                    int fd = ws_clients[i].fd;
-                    httpd_ws_frame_t ws_pkt;
-                    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-                    ws_pkt.payload = (uint8_t*)data;
-                    ws_pkt.len = strlen(data);
-                    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+        if (clientMessage.queueCount > 0) {
+            if (xSemaphoreTake(clientMessage.mutex, portMAX_DELAY)) {
+                if(clientMessage.queueCount > 0) {
+                    cJSON *message_to_send = clientMessage.messageQueue[0];
+                    char *data = cJSON_PrintUnformatted(message_to_send);
 
-                    esp_err_t ret = httpd_ws_send_frame_async(hd, fd, &ws_pkt);
-                    if (ret != ESP_OK) {
-                        ESP_LOGE(WS_TAG, "Error sending to client %d: %d", i, ret);
-                        // Remove disconnected client
-                        for (int j = i; j < active_clients - 1; j++) {
-                            ws_clients[j] = ws_clients[j + 1];
+                    if (data) {
+                        printf("Sending (%d): %s\n", clientMessage.queueCount, data);
+
+                        if (xSemaphoreTake(ws_mutex, portMAX_DELAY)) {
+                            for (int i = 0; i < active_clients; i++) {
+                                httpd_handle_t hd = ws_clients[i].hd;
+                                int fd = ws_clients[i].fd;
+                                httpd_ws_frame_t ws_pkt;
+                                memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+                                ws_pkt.payload = (uint8_t*)data;
+                                ws_pkt.len = strlen(data);
+                                ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+                                esp_err_t ret = httpd_ws_send_frame_async(hd, fd, &ws_pkt);
+                                if (ret != ESP_OK) {
+                                    ESP_LOGE(WS_TAG, "Error sending to client %d: %d", i, ret);
+                                    for (int j = i; j < active_clients - 1; j++) {
+                                        ws_clients[j] = ws_clients[j + 1];
+                                    }
+                                    active_clients--;
+                                    i--; 
+                                }
+                            }
+                            xSemaphoreGive(ws_mutex);
                         }
-                        active_clients--;
-                        i--; // Adjust index after removal
+                        free(data);
                     }
+                    
+                    cJSON_Delete(message_to_send);
+                    for (int j = 0; j < clientMessage.queueCount - 1; j++) {
+                        clientMessage.messageQueue[j] = clientMessage.messageQueue[j+1];
+                    }
+                    clientMessage.messageQueue[clientMessage.queueCount-1] = NULL;
+                    clientMessage.queueCount--;
                 }
-                xSemaphoreGive(ws_mutex);
+                xSemaphoreGive(clientMessage.mutex);
             }
-			clientMessage.readyToSend = false;
-            
-            // Clear the message to free memory
-            memset(clientMessage.message, 0, sizeof(clientMessage.message));
 		}
 
         // Periodically check if clients are still connected
