@@ -44,6 +44,9 @@ void check_fobs(fob_t *fb) {
     if (!fb->enable) return;
     fb->isPressed = get_mcp_io(fb->pin);
     if (!MOMENTARY && fb->isPressed != fb->prevPress) {
+        if (fb->isPressed) {
+            ESP_LOGI("FOB", "Fob %d activated on channel %d", fb->pin, fb->channel);
+        }
         arm_lock(fb->channel, fb->isPressed, fb->alert);
     } else if (!fb->isPressed && fb->prevPress) {
         arm_lock(fb->channel, false, fb->alert);
@@ -131,15 +134,15 @@ void fob_main() {
     fobs[0].pin = FOB_IO_1;
     fobs[0].delay = 4;
     fobs[0].channel = 1;
-    fobs[0].enable = false;
-    fobs[0].alert = false;
+    fobs[0].enable = true;
+    fobs[0].alert = true;
     strcpy(fobs[0].type, "fob");
 
     fobs[1].pin = FOB_IO_2;
     fobs[1].delay = 4;
     fobs[1].channel = 2;
-    fobs[1].enable = false;
-    fobs[1].alert = false;
+    fobs[1].enable = true;
+    fobs[1].alert = true;
     strcpy(fobs[1].type, "fob");
 
     if (USE_MCP23017) {

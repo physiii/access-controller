@@ -45,8 +45,12 @@ static void motion_timer(void *pvParameter) {
 }
 
 void check_motions(motion_t *mtn) {
+    if (!mtn->enable) return;
     mtn->isPressed = get_mcp_io(mtn->pin);
     if (!MOMENTARY && mtn->isPressed != mtn->prevPress) {
+        if (mtn->isPressed) {
+            ESP_LOGI("MOTION", "Motion sensor %d activated on channel %d", mtn->pin, mtn->channel);
+        }
         arm_lock(mtn->channel, mtn->isPressed, mtn->alert);
         enableExit(mtn->channel, mtn->isPressed);
         enableKeypad(mtn->channel, mtn->isPressed);
@@ -146,15 +150,15 @@ void motion_main() {
     motions[0].pin = MOTION_IO_1;
     motions[0].delay = 4;
     motions[0].channel = 1;
-    motions[0].enable = false;
-    motions[0].alert = false;
+    motions[0].enable = true;
+    motions[0].alert = true;
     strcpy(motions[0].type, "motion");
 
     motions[1].pin = MOTION_IO_2;
     motions[1].delay = 4;
     motions[1].channel = 2;
-    motions[1].enable = false;
-    motions[1].alert = false;
+    motions[1].enable = true;
+    motions[1].alert = true;
     strcpy(motions[1].type, "motion");
 
     if (USE_MCP23017) {

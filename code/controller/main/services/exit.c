@@ -87,8 +87,9 @@ int sendExitState() {
 
 void check_exit(exitButton_t *ext) {
     if (!ext->enable) return;
-    ext->isPressed = !get_io(ext->pin);
+    ext->isPressed = !get_mcp_io(ext->pin);
     if (ext->isPressed && !ext->prevPress) {
+        ESP_LOGI(EXIT_TAG, "Exit button %d pressed on channel %d", ext->pin, ext->channel);
         arm_lock(ext->channel, false, ext->alert);
         start_exit_timer(ext, true);
     }
@@ -161,15 +162,15 @@ void exit_main() {
     exits[0].pin = USE_MCP23017 ? EXIT_BUTTON_MCP_IO_1 : EXIT_BUTTON_IO_1;
     exits[0].delay = 4;
     exits[0].channel = 1;
-    exits[0].alert = false;
-    exits[0].enable = false;
+    exits[0].alert = true;
+    exits[0].enable = true;
     strcpy(exits[0].type, "exit");
 
     exits[1].pin = USE_MCP23017 ? EXIT_BUTTON_MCP_IO_2 : EXIT_BUTTON_IO_2;
     exits[1].delay = 4;
     exits[1].channel = 2;
-    exits[1].alert = false;
-    exits[1].enable = false;
+    exits[1].alert = true;
+    exits[1].enable = true;
     strcpy(exits[1].type, "exit");
 
     restoreExitSettings();
