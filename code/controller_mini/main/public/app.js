@@ -28,6 +28,9 @@ window.appFunctions = {
         document.getElementById('alertFob_1').onclick = function() {
             webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
         };
+        document.getElementById('latchFob_1').onclick = function() {
+            webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"latch\": " + this.checked + "}}");
+        };
         document.getElementById('polarity_1').onclick = function() {
             webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"polarity\": " + this.checked + "}}");
         };
@@ -53,6 +56,9 @@ window.appFunctions = {
         };
         document.getElementById('alertFob_2').onclick = function() {
             webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
+        };
+        document.getElementById('latchFob_2').onclick = function() {
+            webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"latch\": " + this.checked + "}}");
         };
         document.getElementById('polarity_2').onclick = function() {
             webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"polarity\": " + this.checked + "}}");
@@ -130,6 +136,7 @@ window.appFunctions = {
             let ch = data.payload.channel;
             document.getElementById('enableFob_' + ch).checked = data.payload.enable;
             document.getElementById('alertFob_' + ch).checked = data.payload.alert;
+            document.getElementById('latchFob_' + ch).checked = data.payload.latch;
         }
 
         if (data.event_type === "authorize") {

@@ -43,12 +43,16 @@ static void fob_timer(void *pvParameter) {
 void check_fobs(fob_t *fb) {
     if (!fb->enable) return;
     fb->isPressed = get_mcp_io(fb->pin);
-    if (!MOMENTARY && fb->isPressed != fb->prevPress) {
+    
+    if (fb->latch && fb->isPressed != fb->prevPress) {
+        // Latch mode: FOB state directly controls lock state
         if (fb->isPressed) {
-            ESP_LOGI("FOB", "Fob %d activated on channel %d", fb->pin, fb->channel);
+            ESP_LOGI("FOB", "Fob %d activated (latch mode) on channel %d", fb->pin, fb->channel);
         }
         arm_lock(fb->channel, fb->isPressed, fb->alert);
-    } else if (!fb->isPressed && fb->prevPress) {
+    } else if (!fb->latch && !fb->isPressed && fb->prevPress) {
+        // Momentary mode: FOB release triggers unlock and timer
+        ESP_LOGI("FOB", "Fob %d released (momentary mode) - disarming lock on channel %d", fb->pin, fb->channel);
         arm_lock(fb->channel, false, fb->alert);
         start_fob_timer(fb, true);
     }
@@ -59,10 +63,11 @@ void storeFobSettings() {
     for (uint8_t i = 0; i < NUM_OF_FOBS; i++) {
         char temp_settings[256];
         snprintf(temp_settings, sizeof(temp_settings),
-                 "{\"eventType\":\"%s\", \"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s}}",
+                 "{\"eventType\":\"%s\", \"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"latch\": %s}}",
                  fobs[i].type, i + 1,
                  fobs[i].enable ? "true" : "false",
-                 fobs[i].alert ? "true" : "false");
+                 fobs[i].alert ? "true" : "false",
+                 fobs[i].latch ? "true" : "false");
         strncpy(fobs[i].settings, temp_settings, sizeof(fobs[i].settings) - 1);
         storeSetting(fobs[i].key, cJSON_Parse(fobs[i].settings));
     }
@@ -82,10 +87,11 @@ int sendFobState() {
     for (uint8_t i = 0; i < NUM_OF_FOBS; i++) {
         char temp_settings[256];
         snprintf(temp_settings, sizeof(temp_settings),
-                 "{\"eventType\":\"%s\", \"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s}}",
+                 "{\"eventType\":\"%s\", \"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"latch\": %s}}",
                  fobs[i].type, i + 1,
                  fobs[i].enable ? "true" : "false",
-                 fobs[i].alert ? "true" : "false");
+                 fobs[i].alert ? "true" : "false",
+                 fobs[i].latch ? "true" : "false");
         strncpy(fobs[i].settings, temp_settings, sizeof(fobs[i].settings) - 1);
         fobs[i].settings[sizeof(fobs[i].settings) - 1] = '\0';
         addClientMessageToQueue(fobs[i].settings);
@@ -115,6 +121,12 @@ void handle_fob_message(cJSON *payload) {
             val = cJSON_IsTrue(cJSON_GetObjectItem(payload, "alert"));
             fobs[ch - 1].alert = val;
         }
+
+        if (cJSON_GetObjectItem(payload, "latch")) {
+            val = cJSON_IsTrue(cJSON_GetObjectItem(payload, "latch"));
+            fobs[ch - 1].latch = val;
+        }
+        
         storeFobSettings();
     }
 }
@@ -136,6 +148,7 @@ void fob_main() {
     fobs[0].channel = 1;
     fobs[0].enable = true;
     fobs[0].alert = true;
+    fobs[0].latch = false;  // Default to momentary mode
     strcpy(fobs[0].type, "fob");
 
     fobs[1].pin = FOB_IO_2;
@@ -143,6 +156,7 @@ void fob_main() {
     fobs[1].channel = 2;
     fobs[1].enable = true;
     fobs[1].alert = true;
+    fobs[1].latch = false;  // Default to momentary mode
     strcpy(fobs[1].type, "fob");
 
     if (USE_MCP23017) {

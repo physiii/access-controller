@@ -19,6 +19,7 @@ typedef struct {
     int count;
     bool expired;
     bool enable;
+    bool latch;  // New field for latch mode (false = momentary, true = latch)
     int delay;
     int channel;
     cJSON *payload;

@@ -58,7 +58,11 @@ document.getElementById('enableFob_1').onclick = function() {
 };
 
 document.getElementById('alertFob_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+};
+
+document.getElementById('latchFob_1').onclick = function() {
+		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"latch\": " + this.checked + "}}");
 };
 
 document.getElementById('enableLock_2').onclick = function() {
@@ -91,6 +95,10 @@ document.getElementById('enableFob_2').onclick = function() {
 
 document.getElementById('alertFob_2').onclick = function() {
 			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
+};
+
+document.getElementById('latchFob_2').onclick = function() {
+		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"latch\": " + this.checked + "}}");
 };
 
 document.getElementById('wifiForm').addEventListener('submit', function(e) {
@@ -152,6 +160,7 @@ webSocket.onmessage = function (event) {
 	if (state.eventType == "fob") {
 		if (pl.enable) document.getElementById('enableFob_' + ch).checked = pl.enable;
 		if (pl.alert) document.getElementById('alertFob_' + ch).checked = pl.alert;
+		if (pl.latch) document.getElementById('latchFob_' + ch).checked = pl.latch;
 	}
 
 	if (state.eventType == "authorize") {

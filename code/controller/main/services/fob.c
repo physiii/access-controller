@@ -17,6 +17,7 @@ struct fob
 	int count;
 	bool expired;
 	bool enable;
+	bool latch;  // New field for latch mode (false = momentary, true = latch)
 	int delay;
 	int channel;
 	cJSON *payload;
@@ -73,14 +74,15 @@ void check_fobs (struct fob *fb)
 
 	fb->isPressed = get_mcp_io(fb->pin);
 
-
-	if (!MOMENTARY && fb->isPressed != fb->prevPress) {
-		ESP_LOGI(TAG, "Fob %d state changed to %s", fb->channel, fb->isPressed ? "activated" : "deactivated");
+	if (fb->latch && fb->isPressed != fb->prevPress) {
+		// Latch mode: FOB state directly controls lock state
+		ESP_LOGI(TAG, "Fob %d state changed to %s (latch mode)", fb->channel, fb->isPressed ? "activated" : "deactivated");
 		arm_lock(fb->channel, fb->isPressed, fb->alert);
 		enableExit(fb->channel, fb->isPressed);
 		enableKeypad(fb->channel, fb->isPressed);
-	} else if (!fb->isPressed && fb->prevPress) {
-		ESP_LOGI(TAG, "Fob %d released - disarming lock", fb->channel);
+	} else if (!fb->latch && !fb->isPressed && fb->prevPress) {
+		// Momentary mode: FOB release triggers unlock and timer
+		ESP_LOGI(TAG, "Fob %d released (momentary mode) - disarming lock", fb->channel);
 		arm_lock(fb->channel, false, fb->alert);
 		start_fob_timer(fb, true);
 	}
@@ -103,11 +105,12 @@ int storeFobSettings()
 		strcpy(type, fobs[i].type);
 		sprintf(fobs[i].settings,
 			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s}}",
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"latch\": %s}}",
 			type,
 			i+1,
 			(fobs[i].enable) ? "true" : "false",
-			(fobs[i].alert) ? "true" : "false");
+			(fobs[i].alert) ? "true" : "false",
+			(fobs[i].latch) ? "true" : "false");
 
 		sprintf(fobs[i].key, "%s%d", type, i);
 		storeSetting(fobs[i].key, cJSON_Parse(fobs[i].settings));
@@ -160,6 +163,11 @@ void handle_fob_message(cJSON * payload)
 			val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"alert"));
 			fobs[ch - 1].alert = val;
 		}
+
+		if (cJSON_GetObjectItem(payload,"latch")) {
+			val = cJSON_IsTrue(cJSON_GetObjectItem(payload,"latch"));
+			fobs[ch - 1].latch = val;
+		}
 		storeFobSettings();
 	}
 }
@@ -187,6 +195,7 @@ void fob_main()
 	fobs[0].channel = 1;
 	fobs[0].enable = false;
 	fobs[0].alert = false;
+	fobs[0].latch = false;  // Default to momentary mode
 	strcpy(fobs[0].type, "fob");
 
 	fobs[1].pin = FOB_MCP_IO_2;
@@ -194,6 +203,7 @@ void fob_main()
 	fobs[1].channel = 2;
 	fobs[1].enable = false;
 	fobs[1].alert = false;
+	fobs[1].latch = false;  // Default to momentary mode
 	strcpy(fobs[1].type, "fob");
 
 	if (USE_MCP23017) {
