@@ -100,12 +100,30 @@ char* get_char(const char* key) {
 }
 
 void set_bool(const char* key, bool value) {
+    static SemaphoreHandle_t storage_mutex = NULL;
+    
+    // Initialize mutex on first call
+    if (storage_mutex == NULL) {
+        storage_mutex = xSemaphoreCreateMutex();
+        if (storage_mutex == NULL) {
+            ESP_LOGE(STORE_TAG, "Failed to create storage mutex!");
+            return;
+        }
+    }
+    
+    // Wait for mutex with timeout
+    if (xSemaphoreTake(storage_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+        ESP_LOGW(STORE_TAG, "Timeout waiting for storage mutex for key: %s", key);
+        return;
+    }
+    
     nvs_handle_t my_handle;
     esp_err_t err;
 
     err = nvs_open("storage", NVS_READWRITE, &my_handle);
     if (err != ESP_OK) {
         ESP_LOGE(STORE_TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        xSemaphoreGive(storage_mutex);
         return;
     }
 
@@ -144,6 +162,7 @@ void set_bool(const char* key, bool value) {
     }
 
     nvs_close(my_handle);
+    xSemaphoreGive(storage_mutex);
 }
 
 bool get_bool(const char* key, bool default_value) {

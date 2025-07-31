@@ -148,14 +148,14 @@ void app_main(void) {
     snprintf(wifi_password, sizeof(wifi_password), "pyfitech");
 
     load_wifi_credentials_from_flash(wifi_ssid, wifi_password);
-    if (!station_main(wifi_ssid, wifi_password)) {
-        ESP_LOGI(TAG, "Starting Access Point...");
-        
-        char ap_ssid[32];
-        generate_ssid_from_device_id(device_id, ap_ssid, sizeof(ap_ssid));
-        
-        ap_main(ap_ssid, "pyfitech");
-    } else {
+    
+    // Check if we have valid credentials before attempting station mode
+    bool has_valid_credentials = (strlen(wifi_ssid) > 0 && strlen(wifi_password) > 0);
+    ESP_LOGI(TAG, "WiFi credentials check: SSID='%s' (len=%d), Password='%s' (len=%d)", 
+             wifi_ssid, (int)strlen(wifi_ssid), wifi_password, (int)strlen(wifi_password));
+    
+    if (has_valid_credentials && station_main(wifi_ssid, wifi_password)) {
+        ESP_LOGI(TAG, "Successfully connected to WiFi in station mode");
         load_server_info_from_flash(server_ip, server_port);
         char ota_url[256];
 
@@ -175,6 +175,13 @@ void app_main(void) {
         if (strcmp(device_id, "") == 0) {
             ESP_LOGE(TAG, "Device ID not found");
         }
+    } else {
+        ESP_LOGI(TAG, "Starting Access Point...");
+        
+        char ap_ssid[32];
+        generate_ssid_from_device_id(device_id, ap_ssid, sizeof(ap_ssid));
+        
+        ap_main(ap_ssid, "pyfitech");
     }
 
     gpio_main();

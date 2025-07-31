@@ -221,8 +221,8 @@ void keypad_main()
 		gpio_set_direction(keypads[1].pin, GPIO_MODE_INPUT);
 	}
 
-  xTaskCreate(keypad_timer, "keypad_timer", 2048, NULL, 10, NULL);
-	xTaskCreate(keypad_service, "keypad_service", 2048, NULL, 10, NULL);
+  xTaskCreate(keypad_timer, "keypad_timer", 4096, NULL, 10, NULL);
+	xTaskCreate(keypad_service, "keypad_service", 4096, NULL, 10, NULL);
 
 	// restoreKeypadSettings();
 }

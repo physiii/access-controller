@@ -200,7 +200,7 @@ void fob_main()
 		gpio_set_direction(fobs[1].pin, GPIO_MODE_INPUT);
 	}
 
-  	xTaskCreate(fob_timer, "fob_timer", 2048, NULL, 10, NULL);
+  	xTaskCreate(fob_timer, "fob_timer", 4096, NULL, 10, NULL);
 	xTaskCreate(fob_service, "fob_service", 5000, NULL, 10, NULL);
 
 	restoreFobSettings();
