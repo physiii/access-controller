@@ -1,3 +1,5 @@
+#define FOB_MCP_IO_1         A7
+#define FOB_MCP_IO_2         B7
 #define NUM_OF_FOBS			    2
 #define MOMENTARY		  1
 
@@ -38,7 +40,7 @@ void start_fob_timer (struct fob *fb, bool val)
 void check_fob_timer (struct fob *fb)
 {
   if (fb->count >= fb->delay && !fb->expired) {
-		printf("Re-arming lock from fob %d service.\n", fb->channel);
+		ESP_LOGI(TAG, "Re-arming lock from fob %d service.", fb->channel);
 		arm_lock(fb->channel, true, fb->alert);
 		fb->expired = true;
   } else fb->count++;
@@ -73,10 +75,12 @@ void check_fobs (struct fob *fb)
 
 
 	if (!MOMENTARY && fb->isPressed != fb->prevPress) {
+		ESP_LOGI(TAG, "Fob %d state changed to %s", fb->channel, fb->isPressed ? "activated" : "deactivated");
 		arm_lock(fb->channel, fb->isPressed, fb->alert);
 		enableExit(fb->channel, fb->isPressed);
 		enableKeypad(fb->channel, fb->isPressed);
 	} else if (!fb->isPressed && fb->prevPress) {
+		ESP_LOGI(TAG, "Fob %d released - disarming lock", fb->channel);
 		arm_lock(fb->channel, false, fb->alert);
 		start_fob_timer(fb, true);
 	}
@@ -178,14 +182,14 @@ void fob_main()
 {
   printf("Starting fob service.\n");
 
-	fobs[0].pin = FOB_IO_1;
+	fobs[0].pin = FOB_MCP_IO_1;
 	fobs[0].delay = 4;
 	fobs[0].channel = 1;
 	fobs[0].enable = false;
 	fobs[0].alert = false;
 	strcpy(fobs[0].type, "fob");
 
-	fobs[1].pin = FOB_IO_2;
+	fobs[1].pin = FOB_MCP_IO_2;
 	fobs[1].delay = 4;
 	fobs[1].channel = 2;
 	fobs[1].enable = false;

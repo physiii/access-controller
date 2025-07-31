@@ -14,7 +14,7 @@
 #include "services/lock.c"
 #include "services/wiegand.c"
 #include "services/exit.c"
-#include "services/radar.c"
+#include "services/motion.c"
 #include "services/keypad.c"
 #include "services/fob.c"
 #include "services/server.c"
@@ -191,8 +191,8 @@ void app_main(void) {
     buzzer_main();
     wiegand_main();
     exit_main();
+    motion_main();
     keypad_main();
-    radar_main();
     fob_main();
     lock_main();
     server_main();

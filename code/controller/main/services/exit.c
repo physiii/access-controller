@@ -2,8 +2,6 @@
 #define EXIT_BUTTON_MCP_IO_2         B5
 #define NUM_OF_EXITS						 2
 
-#include "esp_timer.h"
-
 char exit_service_message[2000];
 bool exit_service_message_ready = false;
 cJSON * exit_payload = NULL;
@@ -37,13 +35,15 @@ void start_exit_timer (struct exitButton *ext, bool val)
   }
 }
 
-void check_exit_timer (struct exitButton *ext)
+void exit_timer_func(struct exitButton *ext)
 {
-  if (ext->count >= ext->delay && !ext->expired) {
-		printf("Re-arming lock from button %d service.\n", ext->channel);
+	if (ext->count >= ext->delay && !ext->expired) {
+		ESP_LOGI(TAG, "Re-arming lock from button %d service.", ext->channel);
 		arm_lock(ext->channel, true, ext->alert);
 		ext->expired = true;
-  } else ext->count++;
+	} else {
+		ext->count++;
+	}
 }
 
 static void
@@ -51,7 +51,7 @@ exit_timer (void *pvParameter)
 {
   while (1) {
 		for (int i=0; i < NUM_OF_EXITS; i++)
-			check_exit_timer(&exits[i]);
+			exit_timer_func(&exits[i]);
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
@@ -138,6 +138,7 @@ void check_exit (struct exitButton *ext)
 	ext->isPressed = !get_io(ext->pin);
 
 	if (ext->isPressed && !ext->prevPress) {
+		ESP_LOGI(TAG, "Exit button %d pressed - disarming lock", ext->channel);
 		arm_lock(ext->channel, false, ext->alert);
 		start_exit_timer(ext, true);
 	}

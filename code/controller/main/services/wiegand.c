@@ -95,7 +95,7 @@ void check_wiegand_timer (struct wiegand *wg)
 {
   if (!wg->enable) return;
   if (wg->count >= wg->delay && !wg->expired) {
-		printf("Re-arming lock from wg %d service. Alert %d\n", wg->channel, wg->alert);
+		ESP_LOGI(TAG, "Re-arming lock from wg %d service. Alert %d", wg->channel, wg->alert);
 
 		arm_lock(wg->channel, true, wg->alert);
 		wg->expired = true;

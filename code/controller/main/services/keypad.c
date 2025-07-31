@@ -35,13 +35,15 @@ void start_keypad_timer (struct keypadButton *pad, bool val)
   }
 }
 
-void check_keypad_timer (struct keypadButton *pad)
+void keypad_timer_func(struct keypadButton *pad)
 {
-  if (pad->count >= pad->delay && !pad->expired) {
-		printf("Re-arming lock from pad %d service. Alert %d\n", pad->channel, pad->alert);
+	if (pad->count >= pad->delay && !pad->expired) {
+		ESP_LOGI(TAG, "Re-arming lock from pad %d service. Alert %d", pad->channel, pad->alert);
 		arm_lock(pad->channel, true, pad->alert);
 		pad->expired = true;
-  } else pad->count++;
+	} else {
+		pad->count++;
+	}
 }
 
 static void
@@ -49,7 +51,7 @@ keypad_timer (void *pvParameter)
 {
   while (1) {
 		for (int i=0; i < NUM_OF_KEYPADS; i++)
-			check_keypad_timer(&keypads[i]);
+			keypad_timer_func(&keypads[i]);
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
@@ -138,7 +140,7 @@ void check_keypads (struct keypadButton *pad)
 	pad->isPressed = !get_io(pad->pin);
 
 	if (pad->isPressed && !pad->prevPress) {
-		printf("Disarming lock from pad %d service. Alert %d\n", pad->channel, pad->alert);
+		ESP_LOGI(TAG, "Keypad %d pressed - disarming lock", pad->channel);
 		arm_lock(pad->channel, false, pad->alert);
 		start_keypad_timer(pad, true);
 	}
