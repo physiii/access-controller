@@ -58,7 +58,7 @@ document.getElementById('enableFob_1').onclick = function() {
 };
 
 document.getElementById('alertFob_1').onclick = function() {
-		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
 };
 
 document.getElementById('latchFob_1').onclick = function() {

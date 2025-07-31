@@ -27,22 +27,28 @@ struct ClientMessage clientMessage = {0};
 struct ServerMessage serverMessage = {0};
 
 cJSON *checkServiceMessage(char *eventType) {
-    if (serviceMessage.queueCount > 0 && serviceMessage.messageQueue[0]) {
-        cJSON *eventTypeItem = cJSON_GetObjectItem(serviceMessage.messageQueue[0], "eventType");
-        if (eventTypeItem && strcmp(eventTypeItem->valuestring, eventType) == 0) {
-            cJSON *payloadItem = cJSON_GetObjectItem(serviceMessage.messageQueue[0], "payload");
-            if (payloadItem) {
-                cJSON *response = cJSON_Duplicate(payloadItem, 1);
-                ESP_LOGI(OA_TAG, "Message processed for eventType: %s", eventType);
+    for (int i = 0; i < serviceMessage.queueCount; i++) {
+        if (serviceMessage.messageQueue[i]) {
+            cJSON *eventTypeItem = cJSON_GetObjectItem(serviceMessage.messageQueue[i], "eventType");
+            if (eventTypeItem && strcmp(eventTypeItem->valuestring, eventType) == 0) {
+                cJSON *payloadItem = cJSON_GetObjectItem(serviceMessage.messageQueue[i], "payload");
+                if (payloadItem) {
+                    cJSON *response = cJSON_Duplicate(payloadItem, 1);
+                    ESP_LOGI(OA_TAG, "Message processed for eventType: %s", eventType);
 
-                cJSON_Delete(serviceMessage.messageQueue[0]);
-                serviceMessage.messageQueue[0] = NULL;
-                for (int i = 1; i < serviceMessage.queueCount; i++) {
-                    serviceMessage.messageQueue[i - 1] = serviceMessage.messageQueue[i];
-                    serviceMessage.messageTimestamps[i - 1] = serviceMessage.messageTimestamps[i];
+                    // Remove the message from the queue
+                    cJSON_Delete(serviceMessage.messageQueue[i]);
+                    serviceMessage.messageQueue[i] = NULL;
+                    
+                    // Shift remaining messages down
+                    for (int j = i; j < serviceMessage.queueCount - 1; j++) {
+                        serviceMessage.messageQueue[j] = serviceMessage.messageQueue[j + 1];
+                        serviceMessage.messageTimestamps[j] = serviceMessage.messageTimestamps[j + 1];
+                    }
+                    serviceMessage.queueCount--;
+                    
+                    return response;
                 }
-                serviceMessage.queueCount--;
-                return response;
             }
         }
     }
@@ -160,15 +166,10 @@ void serviceMessageTask(void *pvParameter) {
                 }
                 serviceMessage.queueCount--;
             } else if (serviceMessage.messageQueue[0]) {
-                // ESP_LOGI(OA_TAG, "Processing message: %s", cJSON_PrintUnformatted(serviceMessage.messageQueue[0]));
-                // cJSON *message = serviceMessage.messageQueue[0];
-                // cJSON_Delete(message);
-                // serviceMessage.messageQueue[0] = NULL;
-                // for (int i = 1; i < serviceMessage.queueCount; i++) {
-                //     serviceMessage.messageQueue[i - 1] = serviceMessage.messageQueue[i];
-                //     serviceMessage.messageTimestamps[i - 1] = serviceMessage.messageTimestamps[i];
-                // }
-                // serviceMessage.queueCount--;
+                // Process the message - it will be handled by individual services
+                // The message stays in the queue until a service picks it up
+                ESP_LOGI(OA_TAG, "Message available for processing: %s", 
+                         cJSON_PrintUnformatted(serviceMessage.messageQueue[0]));
             }
         }
         vTaskDelay(SERVICE_LOOP_SHORT);
