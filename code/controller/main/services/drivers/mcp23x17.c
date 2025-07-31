@@ -1,5 +1,6 @@
 #include "automation.h"
 #include "driver/i2c.h"
+#include "esp_timer.h"
 
 // I2C constants and forward declarations from drivers/i2c.c
 #define I2C_MASTER_NUM              0       /*!< I2C master port number */
@@ -157,8 +158,22 @@ bool get_mcp_io(uint8_t io)
 {
 	// printf("get_mcp_io: %u\n", MCP_IO_VALUES);
 	int val = MCP_IO_VALUES >> io;
+	bool result = val & 0x0001;
+	
+	// Debug logging for exit button pins (A5 and B5)
+	if (io == A5 || io == B5) {
+		static int64_t last_debug_time = 0;
+		int64_t current_time = esp_timer_get_time() / 1000; // Convert to ms
+		
+		// Log every 2 seconds for exit button pins
+		if ((current_time - last_debug_time) > 2000) {
+			ESP_LOGI(TAG, "MCP IO %d (pin %s): value=%d, MCP_IO_VALUES=0x%04X", 
+			         io, (io == A5) ? "A5" : "B5", result, MCP_IO_VALUES);
+			last_debug_time = current_time;
+		}
+	}
 
-	return val &= 0x0001;
+	return result;
 }
 
 void set_mcp_io_dir(uint8_t io, bool dir)

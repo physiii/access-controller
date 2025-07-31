@@ -44,13 +44,22 @@ static esp_err_t echo_handler(httpd_req_t *req)
     uint8_t *buf = NULL;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
     ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+    
     /* Set max_len = 0 to get the frame len */
     esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
     if (ret != ESP_OK) {
         ESP_LOGE(WS_TAG, "httpd_ws_recv_frame failed to get frame len with %d", ret);
         return ret;
     }
+    
     ESP_LOGI(WS_TAG, "frame len is %d", ws_pkt.len);
+    
+    // Validate frame length to prevent buffer overflow
+    if (ws_pkt.len > 1024) {
+        ESP_LOGE(WS_TAG, "Frame too large: %d bytes, max allowed: 1024", ws_pkt.len);
+        return ESP_ERR_INVALID_SIZE;
+    }
+    
     if (ws_pkt.len) {
         /* ws_pkt.len + 1 is for NULL termination as we are expecting a string */
         buf = calloc(1, ws_pkt.len + 1);
@@ -67,15 +76,21 @@ static esp_err_t echo_handler(httpd_req_t *req)
             return ret;
         }
 
+        // Validate that we received a valid JSON string
+        if (ws_pkt.payload == NULL || ws_pkt.len == 0) {
+            ESP_LOGE(WS_TAG, "Empty or null payload received");
+            free(buf);
+            return ESP_ERR_INVALID_ARG;
+        }
+
         cJSON *msg;
         msg = cJSON_Parse((char *)ws_pkt.payload);
-		if (msg)
-		{
-			ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
+        if (msg) {
+            ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
             should_send_data = true;
-			addServiceMessageToQueue(msg);
+            addServiceMessageToQueue(msg);
             cJSON_Delete(msg); // Free the parsed message
-			
+            
             if (xSemaphoreTake(ws_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
                 // Add client to list if not already present
                 int client_fd = httpd_req_to_sockfd(req);
@@ -97,23 +112,13 @@ static esp_err_t echo_handler(httpd_req_t *req)
             } else {
                 ESP_LOGW(WS_TAG, "Timeout waiting for ws_mutex in echo_handler");
             }
-			
-			return ESP_OK;
-		} else {
-			const char *error_ptr = cJSON_GetErrorPtr();
-			if (error_ptr != NULL) ESP_LOGE(WS_TAG, "Error before: %s\n", error_ptr);
-		}
-
-        ESP_LOGI(WS_TAG, "Got packet with message: %s", ws_pkt.payload);
+        } else {
+            ESP_LOGE(WS_TAG, "Failed to parse JSON: %s", (char *)ws_pkt.payload);
+            // Don't return error for invalid JSON, just log it
+        }
+        free(buf);
     }
-    ESP_LOGI(WS_TAG, "Packet type: %d", ws_pkt.type);
-
-    ret = httpd_ws_send_frame(req, &ws_pkt);
-    if (ret != ESP_OK) {
-        ESP_LOGE(WS_TAG, "httpd_ws_send_frame failed with %d", ret);
-    }
-    free(buf);
-    return ret;
+    return ESP_OK;
 }
 
 static const httpd_uri_t echo = {
