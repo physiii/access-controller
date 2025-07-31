@@ -135,29 +135,14 @@ void check_exit (struct exitButton *ext)
 {
 	if (!ext->enable) return;
 
-	bool current_state = !get_io(ext->pin);
-	
-	// Debug logging for exit button state
-	static int64_t last_debug_time = 0;
-	int64_t current_time = esp_timer_get_time() / 1000; // Convert to ms
-	
-	// Log state changes and periodically log current state
-	if (current_state != ext->isPressed || (current_time - last_debug_time) > 5000) {
-		ESP_LOGI(TAG, "Exit %d: pin=%d, state=%d, enabled=%d, prev=%d", 
-		         ext->channel, ext->pin, current_state, ext->enable, ext->isPressed);
-		last_debug_time = current_time;
-	}
+	ext->isPressed = !get_io(ext->pin);
 
-	// Check for button press (transition from not pressed to pressed)
-	if (current_state && !ext->isPressed) {
-		ESP_LOGI(TAG, "Exit button %d PRESSED - disarming lock", ext->channel);
+	if (ext->isPressed && !ext->prevPress) {
 		arm_lock(ext->channel, false, ext->alert);
 		start_exit_timer(ext, true);
 	}
 
-	// Update the previous state
 	ext->prevPress = ext->isPressed;
-	ext->isPressed = current_state;
 }
 
 void handle_exit_message(cJSON * payload)

@@ -1,5 +1,5 @@
-#define KEYPAD_MCP_IO_1         A6
-#define KEYPAD_MCP_IO_2         B6
+#define KEYPAD_MCP_IO_1         A3
+#define KEYPAD_MCP_IO_2         B3
 #define NUM_OF_KEYPADS			    2
 
 char keypad_service_message[2000];

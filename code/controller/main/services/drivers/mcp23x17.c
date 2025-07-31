@@ -121,17 +121,7 @@ void read_io()
 	}
 
 	uint16_t values = (data_rd[1] << 8) | data_rd[0];
-	uint16_t old_values = MCP_IO_VALUES;
 	MCP_IO_VALUES = values;
-
-	// Log when values change to help debug input detection (reduced frequency to prevent memory leak)
-	static uint32_t log_counter = 0;
-	if (old_values != values) {
-		log_counter++;
-		if (log_counter % 10 == 0) {  // Log every 10th change to reduce memory usage
-			ESP_LOGI(TAG, "MCP23017 values changed: 0x%04X -> 0x%04X", old_values, values);
-		}
-	}
 }
 
 void set_mcp_io(uint8_t io, bool val)
@@ -158,22 +148,8 @@ bool get_mcp_io(uint8_t io)
 {
 	// printf("get_mcp_io: %u\n", MCP_IO_VALUES);
 	int val = MCP_IO_VALUES >> io;
-	bool result = val & 0x0001;
-	
-	// Debug logging for exit button pins (A5 and B5)
-	if (io == A5 || io == B5) {
-		static int64_t last_debug_time = 0;
-		int64_t current_time = esp_timer_get_time() / 1000; // Convert to ms
-		
-		// Log every 2 seconds for exit button pins
-		if ((current_time - last_debug_time) > 2000) {
-			ESP_LOGI(TAG, "MCP IO %d (pin %s): value=%d, MCP_IO_VALUES=0x%04X", 
-			         io, (io == A5) ? "A5" : "B5", result, MCP_IO_VALUES);
-			last_debug_time = current_time;
-		}
-	}
 
-	return result;
+	return val &= 0x0001;
 }
 
 void set_mcp_io_dir(uint8_t io, bool dir)
