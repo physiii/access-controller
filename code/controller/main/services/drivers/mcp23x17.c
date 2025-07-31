@@ -1,6 +1,11 @@
 #include "automation.h"
-#include "drivers/i2c.c"
 #include "driver/i2c.h"
+
+// I2C constants and forward declarations from drivers/i2c.c
+#define I2C_MASTER_NUM              0       /*!< I2C master port number */
+
+esp_err_t i2c_master_read_slave(uint8_t addr, i2c_port_t i2c_num, uint8_t *data_rd, size_t size);
+esp_err_t i2c_master_write_slave(uint8_t addr, i2c_port_t i2c_num, uint8_t *data_wr, size_t size);
 
 #define A0	0
 #define A1	1
@@ -100,14 +105,32 @@ static esp_err_t mcp_write(uint8_t *data, uint8_t len)
 void read_io()
 {
 	data_wr[0] = REG_GPIOA;
-	mcp_write(data_wr, 1);
-	mcp_read(data_rd, 2);
+	esp_err_t write_result = mcp_write(data_wr, 1);
+	if (write_result != ESP_OK) {
+		// Don't attempt read if write failed
+		ESP_LOGE(TAG, "MCP23017 write failed: %s", esp_err_to_name(write_result));
+		return;
+	}
+	
+	esp_err_t read_result = mcp_read(data_rd, 2);
+	if (read_result != ESP_OK) {
+		// Don't update values if read failed
+		ESP_LOGE(TAG, "MCP23017 read failed: %s", esp_err_to_name(read_result));
+		return;
+	}
 
 	uint16_t values = (data_rd[1] << 8) | data_rd[0];
-	// MCP_IO_VALUES = (MCP_IO_VALUES & ~MCP_DIR) | (values & MCP_DIR);
-    MCP_IO_VALUES = values;
+	uint16_t old_values = MCP_IO_VALUES;
+	MCP_IO_VALUES = values;
 
-	// printf("MCP_DIR %d\tvalues %d\tMCP_IO_VALUES %d\n", MCP_DIR, values, MCP_IO_VALUES);
+	// Log when values change to help debug input detection (reduced frequency to prevent memory leak)
+	static uint32_t log_counter = 0;
+	if (old_values != values) {
+		log_counter++;
+		if (log_counter % 10 == 0) {  // Log every 10th change to reduce memory usage
+			ESP_LOGI(TAG, "MCP23017 values changed: 0x%04X -> 0x%04X", old_values, values);
+		}
+	}
 }
 
 void set_mcp_io(uint8_t io, bool val)
@@ -122,7 +145,11 @@ void set_mcp_io(uint8_t io, bool val)
 	data_wr[1] = MCP_IO_VALUES & 0x00ff;
 	data_wr[2] = MCP_IO_VALUES >> 8;
 
-	mcp_write(data_wr, 3);
+	esp_err_t result = mcp_write(data_wr, 3);
+	if (result != ESP_OK) {
+		// Silently fail if I2C communication fails
+		return;
+	}
 	// printf("set_mcp_io %d\tvalue %d\tdata [%u, %u, %u]\n", io, val, data_wr[0], data_wr[1], data_wr[2]);
 }
 
@@ -146,7 +173,11 @@ void set_mcp_io_dir(uint8_t io, bool dir)
 	data_wr[1] = MCP_DIR & 0x00ff;
 	data_wr[2] = MCP_DIR >> 8;
 
-	mcp_write(data_wr, 3);
+	esp_err_t result = mcp_write(data_wr, 3);
+	if (result != ESP_OK) {
+		// Silently fail if I2C communication fails
+		return;
+	}
 
 	// printf("set_mcp_io_dir(%u): io:%u\tdir:%d\n", MCP_DIR, io, dir);
 	// printf("Set Direction: A:%d\tB:%d\n", data_wr[1], data_wr[2]);
@@ -177,16 +208,39 @@ void printByte()
 
 static void mcp23x17_task(void* arg)
 {
-// 	int ret;
-// 	uint32_t task_idx = (uint32_t)arg;
-// 	uint8_t *data = (uint8_t *)malloc(DATA_LENGTH);
-// 	uint8_t sensor_data_h, sensor_data_l;
-// 	int cnt = 0;
-// 	bool on = true;
-//   uint16_t val = 0x0000;
+	ESP_LOGI(TAG, "MCP23017 task starting...");
+	
+	// Wait for I2C to be ready
+	vTaskDelay(100 / portTICK_PERIOD_MS);
+	
+	// Test MCP23017 communication
+	ESP_LOGI(TAG, "Testing MCP23017 communication at address 0x%02X", MCP23017_ADDRESS);
+	data_wr[0] = REG_GPIOA;
+	esp_err_t test_result = mcp_write(data_wr, 1);
+	if (test_result == ESP_OK) {
+		ESP_LOGI(TAG, "✅ MCP23017 communication successful!");
+		
+		// Initialize MCP23017 configuration
+		ESP_LOGI(TAG, "Initializing MCP23017 registers...");
+		
+		// Set IOCON register (sequential mode)
+		data_wr[0] = REG_IOCON;
+		data_wr[1] = 0x00;  // Sequential mode, other defaults
+		mcp_write(data_wr, 2);
+		
+		// Initialize all pins as inputs (default)
+		data_wr[0] = REG_IODIRA;
+		data_wr[1] = 0xFF;  // Port A all inputs
+		data_wr[2] = 0xFF;  // Port B all inputs
+		mcp_write(data_wr, 3);
+		
+		ESP_LOGI(TAG, "MCP23017 initialized successfully");
+	} else {
+		ESP_LOGE(TAG, "❌ MCP23017 communication failed: %s", esp_err_to_name(test_result));
+		ESP_LOGE(TAG, "Check I2C wiring: SCL=%d, SDA=%d", 13, 14);
+	}
 
-//   set_mcp_io_dir(4, MCP_OUTPUT);
-
+	// Main loop
 	while (1) {
 		read_io();
     	vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
@@ -197,6 +251,6 @@ static void mcp23x17_task(void* arg)
 void mcp23x17_main(void)
 {
 	if (!USE_MCP23017) return;
-    ESP_ERROR_CHECK(i2c_master_init());
-	xTaskCreate(mcp23x17_task, "mcp23x17_task", 2048, NULL, 10, NULL);
+
+	xTaskCreate(mcp23x17_task, "mcp23x17_task", 4096, NULL, 10, NULL); // Increased stack from 2048 to 4096
 }

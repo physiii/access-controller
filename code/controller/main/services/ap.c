@@ -37,7 +37,7 @@ static void generate_ssid_from_device_id(const char *device_id, char *ssid, size
     }
 }
 
-void ap_main(char *device_id, char *password) {
+void ap_main(const char *device_id, const char *password) {
     char ssid[33];
     generate_ssid_from_device_id(device_id, ssid, sizeof(ssid));
 

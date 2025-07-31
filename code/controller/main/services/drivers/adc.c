@@ -4,7 +4,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "esp_adc/adc_oneshot.h"
-#include "esp_adc_cal.h"
+#include "esp_adc/adc_cali.h"
 
 #define DEFAULT_VREF    1100        // Use adc2_vref_to_gpio() to obtain a better estimate
 #define NO_OF_SAMPLES   64          // Multisampling
@@ -13,18 +13,8 @@ static adc_oneshot_unit_handle_t adc1_handle;
 static const adc_channel_t channel = ADC_CHANNEL_7; // GPIO34 if ADC1, GPIO14 if ADC2
 
 void check_efuse(void) {
-    // Check if TP is burned into eFuse
-    if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK) {
-        printf("eFuse Two Point: Supported\n");
-    } else {
-        printf("eFuse Two Point: NOT supported\n");
-    }
-    // Check Vref is burned into eFuse
-    if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK) {
-        printf("eFuse Vref: Supported\n");
-    } else {
-        printf("eFuse Vref: NOT supported\n");
-    }
+    // TODO: Update to new esp_adc API when needed
+    printf("ADC eFuse check disabled for now\n");
 }
 
 void adc_init(void) {

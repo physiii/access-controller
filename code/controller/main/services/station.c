@@ -45,7 +45,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-bool station_main(char *ssid, char *password) {
+bool station_main(const char *ssid, const char *password) {
     s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());

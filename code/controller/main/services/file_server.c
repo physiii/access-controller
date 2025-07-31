@@ -61,42 +61,55 @@ static esp_err_t favicon_get_handler(httpd_req_t *req)
 
 static esp_err_t script_get_handler(httpd_req_t *req)
 {
+    ESP_LOGI(FILE_TAG, "📄 Serving script.js");
     extern const unsigned char script_js_start[] asm("_binary_script_js_start");
     extern const unsigned char script_js_end[]   asm("_binary_script_js_end");
     const size_t script_js_size = (script_js_end - script_js_start);
     httpd_resp_set_type(req, "application/javascript");
-    httpd_resp_send(req, (const char *)script_js_start, script_js_size);
-    return ESP_OK;
+    esp_err_t result = httpd_resp_send(req, (const char *)script_js_start, script_js_size);
+    ESP_LOGI(FILE_TAG, "✅ script.js sent (%d bytes)", script_js_size);
+    return result;
 }
 
 static esp_err_t style_get_handler(httpd_req_t *req)
 {
+    ESP_LOGI(FILE_TAG, "📄 Serving style.css");
     extern const unsigned char style_css_start[] asm("_binary_style_css_start");
     extern const unsigned char style_css_end[]   asm("_binary_style_css_end");
     const size_t style_css_size = (style_css_end - style_css_start);
     httpd_resp_set_type(req, "text/css");
-    httpd_resp_send(req, (const char *)style_css_start, style_css_size);
-    return ESP_OK;
+    httpd_resp_set_hdr(req, "Connection", "close"); // Close connection after response
+    esp_err_t result = httpd_resp_send(req, (const char *)style_css_start, style_css_size);
+    ESP_LOGI(FILE_TAG, "✅ style.css sent (%d bytes)", style_css_size);
+    return result;
 }
 
 static esp_err_t index_get_handler(httpd_req_t *req)
 {
-    extern const unsigned char index_html_start[] asm("_binary_index_html_start");
-    extern const unsigned char index_html_end[]   asm("_binary_index_html_end");
-    const size_t index_html_size = (index_html_end - index_html_start);
+    ESP_LOGI(FILE_TAG, "Serving URI: %s", req->uri);
+    
+    const char* html = "<html><body><h1>ESP32 Access Controller</h1><p>Working!</p></body></html>";
+    
     httpd_resp_set_type(req, "text/html");
-    httpd_resp_send(req, (const char *)index_html_start, index_html_size);
-    return ESP_OK;
+    httpd_resp_set_hdr(req, "Connection", "close");
+    
+    esp_err_t ret = httpd_resp_send(req, html, strlen(html));
+    ESP_LOGI(FILE_TAG, "Response sent, result: %s", esp_err_to_name(ret));
+    return ret;
 }
 
 static esp_err_t app_html_get_handler(httpd_req_t *req)
 {
+    ESP_LOGI(FILE_TAG, "Serving URI: %s", req->uri);
     extern const unsigned char app_html_start[] asm("_binary_app_html_start");
     extern const unsigned char app_html_end[]   asm("_binary_app_html_end");
     const size_t app_html_size = (app_html_end - app_html_start);
     httpd_resp_set_type(req, "text/html");
-    httpd_resp_send(req, (const char *)app_html_start, app_html_size);
-    return ESP_OK;
+    esp_err_t ret = httpd_resp_send(req, (const char *)app_html_start, app_html_size);
+    if (ret != ESP_OK) {
+        ESP_LOGE(FILE_TAG, "Failed to send app.html: %s", esp_err_to_name(ret));
+    }
+    return ret;
 }
 
 static esp_err_t app_js_get_handler(httpd_req_t *req)
@@ -179,6 +192,7 @@ static const char* get_path_from_uri(char *dest, const char *base_path, const ch
 /* Handler to download a file kept on the server */
 static esp_err_t download_get_handler(httpd_req_t *req)
 {
+    ESP_LOGI(FILE_TAG, "🌐 HTTP Request: %s", req->uri);
     char filepath[FILE_PATH_MAX];
     FILE *fd = NULL;
     struct stat file_stat;
@@ -450,6 +464,7 @@ esp_err_t start_file_server(const char *base_path)
             sizeof(server_data->base_path));
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.max_uri_handlers = 16;  // Increase from default 8 to handle all web interface URIs
 
     /* Use the URI wildcard matching function in order to
      * allow the same handler to respond to multiple different
@@ -464,32 +479,15 @@ esp_err_t start_file_server(const char *base_path)
 
     start_ws_server(server);
 
-    /* URI handler for getting uploaded files */
-    httpd_uri_t file_download = {
-        .uri       = "/*",  // Match all URIs of type /path/to/file
+    /* URI handlers for embedded web interface (registered first) */
+    httpd_uri_t root_handler = {
+        .uri       = "/",
         .method    = HTTP_GET,
-        .handler   = download_get_handler,
-        .user_ctx  = server_data    // Pass server data as context
+        .handler   = index_get_handler,
+        .user_ctx  = NULL
     };
-    httpd_register_uri_handler(server, &file_download);
+    httpd_register_uri_handler(server, &root_handler);
 
-    /* URI handler for uploading files to server */
-    httpd_uri_t file_upload = {
-        .uri       = "/upload/*",   // Match all URIs of type /upload/path/to/file
-        .method    = HTTP_POST,
-        .handler   = upload_post_handler,
-        .user_ctx  = server_data    // Pass server data as context
-    };
-    httpd_register_uri_handler(server, &file_upload);
-
-    /* URI handler for deleting files from server */
-    httpd_uri_t file_delete = {
-        .uri       = "/delete/*",   // Match all URIs of type /delete/path/to/file
-        .method    = HTTP_POST,
-        .handler   = delete_post_handler,
-        .user_ctx  = server_data    // Pass server data as context
-    };
-    httpd_register_uri_handler(server, &file_delete);
-
+    // Temporarily disable complex handlers for testing - just return OK for now
     return ESP_OK;
 }

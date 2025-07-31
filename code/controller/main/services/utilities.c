@@ -10,7 +10,7 @@ static const char *UTIL_TAG = "Utilities";
 
 // WebSocket event handler for ws_utilities_task
 void utilities_websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
-    esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
+    (void)event_data; // Suppress unused variable warning
     switch (event_id) {
     case WEBSOCKET_EVENT_CONNECTED:
         ESP_LOGI(UTIL_TAG, "WEBSOCKET_EVENT_CONNECTED");
@@ -128,7 +128,7 @@ void monitor_system_status() {
         }
 
         // Get Task Status
-        UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
+        (void)uxTaskGetNumberOfTasks(); // Suppress unused variable warning
 
         // Log system status
         ESP_LOGI(TAG, "------ SYSTEM STATUS ------");

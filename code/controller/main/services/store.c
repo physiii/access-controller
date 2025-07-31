@@ -37,9 +37,9 @@ int storeSetting(char *key, cJSON *payload)
     return 0;
 }
 
-int restoreSetting (char *key) {
+cJSON* restoreSetting (char *key) {
 	strcpy(setting.str, get_char(key));
-	if (strcmp(setting.str, "")==0) return 0;
+	if (strcmp(setting.str, "")==0) return NULL;
 
 	cJSON *msg;
 	msg = cJSON_Parse(setting.str);

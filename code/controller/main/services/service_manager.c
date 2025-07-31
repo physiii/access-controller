@@ -31,16 +31,7 @@ void gpio_start() {
 
 void i2c_start() {
     ESP_LOGI(SVC_TAG, "Initializing I2C");
-    i2c_config_t i2c_config = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = 13,         // Adjust SDA pin here
-        .scl_io_num = 14,         // Adjust SCL pin here
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 100000  // Adjust I2C clock speed
-    };
-    i2c_param_config(I2C_NUM_1, &i2c_config);
-    i2c_driver_install(I2C_NUM_1, i2c_config.mode, 0, 0, 0);
+    i2c_main();  // Use the existing I2C initialization from drivers/i2c.c
 }
 
 void mcp23x17_start() {
@@ -102,17 +93,17 @@ void server_start() {
 void service_manager_start_all() {
     ESP_LOGI(SVC_TAG, "Starting all services...");
     gpio_start();
-    // i2c_start();
-    // mcp23x17_start();
+    i2c_start();
+    mcp23x17_start();
     auth_start();
-    // buzzer_start();
-    // wiegand_start();
-    // exit_start();
-    // lock_start();
-    // fob_start();
-    // motion_start();
+    buzzer_start();
+    wiegand_start();
+    exit_start();
+    lock_start();
+    fob_start();
+    motion_start();
     radar_start();
-    // keypad_start();
+    keypad_start();
     server_start();
     config_manager_start();
     ESP_LOGI(SVC_TAG, "All services started successfully.");

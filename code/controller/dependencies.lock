@@ -1,15 +1,17 @@
 dependencies:
   idf:
-    component_hash: null
     source:
       type: idf
-    version: 5.3.0
+    version: 6.0.0
   protocol_examples_common:
-    component_hash: null
+    dependencies: []
     source:
       path: /home/andy/esp/esp-idf/examples/common_components/protocol_examples_common
       type: local
     version: '*'
-manifest_hash: 311d98087cd8e6f358ce79ee752171ee48c0b38fdeb813a502bf38c8782c7e3d
+direct_dependencies:
+- idf
+- protocol_examples_common
+manifest_hash: 91074f2b9f01595fe8dc6da16e03c7e7ed73c2e23e932fe9b440f9c58b7000fb
 target: esp32s3
-version: 1.0.0
+version: 2.0.0

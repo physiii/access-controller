@@ -23,7 +23,7 @@ void load_server_info_from_flash(char *server_ip, char *server_port);
 char* get_md5_from_flash();
 void store_md5_to_flash(const char *md5_hash);
 int storeSetting(char *key, cJSON *payload);
-int restoreSetting(char *key);
+cJSON* restoreSetting(char *key);
 esp_err_t initialize_spiffs(void);
 esp_err_t load_string_from_store(const char *key, char *value, size_t max_len);
 esp_err_t save_string_to_store(const char *key, const char *value);
