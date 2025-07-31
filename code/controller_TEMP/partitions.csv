@@ -1,6 +1,0 @@
-# Name, Type, SubType, Offset, Size, Flags
-nvs,data,nvs,0x9000,20K,
-otadata,data,ota,0xe000,8K,
-app0,app,factory,0x10000,2M,
-app1,app,ota_0,0x210000,2M,
-spiffs,data,spiffs,0x410000,11M,
