@@ -17,7 +17,7 @@ void storage_init () {
   ESP_ERROR_CHECK( err );
 }
 
-char * get_char(char * key)
+char * get_char(const char * key)
 {
     // esp_intr_noniram_disable();
 
@@ -54,7 +54,7 @@ char * get_char(char * key)
     return ""; //return "" if no token found
 }
 
-void store_char(char * key, char * value) {
+void store_char(const char * key, const char * value) {
   storage_in_use = true;
   nvs_handle my_handle;
   esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
@@ -77,7 +77,7 @@ void store_char(char * key, char * value) {
   storage_in_use = false;
 }
 
-void store_u32(char * key, uint32_t value) {
+void store_u32(const char * key, uint32_t value) {
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
         // NVS partition was truncated and needs to be erased
@@ -119,7 +119,7 @@ void store_u32(char * key, uint32_t value) {
     }
 }
 
-uint32_t get_u32(char * key, uint32_t value) {
+uint32_t get_u32(const char * key, uint32_t value) {
     char tag[50] = "[get_u32]";
     // Initialize NVS
     esp_err_t err = nvs_flash_init();

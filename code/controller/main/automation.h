@@ -20,7 +20,7 @@ bool get_mcp_io(uint8_t);
 #define SERVICE_LOOP 100
 #define SERVICE_LOOP_SHORT 10
 #define STRIKE 0
-#define MAX_QUEUE_SIZE 20
+#define MAX_QUEUE_SIZE 10
 
 #if STRIKE
 #define USE_MCP23017 0
@@ -87,7 +87,7 @@ cJSON *checkServiceMessageByAction(char *id, char *action);
 cJSON *checkServiceMessageByKey(char *key);
 void addServiceMessageToQueue(cJSON *message);
 void addServerMessageToQueue(const char *message);
-void addClientMessageToQueue(const char *message);
+void addClientMessageToQueue(char *message);
 void serviceMessageTask(void *pvParameter);
 void serverMessageTask(void *pvParameter);
 void clientMessageTask(void *pvParameter);

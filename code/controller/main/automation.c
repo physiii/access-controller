@@ -27,21 +27,24 @@ struct ClientMessage clientMessage = {0};
 struct ServerMessage serverMessage = {0};
 
 cJSON *checkServiceMessage(char *eventType) {
-    if (serviceMessage.queueCount > 0 && serviceMessage.messageQueue[0]) {
-        cJSON *eventTypeItem = cJSON_GetObjectItem(serviceMessage.messageQueue[0], "eventType");
-        if (eventTypeItem && strcmp(eventTypeItem->valuestring, eventType) == 0) {
-            cJSON *payloadItem = cJSON_GetObjectItem(serviceMessage.messageQueue[0], "payload");
-            if (payloadItem) {
-                cJSON *response = cJSON_Duplicate(payloadItem, 1);
-                ESP_LOGI(TAG, "Message processed for eventType: %s", eventType);
+    for (int i = 0; i < serviceMessage.queueCount; i++) {
+        if (serviceMessage.messageQueue[i]) {
+            cJSON *eventTypeItem = cJSON_GetObjectItem(serviceMessage.messageQueue[i], "eventType");
+            if (eventTypeItem && strcmp(eventTypeItem->valuestring, eventType) == 0) {
+                cJSON *payloadItem = cJSON_GetObjectItem(serviceMessage.messageQueue[i], "payload");
+                if (payloadItem) {
+                    cJSON *response = cJSON_Duplicate(payloadItem, 1);
+                    ESP_LOGI(TAG, "Message processed for eventType: %s", eventType);
 
-                cJSON_Delete(serviceMessage.messageQueue[0]);
-                serviceMessage.messageQueue[0] = NULL;
-                for (int i = 1; i < serviceMessage.queueCount; i++) {
-                    serviceMessage.messageQueue[i - 1] = serviceMessage.messageQueue[i];
+                    // Delete the found message and shift remaining messages
+                    cJSON_Delete(serviceMessage.messageQueue[i]);
+                    for (int j = i; j < serviceMessage.queueCount - 1; j++) {
+                        serviceMessage.messageQueue[j] = serviceMessage.messageQueue[j + 1];
+                    }
+                    serviceMessage.messageQueue[serviceMessage.queueCount - 1] = NULL;
+                    serviceMessage.queueCount--;
+                    return response;
                 }
-                serviceMessage.queueCount--;
-                return response;
             }
         }
     }
@@ -96,9 +99,24 @@ void addServiceMessageToQueue(cJSON *message) {
         return;
     }
 
+    // Emergency memory check - clear queue if memory is critically low
+    size_t free_heap = esp_get_free_heap_size();
+    if (free_heap < 5000) {
+        ESP_LOGW(TAG, "Critical memory low (%zu bytes), clearing message queue", free_heap);
+        for (int i = 0; i < serviceMessage.queueCount; i++) {
+            if (serviceMessage.messageQueue[i]) {
+                cJSON_Delete(serviceMessage.messageQueue[i]);
+                serviceMessage.messageQueue[i] = NULL;
+            }
+        }
+        serviceMessage.queueCount = 0;
+    }
+
     if (serviceMessage.queueCount >= MAX_QUEUE_SIZE) {
         ESP_LOGW(TAG, "Service message queue full. Dropping the oldest message to make space.");
-        cJSON_Delete(serviceMessage.messageQueue[0]);
+        if (serviceMessage.messageQueue[0]) {
+            cJSON_Delete(serviceMessage.messageQueue[0]);
+        }
         serviceMessage.messageQueue[0] = NULL;
         for (int i = 1; i < serviceMessage.queueCount; i++) {
             serviceMessage.messageQueue[i - 1] = serviceMessage.messageQueue[i];
@@ -108,16 +126,18 @@ void addServiceMessageToQueue(cJSON *message) {
 
     cJSON *duplicateMessage = cJSON_Duplicate(message, 1);
     if (!duplicateMessage) {
-        ESP_LOGE(TAG, "Failed to duplicate the message for the queue.");
+        ESP_LOGE(TAG, "Failed to duplicate message. Potential memory issue.");
         return;
     }
 
     serviceMessage.messageQueue[serviceMessage.queueCount] = duplicateMessage;
     serviceMessage.queueCount++;
 
-    char *msg = cJSON_PrintUnformatted(duplicateMessage);
-    ESP_LOGI(TAG, "Added message to queue: %s", msg);
-    free(msg);
+    char *json_string = cJSON_PrintUnformatted(duplicateMessage);
+    if (json_string) {
+        ESP_LOGI(TAG, "Added message to queue: %s", json_string);
+        free(json_string); // Free the printed string to prevent memory leak
+    }
 }
 
 void addServerMessageToQueue(const char *message) {
@@ -129,16 +149,34 @@ void addServerMessageToQueue(const char *message) {
     serverMessage.queueCount++;
 }
 
-void addClientMessageToQueue(const char *message) {
-    if (clientMessage.queueCount >= MAX_QUEUE_SIZE) {
-        ESP_LOGW(TAG, "ClientMessage queue full, dropping message.");
+void addClientMessageToQueue(char *message) {
+    if (!message) {
+        ESP_LOGE(TAG, "Attempting to add a null message to client queue.");
         return;
     }
-    strncpy(clientMessage.messageQueue[clientMessage.queueCount], message, sizeof(clientMessage.messageQueue[clientMessage.queueCount]) - 1);
-    ESP_LOGI(TAG, "addClientMessageToQueue (%d) %s\n", clientMessage.queueCount, message);
+
+    if (clientMessage.queueCount >= MAX_QUEUE_SIZE) {
+        ESP_LOGW(TAG, "Client message queue full. Dropping oldest message.");
+        // Shift all messages down
+        for (int i = 1; i < clientMessage.queueCount; i++) {
+            strncpy(clientMessage.messageQueue[i - 1], clientMessage.messageQueue[i], sizeof(clientMessage.messageQueue[i - 1]) - 1);
+            clientMessage.messageQueue[i - 1][sizeof(clientMessage.messageQueue[i - 1]) - 1] = '\0';
+        }
+        clientMessage.queueCount--;
+    }
+
+    // Ensure message fits in buffer
+    size_t message_len = strlen(message);
+    if (message_len >= sizeof(clientMessage.messageQueue[0])) {
+        ESP_LOGW(TAG, "Message too long (%zu chars), truncating", message_len);
+        message_len = sizeof(clientMessage.messageQueue[0]) - 1;
+    }
+
+    strncpy(clientMessage.messageQueue[clientMessage.queueCount], message, message_len);
+    clientMessage.messageQueue[clientMessage.queueCount][message_len] = '\0';
     clientMessage.queueCount++;
 
-    addServerMessageToQueue(message);
+    ESP_LOGI(TAG, "addClientMessageToQueue (%d) %s", clientMessage.queueCount - 1, message);
 }
 
 void serviceMessageTask(void *pvParameter) {
@@ -174,9 +212,14 @@ void clientMessageTask(void *pvParameter) {
     while (1) {
         if (!clientMessage.readyToSend) {
             if (clientMessage.queueCount > 0) {
-                clientMessage.queueCount--;
-                strncpy(clientMessage.message, clientMessage.messageQueue[clientMessage.queueCount], sizeof(clientMessage.message) - 1);
+                strncpy(clientMessage.message, clientMessage.messageQueue[0], sizeof(clientMessage.message) - 1);
                 clientMessage.readyToSend = true;
+                
+                // Shift all messages down
+                for (int i = 1; i < clientMessage.queueCount; i++) {
+                    strncpy(clientMessage.messageQueue[i - 1], clientMessage.messageQueue[i], sizeof(clientMessage.messageQueue[i - 1]) - 1);
+                }
+                clientMessage.queueCount--;
             }
         }
 

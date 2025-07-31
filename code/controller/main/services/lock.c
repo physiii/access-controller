@@ -1,5 +1,46 @@
-#define LOCK_MCP_IO_1       A0
-#define LOCK_MCP_IO_2       B0
+#include <stdio.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_log.h"
+#include "cJSON.h"
+#include "automation.h"
+
+// Function declarations
+bool get_io(uint8_t io);
+void set_io(uint8_t io, bool val);
+void set_mcp_io_dir(uint8_t io, bool dir);
+void set_mcp_io(uint8_t io, bool val);
+bool get_mcp_io(uint8_t io);
+void set_bool(const char *key, bool value);
+bool get_bool(const char *key, bool default_value);
+void beep(int cnt);
+void longBeep(int cnt);
+
+// MCP definitions
+#define MCP_OUTPUT 0
+#define MCP_INPUT  1
+
+// MCP pin definitions
+#define MCP_A0  0
+#define MCP_A1  1
+#define MCP_A2  2
+#define MCP_A3  3
+#define MCP_A4  4
+#define MCP_A5  5
+#define MCP_A6  6
+#define MCP_A7  7
+#define MCP_B0  8
+#define MCP_B1  9
+#define MCP_B2  10
+#define MCP_B3  11
+#define MCP_B4  12
+#define MCP_B5  13
+#define MCP_B6  14
+#define MCP_B7  15
+
+#define LOCK_MCP_IO_1       MCP_A0
+#define LOCK_MCP_IO_2       MCP_B0
 #define NUM_OF_LOCKS        2
 
 const uint8_t LOCK_CONTACT_PIN_1 = A1;
@@ -172,66 +213,67 @@ void arm_lock(int channel, bool arm, bool alert) {
 }
 
 int storeLockSettings() {
-    for (uint8_t i = 0; i < NUM_OF_LOCKS; i++) {
-        sprintf(locks[i].settings,
-                "{\"eventType\":\"lock\", "
-				"\"payload\":{\"channel\":%d, \"enable\":%s, \"arm\":%s, \"enableContactAlert\":%s, \"polarity\":%s}}",
-                i + 1,
-                locks[i].enable ? "true" : "false",
-                locks[i].shouldLock ? "true" : "false",
-                locks[i].enableContactAlert ? "true" : "false",
-                locks[i].polarity ? "true" : "false");
-
-        sprintf(locks[i].key, "lock%d", i);
-        storeSetting(locks[i].key, cJSON_Parse(locks[i].settings));
+    for (int i = 0; i < NUM_OF_LOCKS; i++) {
+        char key[50];
+        snprintf(key, sizeof(key), "lock_%d_enable", i + 1);
+        set_bool(key, locks[i].enable);
+        
+        snprintf(key, sizeof(key), "lock_%d_arm", i + 1);
+        set_bool(key, locks[i].shouldLock);
+        
+        snprintf(key, sizeof(key), "lock_%d_contactAlert", i + 1);
+        set_bool(key, locks[i].enableContactAlert);
+        
+        snprintf(key, sizeof(key), "lock_%d_polarity", i + 1);
+        set_bool(key, locks[i].polarity);
     }
     return 0;
 }
 
 int restoreLockSettings() {
-    for (uint8_t i = 0; i < NUM_OF_LOCKS; i++) {
-        sprintf(locks[i].key, "lock%d", i);
-        // cJSON *json = restoreSetting(locks[i].key);
-		restoreSetting(locks[i].key);
-		printf("Lock %d key is %s\n", i+1, locks[i].key);
-        // if (json) {
-		// 	printf("Restoring lock settings for channel %d\n", i+1);
-        //     locks[i].enable = cJSON_GetObjectItem(json, "enable")->type == cJSON_True;
-        //     locks[i].shouldLock = cJSON_GetObjectItem(json, "arm")->type == cJSON_True;
-        //     locks[i].enableContactAlert = cJSON_GetObjectItem(json, "enableContactAlert")->type == cJSON_True;
-        //     locks[i].polarity = cJSON_GetObjectItem(json, "polarity")->type == cJSON_True;
-		// 	printf("Lock %d polarity is %d\n", i+1, locks[i].polarity);
-        //     cJSON_Delete(json);
-        // }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    for (int i = 0; i < NUM_OF_LOCKS; i++) {
+        char key[50];
+        snprintf(key, sizeof(key), "lock_%d_enable", i + 1);
+        locks[i].enable = get_bool(key, true); // Default to enabled
+        
+        snprintf(key, sizeof(key), "lock_%d_arm", i + 1);
+        locks[i].shouldLock = get_bool(key, true); // Default to armed
+        
+        snprintf(key, sizeof(key), "lock_%d_contactAlert", i + 1);
+        locks[i].enableContactAlert = get_bool(key, false); // Default to disabled
+        
+        snprintf(key, sizeof(key), "lock_%d_polarity", i + 1);
+        locks[i].polarity = get_bool(key, false); // Default to normal polarity
     }
     return 0;
 }
 
 int sendLockState()
 {
-	for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-		char type[25] = "";
-		strcpy(type, locks[i].type);
-		sprintf(locks[i].settings,
-			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"arm\": %s, \"polarity\": %s, \"enableContactAlert\": %s}}",
-			type,
-			i+1,
-			(locks[i].enable) ? "true" : "false",
-			(locks[i].isLocked) ? "true" : "false",
-			(locks[i].polarity) ? "true" : "false",
-			(locks[i].enableContactAlert) ? "true" : "false");
-
-		addClientMessageToQueue(locks[i].settings);
-	}
-  return 0;
+    char response[1000];
+    for (int i = 0; i < NUM_OF_LOCKS; i++) {
+        snprintf(response, sizeof(response), 
+            "{\"eventType\":\"lock\",\"payload\":{"
+            "\"channel\":%d,"
+            "\"enable\":%s,"
+            "\"arm\":%s,"
+            "\"enableContactAlert\":%s,"
+            "\"polarity\":%s"
+            "}}",
+            locks[i].channel,
+            locks[i].enable ? "true" : "false",
+            locks[i].shouldLock ? "true" : "false",
+            locks[i].enableContactAlert ? "true" : "false",
+            locks[i].polarity ? "true" : "false"
+        );
+        addClientMessageToQueue(response);
+    }
+    return 0;
 }
 
 void handle_lock_message(cJSON * payload) {
     int ch=0;
     bool val;
-    char property[250];
 
     if (payload == NULL) return;
 
@@ -240,80 +282,57 @@ void handle_lock_message(cJSON * payload) {
 	cJSON *enableContactAlert_item = cJSON_GetObjectItem(payload, "enableContactAlert");
 	cJSON *polarity_item = cJSON_GetObjectItem(payload, "polarity");
 	cJSON *arm_item = cJSON_GetObjectItem(payload, "arm");
-	cJSON *property_item = cJSON_GetObjectItem(payload,"property");
+	cJSON *getState_item = cJSON_GetObjectItem(payload,"getState");
 
-	if (cJSON_GetObjectItem(payload,"getState")) {
+	if (getState_item && getState_item->type == cJSON_True) {
 		sendLockState();
+		cJSON_Delete(payload);
+		return;
 	}
 
 	if (channel_item) {
-	 	ch = channel_item->valueint;
+	 	ch = channel_item->valueint - 1;
+        if (ch < 0 || ch >= NUM_OF_LOCKS) {
+            ESP_LOGE(TAG, "Invalid channel: %d", ch + 1);
+            cJSON_Delete(payload);
+            return;
+        }
+    }
 
-	 	if (arm_item) {
-	 		val = arm_item->type == cJSON_True;
-	 		arm_lock(ch, val, true);
-			printf("Arming lock %d\n", ch);
-	 	}
+	if (enable_item) {
+		val = (enable_item->type == cJSON_True);
+        locks[ch].enable = val;
+        ESP_LOGI(TAG, "Enable for lock %d is %d", ch + 1, val);
+    }
 
-		if (enable_item) {
-			if (enable_item->type == cJSON_False || enable_item->type == cJSON_True) {
-				val = cJSON_IsTrue(enable_item);
-				enableLock(ch, val);
-				printf("Enabling lock %d\n", ch);
-			}
-		}
+	if (enableContactAlert_item) {
+        val = (enableContactAlert_item->type == cJSON_True);
+        locks[ch].enableContactAlert = val;
+        ESP_LOGI(TAG, "Enabling contact alert for lock %d", ch + 1);
+    }
 
-		if (enableContactAlert_item) {
-	 		val = enableContactAlert_item->type == cJSON_True;
-			locks[ch - 1].enableContactAlert = val;
-			printf("Enabling contact alert for lock %d\n", ch);
-	 	}
+	if (polarity_item) {
+        val = (polarity_item->type == cJSON_True);
+        locks[ch].polarity = val;
+        ESP_LOGI(TAG, "Polarity for lock %d is %d", ch + 1, val);
+    }
 
-		if (polarity_item) {
-			locks[ch - 1].polarity = polarity_item->type == cJSON_True;
-			printf("Polarity for lock %d is %d\n", ch, locks[ch - 1].polarity);
-		}
+	if (arm_item) {
+        val = (arm_item->type == cJSON_True);
+        locks[ch].shouldLock = val;
+        if (val) {
+            arm_lock(ch + 1, true, true);
+            ESP_LOGI(TAG, "Arming lock %d", ch + 1);
+        } else {
+            arm_lock(ch + 1, false, true);
+            ESP_LOGI(TAG, "Disarming lock %d", ch + 1);
+        }
+    }
 
-		storeLockSettings();
-	}
-
-	if (property_item) {
-		if (property_item->valuestring == NULL) {
-			cJSON_Delete(payload);
-			return;
-		}
-
-		sprintf(property, "%s", property_item->valuestring);
-		if (strcmp(property, "pulseLock") == 0) {
-
-    		char log_msg[1000];
-			snprintf(log_msg, sizeof(log_msg), 
-				"{\"event_type\":\"log\",\"payload\":"
-				"{\"service_id\":\"ac_1\", "
-				"\"type\":\"access-control\", "
-				"\"description\":\"Access granted from online portal.\", "
-				"\"event\":\"authentication\", "
-				"\"value\":\"true\"}"
-				"}");
-			addServerMessageToQueue(log_msg);
-
-			for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-				if (!locks[i].enable) continue;
-				int ch = i + 1;
-				arm_lock(ch, false, true);
-			}
-
-			vTaskDelay(locks[0].delay * 1000 / portTICK_PERIOD_MS);
-
-			for (uint8_t i=0; i < NUM_OF_LOCKS; i++) {
-				if (!locks[i].enable) continue;
-				int ch = i + 1;
-				arm_lock(ch, true, true);
-			}
-		}
-
-		cJSON_Delete(payload);
-	}
+    // Save settings to flash storage
+    storeLockSettings();
+    
+    cJSON_Delete(payload);
 }
 
 void lock_init()
@@ -357,14 +376,34 @@ void lock_init()
 
 static void lock_service(void *pvParameter) {
     while (1) {
-        for (int i = 0; i < NUM_OF_LOCKS; i++) {
-            locks[i].isContact = !get_io(locks[i].contactPin);
-			locks[i].isSignal = get_io(locks[i].signalPin);
-        }
-
         handle_lock_message(checkServiceMessage("lock"));
-        handle_lock_message(checkServiceMessageByAction("ac_1", "pulseLock"));
-
+        
+        // Reduce frequency of contact checking to prevent spam
+        static int contact_check_counter = 0;
+        contact_check_counter++;
+        
+        // Only check contacts every 200 iterations (about 20 seconds)
+        if (contact_check_counter >= 200) {
+            for (int i = 0; i < NUM_OF_LOCKS; i++) {
+                if (locks[i].enableContactAlert && locks[i].enable) {
+                    // Check for contact
+                    bool hasContact = false;
+                    
+                    if (i == 0) {
+                        hasContact = get_io(CONTACT_IO_1);
+                    } else if (i == 1) {
+                        hasContact = get_io(CONTACT_IO_2);
+                    }
+                    
+                    if (!hasContact) {
+                        ESP_LOGW(TAG, "No contact from lock %d, sounding alert.", i + 1);
+                        beep_keypad(1, 200);
+                    }
+                }
+            }
+            contact_check_counter = 0;
+        }
+        
         vTaskDelay(SERVICE_LOOP / portTICK_PERIOD_MS);
     }
 }

@@ -2,6 +2,8 @@
 #include <inttypes.h>
 #include "esp_spiffs.h"
 #include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 
 #define USERS_PER_INDEX   8
 #define MAX_USER_COUNT    10 * 1000
@@ -24,6 +26,68 @@ typedef struct {
     char name[100];
     char pin[10];
 } UserData;
+
+// Boolean storage functions
+void set_bool(const char *key, bool value) {
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        // NVS partition was truncated and needs to be erased
+        ESP_LOGW(TAG, "NVS partition needs to be erased, doing so now...");
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error (%d) initializing NVS for set_bool", err);
+        return;
+    }
+
+    nvs_handle my_handle;
+    err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error (%d) opening NVS handle for set_bool", err);
+        return;
+    }
+    
+    uint8_t val = value ? 1 : 0;
+    err = nvs_set_u8(my_handle, key, val);
+    if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE) {
+        ESP_LOGW(TAG, "NVS not enough space, skipping storage for %s", key);
+        nvs_close(my_handle);
+        return;
+    }
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Error (%d) setting bool %s, continuing anyway", err, key);
+        nvs_close(my_handle);
+        return;
+    }
+    
+    err = nvs_commit(my_handle);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Error (%d) committing bool %s, continuing anyway", err, key);
+    }
+    
+    nvs_close(my_handle);
+}
+
+bool get_bool(const char *key, bool default_value) {
+    nvs_handle my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READONLY, &my_handle);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Error (%d) opening NVS for get_bool %s, using default", err, key);
+        return default_value;
+    }
+    
+    uint8_t val = default_value ? 1 : 0;
+    err = nvs_get_u8(my_handle, key, &val);
+    nvs_close(my_handle);
+    
+    if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) {
+        ESP_LOGW(TAG, "Error (%d) getting bool %s, using default", err, key);
+        return default_value;
+    }
+    
+    return val != 0;
+}
 
 int storeSetting(char *key, cJSON *payload)
 {

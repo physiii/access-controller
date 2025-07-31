@@ -209,6 +209,7 @@ static void auth_service (void *pvParameter)
   uint8_t r;
 
   while (1) {
+    handle_authorize_message(checkServiceMessage("users"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "addUser"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "modifyUser"));
     handle_authorize_message(checkServiceMessageByAction("ac_1", "removeUser"));

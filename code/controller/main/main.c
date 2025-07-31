@@ -19,8 +19,6 @@
 #include "services/fob.c"
 #include "services/server.c"
 #include "services/ap.c"
-#include "services/ws_client.c"
-#include "services/utilities_server.c"
 #include "esp_http_client.h"
 
 char stored_firmware_md5[33];
@@ -156,13 +154,13 @@ void app_main(void) {
             perform_ota_update(ota_url);
         }
 
-        ws_client_main(server_ip, server_port);
+        // Start services that require credentials (some of these services use device id and token)
+        // ws_client_main(server_ip, server_port);  // Disabled - external server not available
 
         if (strcmp(device_id, "") == 0) {
-            ESP_LOGI(TAG, "No Device ID found, fetching UUID...");
-            xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10 * 1000, NULL, 5, NULL);
+            ESP_LOGE(tag, "Device ID not found");
         } else {
-            ESP_LOGI(TAG, "Device ID : %s", device_id);
+            // xTaskCreate(&ws_utilities_task, "ws_utilities_task", 10 * 1000, NULL, 5, NULL);  // Disabled - depends on WebSocket client
         }
     }
 
@@ -170,16 +168,17 @@ void app_main(void) {
     i2c_main();
     mcp23x17_main();
     auth_main();
-    // buzzer_main();
+    buzzer_main();
     // wiegand_main();
-    // exit_main();
+    exit_main();
     // keypad_main();
 
     // #if STRIKE
-    //     radar_main();
+    radar_main();
     // #else
-    //     fob_main();
+    fob_main();
     // #endif
+    lock_main();
     server_main();
 
     if (initialize_spiffs() == ESP_OK) {

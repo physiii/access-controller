@@ -62,6 +62,9 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
             log_error_if_nonzero("reported from tls stack", data->error_handle.esp_tls_stack_err);
             log_error_if_nonzero("captured as transport's socket errno",  data->error_handle.esp_transport_sock_errno);
         }
+        // Clear any pending messages when disconnected
+        serverMessage.queueCount = 0;
+        serverMessage.readyToSend = false;
         break;
 
     case WEBSOCKET_EVENT_DATA:
@@ -88,6 +91,9 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
             log_error_if_nonzero("reported from tls stack", data->error_handle.esp_tls_stack_err);
             log_error_if_nonzero("captured as transport's socket errno",  data->error_handle.esp_transport_sock_errno);
         }
+        // Clear any pending messages on error
+        serverMessage.queueCount = 0;
+        serverMessage.readyToSend = false;
         break;
     }
 }
@@ -148,10 +154,7 @@ static void ws_client_task(void *pvParameters)
 
 void ws_client_main(const char* ip, const char* port)
 {
-    printf("starting websocket client service\n");
-
-    static char server_info[40];  // Static so it remains valid for the lifetime of the task
-    snprintf(server_info, sizeof(server_info), "%s:%s", ip, port);
-
-    xTaskCreate(&ws_client_task, "ws_client_task", 9 * 1000, server_info, 5, NULL);
+    printf("WebSocket client disabled - external server not available\n");
+    // Disabled to save memory and prevent connection errors
+    // xTaskCreate(&ws_client_task, "ws_client_task", 9 * 1000, server_info, 5, NULL);
 }

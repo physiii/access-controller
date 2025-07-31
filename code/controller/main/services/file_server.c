@@ -445,7 +445,12 @@ esp_err_t start_file_server(const char *base_path)
         return ESP_FAIL;
     }
 
-	start_ws_server(server);
+    ws_mutex = xSemaphoreCreateMutex();
+    if (ws_mutex == NULL) {
+        ESP_LOGE(FILE_TAG, "Mutex creation failed");
+        return ESP_FAIL;
+    }
+    start_ws_server(server);
 
     /* URI handler for getting uploaded files */
     httpd_uri_t file_download = {
