@@ -121,31 +121,6 @@ void read_io()
 	}
 
 	uint16_t values = (data_rd[1] << 8) | data_rd[0];
-	
-	// Log detailed I/O values periodically
-	static int64_t last_detailed_log = 0;
-	int64_t current_time = esp_timer_get_time() / 1000;
-	
-	if ((current_time - last_detailed_log) > 5000) {  // Every 5 seconds
-		ESP_LOGI(TAG, "=== FULL MCP I/O STATUS ===");
-		ESP_LOGI(TAG, "GPIOA raw: 0x%02X", data_rd[0]);
-		ESP_LOGI(TAG, "GPIOB raw: 0x%02X", data_rd[1]);
-		ESP_LOGI(TAG, "Combined 16-bit: 0x%04X", values);
-		ESP_LOGI(TAG, "Individual pins A0-A7: %d %d %d %d %d %d %d %d",
-				 (data_rd[0] >> 0) & 1, (data_rd[0] >> 1) & 1, (data_rd[0] >> 2) & 1, (data_rd[0] >> 3) & 1,
-				 (data_rd[0] >> 4) & 1, (data_rd[0] >> 5) & 1, (data_rd[0] >> 6) & 1, (data_rd[0] >> 7) & 1);
-		ESP_LOGI(TAG, "Individual pins B0-B7: %d %d %d %d %d %d %d %d",
-				 (data_rd[1] >> 0) & 1, (data_rd[1] >> 1) & 1, (data_rd[1] >> 2) & 1, (data_rd[1] >> 3) & 1,
-				 (data_rd[1] >> 4) & 1, (data_rd[1] >> 5) & 1, (data_rd[1] >> 6) & 1, (data_rd[1] >> 7) & 1);
-		ESP_LOGI(TAG, "Motion pins: A6=%d (motion1), B6=%d (motion2)", (data_rd[0] >> 6) & 1, (data_rd[1] >> 6) & 1);
-		ESP_LOGI(TAG, "Exit pins: A5=%d (exit1), B5=%d (exit2)", (data_rd[0] >> 5) & 1, (data_rd[1] >> 5) & 1);
-		ESP_LOGI(TAG, "Keypad pins: A3=%d (keypad1), B3=%d (keypad2)", (data_rd[0] >> 3) & 1, (data_rd[1] >> 3) & 1);
-		ESP_LOGI(TAG, "Fob pins: A7=%d (fob1), B7=%d (fob2)", (data_rd[0] >> 7) & 1, (data_rd[1] >> 7) & 1);
-		ESP_LOGI(TAG, "========================");
-		
-		last_detailed_log = current_time;
-	}
-	
 	MCP_IO_VALUES = values;
 }
 

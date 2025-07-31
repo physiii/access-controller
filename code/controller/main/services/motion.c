@@ -1,8 +1,11 @@
-#define MOTION_MCP_IO_1 A0  // Changed from A6 to A0 for testing
-#define MOTION_MCP_IO_2 B0  // Changed from B6 to B0 for testing
+#define MOTION_MCP_IO_1 A6  // Reverted back to correct pin
+#define MOTION_MCP_IO_2 B6  // Reverted back to correct pin
 #define NUM_OF_MOTIONS				  2
 
-#include "esp_timer.h"
+// MCP23017 constants and function declarations
+#define MCP_OUTPUT 0
+#define MCP_INPUT  1
+void set_mcp_io_dir(uint8_t io, bool dir);
 
 char motion_service_message[2000];
 bool motion_service_message_ready = false;
@@ -112,38 +115,12 @@ void start_motion_timer (struct motionButton *mot, bool val)
 
 void check_motion (struct motionButton *mot)
 {
-	// Log each sensor individually with separate timers
-	static int64_t last_debug_time[2] = {0, 0};
-	int64_t current_time = esp_timer_get_time() / 1000;
-	int sensor_index = mot->channel - 1; // Convert channel 1,2 to index 0,1
-	
-	if (sensor_index >= 0 && sensor_index < 2 && (current_time - last_debug_time[sensor_index]) > 3000) {
-		ESP_LOGI(TAG, "=== Motion %d Debug ===", mot->channel);
-		ESP_LOGI(TAG, "Motion %d: enable=%d, pin=%d", mot->channel, mot->enable, mot->pin);
-		
-		// Log actual MCP GPIO values
-		bool raw_mcp_value = get_mcp_io(mot->pin);
-		ESP_LOGI(TAG, "Motion %d: MCP raw_value=%d", mot->channel, raw_mcp_value);
-		
-		last_debug_time[sensor_index] = current_time;
-	}
+	if (!mot->enable) return;
 
-	if (!mot->enable) {
-		ESP_LOGI(TAG, "Motion %d is DISABLED", mot->channel);
-		return;
-	}
-
-	bool raw_value = get_mcp_io(mot->pin);
-	mot->isPressed = !raw_value;
-	
-	// Always log state changes immediately
-	if (mot->isPressed != mot->prevPress) {
-		ESP_LOGI(TAG, "*** Motion %d STATE CHANGE: raw=%d, isPressed=%d, prevPress=%d ***", 
-		         mot->channel, raw_value, mot->isPressed, mot->prevPress);
-	}
+	mot->isPressed = !get_mcp_io(mot->pin);
 
 	if (mot->isPressed && !mot->prevPress) {
-		ESP_LOGI(TAG, "Motion detected on channel %d", mot->channel);
+		ESP_LOGI(TAG, "Motion detected on channel %d - disarming lock", mot->channel);
 		arm_lock(mot->channel, false, mot->alert);
 		start_motion_timer(mot, true);
 	}
@@ -210,20 +187,7 @@ static void
 motion_service (void *pvParameter)
 {
   while (1) {
-		static int loop_count = 0;
-		loop_count++;
-		
-		// Log every 100 loops to see if service is running
-		if (loop_count % 100 == 0) {
-			ESP_LOGI(TAG, "Motion service loop %d, NUM_OF_MOTIONS=%d", loop_count, NUM_OF_MOTIONS);
-		}
-		
 		for (int i=0; i < NUM_OF_MOTIONS; i++) {
-			// Log which sensor we're checking
-			if (loop_count % 100 == 0) {
-				ESP_LOGI(TAG, "Checking motion sensor %d: channel=%d, pin=%d, enable=%d", 
-				         i, motions[i].channel, motions[i].pin, motions[i].enable);
-			}
 			check_motion(&motions[i]);
 		}
 
@@ -239,18 +203,28 @@ void motion_main()
 	motions[0].pin = MOTION_MCP_IO_1;
 	motions[0].delay = 4;
 	motions[0].channel = 1;
-	motions[0].alert = false;
+	motions[0].alert = true;
 	motions[0].enable = true;
 	strcpy(motions[0].type, "motion");
 
 	motions[1].pin = MOTION_MCP_IO_2;
 	motions[1].delay = 4;
 	motions[1].channel = 2;
-	motions[1].alert = false;
+	motions[1].alert = true;
 	motions[1].enable = true;
 	strcpy(motions[1].type, "motion");
 
 	restoreMotionSettings();
+
+	// Configure motion pins as inputs
+	if (USE_MCP23017) {
+		set_mcp_io_dir(motions[0].pin, MCP_INPUT);
+		set_mcp_io_dir(motions[1].pin, MCP_INPUT);
+		ESP_LOGI(TAG, "Motion pins configured as inputs: pin %d, pin %d", motions[0].pin, motions[1].pin);
+	} else {
+		gpio_set_direction(motions[0].pin, GPIO_MODE_INPUT);
+		gpio_set_direction(motions[1].pin, GPIO_MODE_INPUT);
+	}
 
   xTaskCreate(motion_timer, "motion_timer", 4096, NULL, 10, NULL);
 	xTaskCreate(motion_service, "motion_service", 5000, NULL, 10, NULL);
