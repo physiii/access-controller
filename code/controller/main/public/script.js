@@ -1,172 +1,196 @@
-document.addEventListener('DOMContentLoaded', function() {
-    var url = "ws://" + location.host + '/ws';
-    var webSocket;
-    var deviceSettingsDiv = document.getElementById('device-settings');
-    var appContentDiv = document.getElementById('app-content');
+var url = "ws://" + location.host + '/ws';
+var webSocket = new WebSocket(url);
 
-    function connectWebSocket() {
-        webSocket = new WebSocket(url);
+webSocket.onopen = function (event) {
+	webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"getState\": true}}");
+	setTimeout(() => {
+		webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"getState\": true}}");
+	}, 250);
+	setTimeout(() => {
+		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"getState\": true}}");
+	}, 500);
 
-        webSocket.onopen = function (event) {
-            console.log("WebSocket connected");
-            webSocket.send(JSON.stringify({ "eventType": "getDeviceInfo", "payload": {"getState": true} }));
-        };
+	setTimeout(() => {
+		webSocket.send("{ \"eventType\":\"users\", \"payload\": {\"getState\": true}}");
+	}, 750);
 
-        webSocket.onclose = function(event) {
-            console.log("WebSocket disconnected. Reconnecting in 5 seconds...");
-            setTimeout(connectWebSocket, 5000);
-        };
+	setTimeout(() => {
+		webSocket.send("{ \"eventType\":\"radar\", \"payload\": {\"getState\": true}}");
+	}, 1000);
 
-        webSocket.onerror = function(error) {
-            console.error("WebSocket error:", error);
-        };
+	setTimeout(() => {
+		webSocket.send("{ \"eventType\":\"getInfo\", \"payload\": {\"getInfo\": true}}");
+	}, 1250);
+};
 
-        webSocket.onmessage = function (event) {
-            var data = JSON.parse(event.data);
-            console.log("[WebSocket]", data);
+let armDelay = (channel, value) => {
+	if (!value) value = 0;
+	webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": " + channel + ", \"delay\": " + value + "}}");
+	console.log("Set alarm delay to ", value);
+}
 
-            if (data.event_type === "load" && data.payload && data.payload.services && data.payload.services.length > 0) {
-                // Extract the state object from the first service in the array
-                var deviceState = data.payload.services[0].state;
-                updateDeviceInfo(deviceState);
-                
-                if (window.appFunctions && window.appFunctions.handleAppWebSocketMessage) {
-                    window.appFunctions.handleAppWebSocketMessage(data);
-                }
-            } else if (data.eventType === "updateDeviceInfo") {
-                updateDeviceInfo(data.payload);
-            }
-        };
+document.getElementById('enableLock_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+};
 
-        window.webSocket = webSocket;
-    }
+document.getElementById('polarity_1').onclick = function() {
+	webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"polarity\": " + this.checked + "}}");
+};
 
-    connectWebSocket();
+document.getElementById('arm_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"arm\": " + this.checked + "}}");
+};
 
-    // Navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            var target = this.getAttribute('data-target');
-            loadContent(target);
-        });
-    });
+document.getElementById('enableContactAlert_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enableContactAlert\": " + this.checked + "}}");
+};
 
-    function loadContent(target) {
-        localStorage.setItem('lastView', target);
-        if (target === 'app') {
-            deviceSettingsDiv.style.display = 'none';
-            appContentDiv.style.display = 'block';
-            fetch('/app.html')
-                .then(response => response.text())
-                .then(html => {
-                    appContentDiv.innerHTML = html;
-                    loadScript('/app.js', () => {
-                        if (window.appFunctions && window.appFunctions.initializeApp) {
-                            window.appFunctions.initializeApp();
-                        }
-                    });
-                });
-        } else if (target === 'device') {
-            appContentDiv.style.display = 'none';
-            deviceSettingsDiv.style.display = 'block';
-            initializeDeviceSettings();
+document.getElementById('enableExit_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+};
+
+document.getElementById('alertExit_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+};
+
+document.getElementById('enableFob_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+};
+
+document.getElementById('alertFob_1').onclick = function() {
+			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+};
+
+document.getElementById('enableLock_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
+};
+
+document.getElementById('polarity_2').onclick = function() {
+	webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"polarity\": " + this.checked + "}}");
+};
+
+document.getElementById('arm_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"arm\": " + this.checked + "}}");
+};
+
+document.getElementById('enableContactAlert_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"enableContactAlert\": " + this.checked + "}}");
+};
+
+document.getElementById('enableExit_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
+};
+
+document.getElementById('alertExit_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
+};
+
+document.getElementById('enableFob_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
+};
+
+document.getElementById('alertFob_2').onclick = function() {
+			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
+};
+
+document.getElementById('wifiForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents the default form submission behavior
+    const wifiName = document.getElementById('wifiName').value;
+    const wifiPassword = document.getElementById('wifiPassword').value;
+
+    // Send the WiFi credentials to your server using WebSocket
+    webSocket.send(JSON.stringify({
+        eventType: "setWifiCredentials",
+        payload: {
+            wifiName: wifiName,
+            wifiPassword: wifiPassword
         }
-    }
-
-    function loadScript(url, callback) {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = url;
-        script.onload = callback;
-        document.head.appendChild(script);
-    }
-
-    function initializeDeviceSettings() {
-        var wifiForm = document.getElementById('wifiForm');
-        var serverForm = document.getElementById('serverForm');
-
-        if (wifiForm) {
-            wifiForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var wifiName = document.getElementById('wifiName').value;
-                var wifiPassword = document.getElementById('wifiPassword').value;
-                webSocket.send(JSON.stringify({
-                    "eventType": "setWifiCredentials",
-                    "payload": { "wifiName": wifiName, "wifiPassword": wifiPassword }
-                }));
-                console.log("WiFi settings submitted");
-            });
-        }
-
-        if (serverForm) {
-            serverForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var ipAddress = document.getElementById('serverIpAddress').value;
-                var port = document.getElementById('port').value;
-                webSocket.send(JSON.stringify({
-                    "eventType": "setServerInfo",
-                    "payload": { "ipAddress": ipAddress, "port": port }
-                }));
-                console.log("Server info submitted");
-            });
-        }
-    }
-
-    window.editDeviceName = function() {
-        document.getElementById('deviceName').style.display = 'none';
-        document.getElementById('deviceNameInput').style.display = 'inline';
-        document.getElementById('deviceNameInput').value = document.getElementById('deviceName').textContent;
-        document.getElementById('editDeviceNameBtn').style.display = 'none';
-        document.getElementById('saveDeviceNameBtn').style.display = 'inline';
-    }
-
-    window.saveDeviceName = function() {
-        var newDeviceName = document.getElementById('deviceNameInput').value;
-        webSocket.send(JSON.stringify({
-            "eventType": "setDeviceName",
-            "payload": { "deviceName": newDeviceName }
-        }));
-        console.log("Device name submitted: " + newDeviceName);
-        document.getElementById('deviceName').textContent = newDeviceName;
-        document.getElementById('deviceName').style.display = 'inline';
-        document.getElementById('deviceNameInput').style.display = 'none';
-        document.getElementById('saveDeviceNameBtn').style.display = 'none';
-        document.getElementById('editDeviceNameBtn').style.display = 'inline';
-    }
-
-    window.editDeviceRoom = function() {
-        document.getElementById('deviceRoom').style.display = 'none';
-        document.getElementById('deviceRoomInput').style.display = 'inline';
-        document.getElementById('deviceRoomInput').value = document.getElementById('deviceRoom').textContent;
-        document.getElementById('editDeviceRoomBtn').style.display = 'none';
-        document.getElementById('saveDeviceRoomBtn').style.display = 'inline';
-    }
-
-    window.saveDeviceRoom = function() {
-        var newDeviceRoom = document.getElementById('deviceRoomInput').value;
-        webSocket.send(JSON.stringify({
-            "eventType": "setDeviceRoom",
-            "payload": { "deviceRoom": newDeviceRoom }
-        }));
-        console.log("Device room submitted: " + newDeviceRoom);
-        document.getElementById('deviceRoom').textContent = newDeviceRoom;
-        document.getElementById('deviceRoom').style.display = 'inline';
-        document.getElementById('deviceRoomInput').style.display = 'none';
-        document.getElementById('saveDeviceRoomBtn').style.display = 'none';
-        document.getElementById('editDeviceRoomBtn').style.display = 'inline';
-    }
-
-    function updateDeviceInfo(info) {
-        console.log("Updating device info:", info);
-        if (info.device_id) document.getElementById('deviceID').textContent = info.device_id;
-        if (info.ip_address) document.getElementById('ipAddress').textContent = info.ip_address;
-        if (info.device_name) document.getElementById('deviceName').textContent = info.device_name;
-        if (info.room_name) document.getElementById('deviceRoom').textContent = info.room_name;
-        if (info.mac_address) document.getElementById('macAddress').textContent = info.mac_address;
-    }
-
-    // Load last viewed content or default to app
-    var lastView = localStorage.getItem('lastView') || 'app';
-    loadContent(lastView);
+    }));
 });
+
+document.getElementById('serverForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents the default form submission behavior
+    const ipAddress = document.getElementById('ipAddress').value;
+    const port = document.getElementById('port').value;
+
+    // Send the server info to your server using WebSocket
+    webSocket.send(JSON.stringify({
+        eventType: "setServerInfo",
+        payload: {
+            serverIp: ipAddress,
+            serverPort: port
+        }
+    }));
+});
+
+webSocket.onmessage = function (event) {
+	let state = JSON.parse(event.data);
+	let pl = state.payload;
+	let ch = 1;
+	if (pl.channel) ch = pl.channel;
+	if (!event.data) return;
+
+	function removeUser(user) {
+			console.log(users[i]);
+			let msg = "{ \"eventType\":\"users\", \"payload\": {\"removeUser\":\"" + user + "\"}}";
+			webSocket.send(msg);
+	}
+
+	if (state.eventType == "exit") {
+		if (pl.enable) document.getElementById('enableExit_' + ch).checked = pl.enable;
+		if (pl.alert) document.getElementById('alertExit_' + ch).checked = pl.alert;
+		if (pl.delay) document.getElementById('armDelay_' + ch).value = pl.delay;
+	}
+
+	if (state.eventType == "lock") {
+		if (pl.enable) document.getElementById('enableLock_' + ch).checked = pl.enable;
+		if (pl.arm) document.getElementById('arm_' + ch).checked = pl.arm;
+		if (pl.enableContactAlert) document.getElementById('enableContactAlert_' + ch).checked = pl.enableContactAlert;
+		if (pl.polarity) document.getElementById('polarity_' + ch).checked = pl.polarity;
+	}
+
+	if (state.eventType == "fob") {
+		if (pl.enable) document.getElementById('enableFob_' + ch).checked = pl.enable;
+		if (pl.alert) document.getElementById('alertFob_' + ch).checked = pl.alert;
+	}
+
+	if (state.eventType == "authorize") {
+		document.getElementById('uuid').textContent = pl.uuid;
+	}
+
+	if (state.eventType == "users") {
+		let users = pl;
+		let rowsAsString = "<table>";
+		rowsAsString += "<tr><th colspan=\"2\">Users</th></tr>";
+		rowsAsString += "<tr><th>ID</th><th>Remove</th></tr>";
+
+		for(var i = 0; i < users.length; i++) {
+			rowsAsString += "<tr><td>" + users[i] + "</td>"
+				+ "<td style=\"width:100px\"><button id=\"remove_" + users[i] + "\" onClick=\"" + users[i] + "\" type='button'\">remove</button></td></tr>";
+		}
+
+		rowsAsString += "<tr><th colspan=\"2\"><button id=\"addUserBtn\" style=\"width:100%\" type=\"button\">Add User</button></th></tr>";
+		rowsAsString += "</table>";
+
+		document.getElementById('users_list').innerHTML = rowsAsString;
+		document.getElementById('addUserBtn').onclick = function(event) {
+			console.log(event.target.textContent);
+			if (event.target.textContent === "Done") {
+				webSocket.send("{ \"eventType\":\"users\", \"payload\": {\"addUser\":false}}");
+				document.getElementById('addUserBtn').innerHTML = "Add User";
+			} else {
+				webSocket.send("{ \"eventType\":\"users\", \"payload\": {\"addUser\":true}}");
+				document.getElementById('addUserBtn').innerHTML = "Done";
+			}
+		};
+
+		for(var i = 0; i < users.length; i++) {
+			document.getElementById('remove_' + users[i]).onclick = function(event) {
+						let user = event.target.attributes.id.value.replace("remove_", "");
+						let msg = "{ \"eventType\":\"users\", \"payload\": {\"removeUser\":\"" + user + "\"}}";
+						webSocket.send(msg);
+			};
+		}
+
+	}
+}

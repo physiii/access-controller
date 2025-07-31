@@ -1,5 +1,3 @@
-wifi on disconnect with periodic check for known AP
-add RFID user, where did pin user go?
 full system test
 
 add toggles from local page to card details component

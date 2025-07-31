@@ -3,7 +3,6 @@
 
 #include <string.h>
 #include <ctype.h>
-#include <time.h>  // Include for time_t type
 #include "cJSON.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -11,24 +10,11 @@
 #include "esp_system.h"
 #include "esp_timer.h"
 #include "nvs_flash.h"
-#include "esp_http_server.h"
 
 // Function declarations
 void beep_keypad(int, int);
 void set_mcp_io(uint8_t, bool);
 bool get_mcp_io(uint8_t);
-void start_ws_server(httpd_handle_t server);
-void automationInit();
-
-cJSON *checkServiceMessage(char *eventType);
-cJSON *checkServiceMessageByAction(char *id, char *action);
-cJSON *checkServiceMessageByKey(char *key);
-void addServiceMessageToQueue(cJSON *message);
-void addServerMessageToQueue(const char *message);
-void addClientMessageToQueue(const char *message);
-void serviceMessageTask(void *pvParameter);
-void serverMessageTask(void *pvParameter);
-void clientMessageTask(void *pvParameter);
 
 // Macros
 #define SERVICE_LOOP 100
@@ -44,7 +30,7 @@ void clientMessageTask(void *pvParameter);
 
 #define NO_DATA_TIMEOUT_SEC 5
 
-// Global variables
+// Global variable declarations (extern)
 extern char wss_data_in[1800];
 extern char wss_data_out[1800];
 extern bool wss_data_out_ready;
@@ -64,29 +50,46 @@ extern bool connect_to_relay;
 
 extern const char *TAG;
 
-struct ServiceMessage {
+struct ServiceMessage
+{
+    cJSON *message;
     cJSON *messageQueue[MAX_QUEUE_SIZE];
-    int queueCount;
     bool read;
-    time_t messageTimestamps[MAX_QUEUE_SIZE];  // Timestamps for each message
-};
-
-struct ClientMessage {
-    char message[1000];
-    char messageQueue[MAX_QUEUE_SIZE][1000];
-    bool readyToSend;
+    int timeout;
     int queueCount;
 };
 
-struct ServerMessage {
+struct ClientMessage
+{
     char message[1000];
     char messageQueue[MAX_QUEUE_SIZE][1000];
     bool readyToSend;
+    int timeout;
+    int queueCount;
+};
+
+struct ServerMessage
+{
+    char message[1000];
+    char messageQueue[MAX_QUEUE_SIZE][1000];
+    bool readyToSend;
+    int timeout;
     int queueCount;
 };
 
 extern struct ServiceMessage serviceMessage;
 extern struct ClientMessage clientMessage;
 extern struct ServerMessage serverMessage;
+
+// Function declarations
+cJSON *checkServiceMessage(char *eventType);
+cJSON *checkServiceMessageByAction(char *id, char *action);
+cJSON *checkServiceMessageByKey(char *key);
+void addServiceMessageToQueue(cJSON *message);
+void addServerMessageToQueue(const char *message);
+void addClientMessageToQueue(const char *message);
+void serviceMessageTask(void *pvParameter);
+void serverMessageTask(void *pvParameter);
+void clientMessageTask(void *pvParameter);
 
 #endif // AUTOMATION_H

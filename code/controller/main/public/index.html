@@ -1,122 +1,267 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 Control Panel</title>
+    <title>Access Controller</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <div class="titleDiv">
-        <h1>ESP32 Control Panel</h1>
+        <h1>Access Controller</h1>
     </div>
 
-    <div class="navigation">
-        <a href="#" class="nav-link" data-target="app">Access Control App</a>
-        <a href="#" class="nav-link" data-target="device">Device Settings</a>
-    </div>
+    <!-- Device Info -->
+	<div class="table-container">
+		<table>
+			<thead>
+				<tr>
+					<th colspan="2">Device Info</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>UUID</td>
+					<td id="uuid" name="uuid"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-    <div id="content">
-        <div id="device-settings" style="display: none;">
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th colspan="2">Device Info</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Device ID</td>
-                            <td id="deviceID"></td>
-                        </tr>
-                        <tr>
-                            <td>MAC Address</td>
-                            <td id="macAddress"></td>
-                        </tr>
-                        <tr>
-                            <td>IP Address</td>
-                            <td id="ipAddress"></td>
-                        </tr>
-                        <tr>
-                            <td>Device Name</td>
-                            <td>
-                                <div class="input-group">
-                                    <span id="deviceName"></span>
-                                    <input type="text" id="deviceNameInput" style="display:none;">
-                                    <button id="editDeviceNameBtn" onclick="editDeviceName()">Edit</button>
-                                    <button id="saveDeviceNameBtn" style="display:none;" onclick="saveDeviceName()">Save</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Device Room</td>
-                            <td>
-                                <div class="input-group">
-                                    <span id="deviceRoom"></span>
-                                    <input type="text" id="deviceRoomInput" style="display:none;">
-                                    <button id="editDeviceRoomBtn" onclick="editDeviceRoom()">Edit</button>
-                                    <button id="saveDeviceRoomBtn" style="display:none;" onclick="saveDeviceRoom()">Save</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+	<!-- Channel 1 -->
+	<div class="table-container">
+		<table>
+			<thead>
+				<tr>
+					<th colspan="2">Channel 1</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Enable or disable lock</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableLock_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Arm or disarm the lock</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="arm_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Enable or disable contact alerts</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableContactAlert_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Enable or disable exit button</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableExit_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Alert when exit button is pressed</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="alertExit_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Enable or disable FOB button</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableFob_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Alert when remote FOB is used</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="alertFob_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Set polarity</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="polarity_1">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Time for system to re-arm after pulsed in seconds</td>
+					<td>
+						<input id="armDelay_1" type="number" value="5">
+						<button id="relock" type="button">Save</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-            <div class="table-container">
-                <form id="wifiForm">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th colspan="2">WiFi Settings</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>WiFi Name:</td>
-                                <td><input type="text" id="wifiName" placeholder="Enter WiFi Name"></td>
-                            </tr>
-                            <tr>
-                                <td>Password:</td>
-                                <td><input type="password" id="wifiPassword" placeholder="Enter Password"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2"><button type="submit">Submit</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
-            </div>
 
-            <div class="table-container">
-                <form id="serverForm">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th colspan="2">Server Info</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>IP Address:</td>
-                                <td><input type="text" id="serverIpAddress" placeholder="Enter IP Address"></td>
-                            </tr>
-                            <tr>
-                                <td>Port:</td>
-                                <td><input type="text" id="port" placeholder="Enter Port"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2"><button type="submit">Submit</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
-            </div>
-        </div>
-        <div id="app-content"></div>
-    </div>
+	<!-- Channel 2 -->
+	<div class="table-container">
+		<table>
+			<thead>
+				<tr>
+					<th colspan="2">Channel 2</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Enable or disable lock</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableLock_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Arm or disarm the lock</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="arm_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Enable or disable contact alerts</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableContactAlert_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Enable or disable exit button</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableExit_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Alert when exit button is pressed</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="alertExit_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Enable or disable FOB button</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="enableFob_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Alert when remote FOB is used</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="alertFob_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Set polarity</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" id="polarity_2">
+							<span class="slider round"></span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>Time for system to re-arm after pulsed in seconds</td>
+					<td>
+						<input id="armDelay_2" type="number" value="5">
+						<button id="relock_2" type="button">Save</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+    <!-- WiFi Settings -->
+	<div class="table-container">
+		<form id="wifiForm">
+			<table>
+				<thead>
+					<tr>
+						<th colspan="2">WiFi Settings</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>WiFi Name:</td>
+						<td><input type="text" id="wifiName" placeholder="Enter WiFi Name" /></td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td><input type="password" id="wifiPassword" placeholder="Enter Password" /></td>
+					</tr>
+					<tr>
+						<td colspan="2"><button type="submit">Submit</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>	
 
-    <script src="/script.js"></script>
+    <!-- Server Info -->
+	<div class="table-container">
+		<form id="serverForm">
+			<table>
+				<thead>
+					<tr>
+						<th colspan="2">Server Info</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>IP Address:</td>
+						<td><input type="text" id="ipAddress" placeholder="Enter IP Address" /></td>
+					</tr>
+					<tr>
+						<td>Port:</td>
+						<td><input type="text" id="port" placeholder="Enter Port" /></td>
+					</tr>
+					<tr>
+						<td colspan="2"><button type="submit">Submit</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	
+	<script src="/script.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 {
-    "idf.adapterTargetName": "esp32s3",
+    "idf.adapterTargetName": "esp32",
     "files.associations": {
         "typeindex": "c",
         "typeinfo": "c",
@@ -36,20 +36,7 @@
         "unordered_set": "c",
         "ios": "c",
         "cstdint": "c",
-        "ctype.h": "c",
-        "fob.h": "c",
-        "motion.h": "c",
-        "stat.h": "c",
-        "string_view": "c",
-        "span": "c",
-        "param.h": "c",
-        "gpio.h": "c",
-        "string.h": "c",
-        "lock.h": "c",
-        "mcp23x17.h": "c",
-        "buzzer.h": "c",
-        "complex": "c",
-        "stdio.h": "c"
+        "ctype.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
