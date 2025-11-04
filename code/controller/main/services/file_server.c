@@ -46,6 +46,8 @@ struct file_server_data {
 
 static const char *FILE_TAG = "file_server";
 
+extern void register_api_routes(httpd_handle_t server);
+
 /* Handler to redirect incoming GET request for /index.html to /
  * This can be overridden by uploading file with same name */
 static esp_err_t index_html_get_handler(httpd_req_t *req)
@@ -433,13 +435,14 @@ esp_err_t start_file_server(const char *base_path)
             sizeof(server_data->base_path));
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.max_uri_handlers = 20;
 
     /* Use the URI wildcard matching function in order to
      * allow the same handler to respond to multiple different
      * target URIs which match the wildcard scheme */
     config.uri_match_fn = httpd_uri_match_wildcard;
 
-    ESP_LOGI(FILE_TAG, "Starting HTTP Server");
+    ESP_LOGI(FILE_TAG, "Starting HTTP Server (max_uri_handlers=%d)", config.max_uri_handlers);
     if (httpd_start(&server, &config) != ESP_OK) {
         ESP_LOGE(FILE_TAG, "Failed to start file server!");
         return ESP_FAIL;
@@ -451,6 +454,7 @@ esp_err_t start_file_server(const char *base_path)
         return ESP_FAIL;
     }
     start_ws_server(server);
+    register_api_routes(server);
 
     /* URI handler for getting uploaded files */
     httpd_uri_t file_download = {

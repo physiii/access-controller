@@ -102,6 +102,27 @@ void sendExitState(void) {
     }
 }
 
+cJSON *exit_state_snapshot(void) {
+    cJSON *array = cJSON_CreateArray();
+    if (!array) {
+        return NULL;
+    }
+
+    for (int i = 0; i < NUM_OF_EXITS; i++) {
+        cJSON *entry = cJSON_CreateObject();
+        if (!entry) {
+            continue;
+        }
+        cJSON_AddNumberToObject(entry, "channel", exits[i].channel);
+        cJSON_AddBoolToObject(entry, "enable", exits[i].enable);
+        cJSON_AddBoolToObject(entry, "alert", exits[i].alert);
+        cJSON_AddNumberToObject(entry, "delay", exits[i].delay);
+        cJSON_AddItemToArray(array, entry);
+    }
+
+    return array;
+}
+
 
 int handle_exit_property (char * prop)
 {

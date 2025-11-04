@@ -18,6 +18,9 @@
 #include "automation.h"
 
 extern char *get_char(const char *key);
+extern cJSON *lock_state_snapshot(void);
+extern cJSON *exit_state_snapshot(void);
+extern cJSON *fob_state_snapshot(void);
 
 static const char *TUNNEL_TAG = "tunnel";
 
@@ -55,6 +58,10 @@ typedef struct {
 } http_response_buffer_t;
 
 static bool tunnel_task_started = false;
+
+void tunnel_ws_broadcast(const char *message) {
+    (void)message;
+}
 
 static void load_tunnel_config(tunnel_config_t *cfg) {
     if (!cfg) {
@@ -661,11 +668,11 @@ static void tunnel_main_loop(tunnel_client_t *client) {
                 snprintf(client->assigned_id, sizeof(client->assigned_id), "%s", device_id_item->valuestring);
                 ESP_LOGI(TUNNEL_TAG, "Assigned device ID: %s", client->assigned_id);
             }
-            if (strlen(device_id) > 0) {
+            if (strlen(client->assigned_id) > 0) {
                 cJSON *identify = cJSON_CreateObject();
                 if (identify) {
                     cJSON_AddStringToObject(identify, "type", "identify");
-                    cJSON_AddStringToObject(identify, "deviceId", device_id);
+                    cJSON_AddStringToObject(identify, "deviceId", client->assigned_id);
                     if (send_frame(client->sock, identify, NULL, 0) == ESP_OK) {
                         client->identified = true;
                     }

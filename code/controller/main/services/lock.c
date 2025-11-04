@@ -271,6 +271,28 @@ void sendLockState(void) {
     }
 }
 
+cJSON *lock_state_snapshot(void) {
+    cJSON *array = cJSON_CreateArray();
+    if (!array) {
+        return NULL;
+    }
+
+    for (int i = 0; i < NUM_OF_LOCKS; i++) {
+        cJSON *entry = cJSON_CreateObject();
+        if (!entry) {
+            continue;
+        }
+        cJSON_AddNumberToObject(entry, "channel", i + 1);
+        cJSON_AddBoolToObject(entry, "enable", locks[i].enable);
+        cJSON_AddBoolToObject(entry, "arm", locks[i].shouldLock);
+        cJSON_AddBoolToObject(entry, "enableContactAlert", locks[i].enableContactAlert);
+        cJSON_AddBoolToObject(entry, "polarity", locks[i].polarity);
+        cJSON_AddItemToArray(array, entry);
+    }
+
+    return array;
+}
+
 void handle_lock_message(cJSON * payload) {
     int ch=0;
     bool val;

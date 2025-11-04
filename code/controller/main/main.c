@@ -20,6 +20,7 @@
 #include "services/server.c"
 #include "services/tunnel.c"
 #include "services/ap.c"
+#include "services/api.c"
 #include "esp_http_client.h"
 #include "esp_random.h"
 

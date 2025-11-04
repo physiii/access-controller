@@ -140,6 +140,27 @@ void sendFobState(void) {
     }
 }
 
+cJSON *fob_state_snapshot(void) {
+    cJSON *array = cJSON_CreateArray();
+    if (!array) {
+        return NULL;
+    }
+
+    for (int i = 0; i < NUM_OF_FOBS; i++) {
+        cJSON *entry = cJSON_CreateObject();
+        if (!entry) {
+            continue;
+        }
+        cJSON_AddNumberToObject(entry, "channel", fobs[i].channel);
+        cJSON_AddBoolToObject(entry, "enable", fobs[i].enable);
+        cJSON_AddBoolToObject(entry, "alert", fobs[i].alert);
+        cJSON_AddBoolToObject(entry, "latch", fobs[i].latch);
+        cJSON_AddItemToArray(array, entry);
+    }
+
+    return array;
+}
+
 void handle_fob_message(cJSON * payload)
 {
 	if (payload == NULL) return;

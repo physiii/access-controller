@@ -153,7 +153,7 @@ ws_service (void *pvParameter)
                     char *data = cJSON_PrintUnformatted(message_to_send);
 
                     if (data) {
-                        printf("Sending (%d): %s\n", clientMessage.queueCount, data);
+                        ESP_LOGD(WS_TAG, "Sending (%d): %s", clientMessage.queueCount, data);
 
                         tunnel_ws_broadcast(data);
 

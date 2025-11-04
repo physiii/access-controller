@@ -1,206 +1,198 @@
-const wsUrl = new URL('ws', window.location.href);
-wsUrl.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-var webSocket = new WebSocket(wsUrl.href);
-
-webSocket.onopen = function (event) {
-	webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"getState\": true}}");
-	setTimeout(() => {
-		webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"getState\": true}}");
-	}, 250);
-	setTimeout(() => {
-		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"getState\": true}}");
-	}, 500);
-
-	setTimeout(() => {
-		webSocket.send("{ \"eventType\":\"users\", \"payload\": {\"getState\": true}}");
-	}, 750);
-
-	setTimeout(() => {
-		webSocket.send("{ \"eventType\":\"radar\", \"payload\": {\"getState\": true}}");
-	}, 1000);
-
-	setTimeout(() => {
-		webSocket.send("{ \"eventType\":\"getInfo\", \"payload\": {\"getInfo\": true}}");
-	}, 1250);
+const fetchJSON = async (path, options = {}) => {
+  const url = new URL(path, window.location.origin);
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Request failed: ${response.status}`);
+  }
+  if (response.status === 204) {
+    return null;
+  }
+  return response.json();
 };
 
-let armDelay = (channel, value) => {
-	if (!value) value = 0;
-	webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": " + channel + ", \"delay\": " + value + "}}");
-	console.log("Set alarm delay to ", value);
-}
-
-document.getElementById('enableLock_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+const applyLockState = (locks = []) => {
+  locks.forEach((lock) => {
+    const ch = lock.channel;
+    document.getElementById(`enableLock_${ch}`).checked = !!lock.enable;
+    document.getElementById(`arm_${ch}`).checked = !!lock.arm;
+    document.getElementById(`enableContactAlert_${ch}`).checked = !!lock.enableContactAlert;
+    document.getElementById(`polarity_${ch}`).checked = !!lock.polarity;
+  });
 };
 
-document.getElementById('polarity_1').onclick = function() {
-	webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"polarity\": " + this.checked + "}}");
+const applyExitState = (exits = []) => {
+  exits.forEach((exit) => {
+    const ch = exit.channel;
+    document.getElementById(`enableExit_${ch}`).checked = !!exit.enable;
+    document.getElementById(`alertExit_${ch}`).checked = !!exit.alert;
+    document.getElementById(`armDelay_${ch}`).value = exit.delay ?? 0;
+  });
 };
 
-document.getElementById('arm_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"arm\": " + this.checked + "}}");
+const applyFobState = (fobs = []) => {
+  fobs.forEach((fob) => {
+    const ch = fob.channel;
+    document.getElementById(`enableFob_${ch}`).checked = !!fob.enable;
+    document.getElementById(`alertFob_${ch}`).checked = !!fob.alert;
+    document.getElementById(`latchFob_${ch}`).checked = !!fob.latch;
+  });
 };
 
-document.getElementById('enableContactAlert_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 1, \"enableContactAlert\": " + this.checked + "}}");
+const applyDeviceInfo = (device = {}) => {
+  document.getElementById('uuid').textContent = device.uuid || '';
 };
 
-document.getElementById('enableExit_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+const applyState = (state = {}) => {
+  applyDeviceInfo(state.device || {});
+  applyLockState(state.locks || []);
+  applyExitState(state.exits || []);
+  applyFobState(state.fobs || []);
 };
 
-document.getElementById('alertExit_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+const loadState = async () => {
+  try {
+    const state = await fetchJSON('/api/state');
+    applyState(state);
+  } catch (error) {
+    console.error('Failed to load state', error);
+  }
 };
 
-document.getElementById('enableFob_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"enable\": " + this.checked + "}}");
+const updateLock = async (channel, updates) => {
+  const body = { channel, ...updates };
+  try {
+    const locks = await fetchJSON('/api/lock', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    applyLockState(locks || []);
+  } catch (error) {
+    console.error('Failed to update lock', error);
+  }
 };
 
-document.getElementById('alertFob_1').onclick = function() {
-			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"alert\": " + this.checked + "}}");
+const updateExit = async (channel, updates) => {
+  const body = { channel, ...updates };
+  try {
+    const exits = await fetchJSON('/api/exit', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    applyExitState(exits || []);
+  } catch (error) {
+    console.error('Failed to update exit', error);
+  }
 };
 
-document.getElementById('latchFob_1').onclick = function() {
-		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 1, \"latch\": " + this.checked + "}}");
+const updateFob = async (channel, updates) => {
+  const body = { channel, ...updates };
+  try {
+    const fobs = await fetchJSON('/api/fob', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    applyFobState(fobs || []);
+  } catch (error) {
+    console.error('Failed to update fob', error);
+  }
 };
 
-document.getElementById('enableLock_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
+const setupLockHandlers = () => {
+  [1, 2].forEach((ch) => {
+    document.getElementById(`enableLock_${ch}`).addEventListener('change', (event) => {
+      updateLock(ch, { enable: event.target.checked });
+    });
+    document.getElementById(`arm_${ch}`).addEventListener('change', (event) => {
+      updateLock(ch, { arm: event.target.checked });
+    });
+    document.getElementById(`enableContactAlert_${ch}`).addEventListener('change', (event) => {
+      updateLock(ch, { enableContactAlert: event.target.checked });
+    });
+    document.getElementById(`polarity_${ch}`).addEventListener('change', (event) => {
+      updateLock(ch, { polarity: event.target.checked });
+    });
+  });
 };
 
-document.getElementById('polarity_2').onclick = function() {
-	webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"polarity\": " + this.checked + "}}");
+const setupExitHandlers = () => {
+  [1, 2].forEach((ch) => {
+    document.getElementById(`enableExit_${ch}`).addEventListener('change', (event) => {
+      updateExit(ch, { enable: event.target.checked });
+    });
+    document.getElementById(`alertExit_${ch}`).addEventListener('change', (event) => {
+      updateExit(ch, { alert: event.target.checked });
+    });
+  });
+
+  document.getElementById('relock').addEventListener('click', () => {
+    const value = parseInt(document.getElementById('armDelay_1').value, 10) || 0;
+    updateExit(1, { delay: value });
+  });
+
+  document.getElementById('relock_2').addEventListener('click', () => {
+    const value = parseInt(document.getElementById('armDelay_2').value, 10) || 0;
+    updateExit(2, { delay: value });
+  });
 };
 
-document.getElementById('arm_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"arm\": " + this.checked + "}}");
+const setupFobHandlers = () => {
+  [1, 2].forEach((ch) => {
+    document.getElementById(`enableFob_${ch}`).addEventListener('change', (event) => {
+      updateFob(ch, { enable: event.target.checked });
+    });
+    document.getElementById(`alertFob_${ch}`).addEventListener('change', (event) => {
+      updateFob(ch, { alert: event.target.checked });
+    });
+    document.getElementById(`latchFob_${ch}`).addEventListener('change', (event) => {
+      updateFob(ch, { latch: event.target.checked });
+    });
+  });
 };
 
-document.getElementById('enableContactAlert_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"lock\", \"payload\": {\"channel\": 2, \"enableContactAlert\": " + this.checked + "}}");
-};
-
-document.getElementById('enableExit_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
-};
-
-document.getElementById('alertExit_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
-};
-
-document.getElementById('enableFob_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"enable\": " + this.checked + "}}");
-};
-
-document.getElementById('alertFob_2').onclick = function() {
-			webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"alert\": " + this.checked + "}}");
-};
-
-document.getElementById('latchFob_2').onclick = function() {
-		webSocket.send("{ \"eventType\":\"fob\", \"payload\": {\"channel\": 2, \"latch\": " + this.checked + "}}");
-};
-
-document.getElementById('wifiForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevents the default form submission behavior
+const setupForms = () => {
+  document.getElementById('wifiForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
     const wifiName = document.getElementById('wifiName').value;
     const wifiPassword = document.getElementById('wifiPassword').value;
+    try {
+      await fetchJSON('/api/wifi', {
+        method: 'POST',
+        body: JSON.stringify({ wifiName, wifiPassword }),
+      });
+      alert('WiFi credentials updated. Device will reboot to apply changes.');
+    } catch (error) {
+      console.error('Failed to update WiFi info', error);
+      alert('Failed to update WiFi credentials.');
+    }
+  });
 
-    // Send the WiFi credentials to your server using WebSocket
-    webSocket.send(JSON.stringify({
-        eventType: "setWifiCredentials",
-        payload: {
-            wifiName: wifiName,
-            wifiPassword: wifiPassword
-        }
-    }));
-});
+  document.getElementById('serverForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const serverIp = document.getElementById('ipAddress').value;
+    const serverPort = document.getElementById('port').value;
+    try {
+      await fetchJSON('/api/server', {
+        method: 'POST',
+        body: JSON.stringify({ serverIp, serverPort }),
+      });
+      alert('Server info updated. Device will reboot to apply changes.');
+    } catch (error) {
+      console.error('Failed to update server info', error);
+      alert('Failed to update server info.');
+    }
+  });
+};
 
-document.getElementById('serverForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevents the default form submission behavior
-    const ipAddress = document.getElementById('ipAddress').value;
-    const port = document.getElementById('port').value;
+const initialise = () => {
+  setupLockHandlers();
+  setupExitHandlers();
+  setupFobHandlers();
+  setupForms();
+  loadState();
+};
 
-    // Send the server info to your server using WebSocket
-    webSocket.send(JSON.stringify({
-        eventType: "setServerInfo",
-        payload: {
-            serverIp: ipAddress,
-            serverPort: port
-        }
-    }));
-});
-
-webSocket.onmessage = function (event) {
-	let state = JSON.parse(event.data);
-	let pl = state.payload;
-	let ch = 1;
-	if (pl.channel) ch = pl.channel;
-	if (!event.data) return;
-
-	function removeUser(user) {
-			console.log(users[i]);
-			let msg = "{ \"eventType\":\"users\", \"payload\": {\"removeUser\":\"" + user + "\"}}";
-			webSocket.send(msg);
-	}
-
-	if (state.eventType == "exit") {
-		if (pl.enable) document.getElementById('enableExit_' + ch).checked = pl.enable;
-		if (pl.alert) document.getElementById('alertExit_' + ch).checked = pl.alert;
-		if (pl.delay) document.getElementById('armDelay_' + ch).value = pl.delay;
-	}
-
-	if (state.eventType == "lock") {
-		if (pl.enable) document.getElementById('enableLock_' + ch).checked = pl.enable;
-		if (pl.arm) document.getElementById('arm_' + ch).checked = pl.arm;
-		if (pl.enableContactAlert) document.getElementById('enableContactAlert_' + ch).checked = pl.enableContactAlert;
-		if (pl.polarity) document.getElementById('polarity_' + ch).checked = pl.polarity;
-	}
-
-	if (state.eventType == "fob") {
-		if (pl.enable) document.getElementById('enableFob_' + ch).checked = pl.enable;
-		if (pl.alert) document.getElementById('alertFob_' + ch).checked = pl.alert;
-		if (pl.latch) document.getElementById('latchFob_' + ch).checked = pl.latch;
-	}
-
-	if (state.eventType == "authorize") {
-		document.getElementById('uuid').textContent = pl.uuid;
-	}
-
-	if (state.eventType == "users") {
-		let users = pl;
-		let rowsAsString = "<table>";
-		rowsAsString += "<tr><th colspan=\"2\">Users</th></tr>";
-		rowsAsString += "<tr><th>ID</th><th>Remove</th></tr>";
-
-		for(var i = 0; i < users.length; i++) {
-			rowsAsString += "<tr><td>" + users[i] + "</td>"
-				+ "<td style=\"width:100px\"><button id=\"remove_" + users[i] + "\" onClick=\"" + users[i] + "\" type='button'\">remove</button></td></tr>";
-		}
-
-		rowsAsString += "<tr><th colspan=\"2\"><button id=\"addUserBtn\" style=\"width:100%\" type=\"button\">Add User</button></th></tr>";
-		rowsAsString += "</table>";
-
-		document.getElementById('users_list').innerHTML = rowsAsString;
-		document.getElementById('addUserBtn').onclick = function(event) {
-			console.log(event.target.textContent);
-			if (event.target.textContent === "Done") {
-				webSocket.send("{ \"eventType\":\"users\", \"payload\": {\"addUser\":false}}");
-				document.getElementById('addUserBtn').innerHTML = "Add User";
-			} else {
-				webSocket.send("{ \"eventType\":\"users\", \"payload\": {\"addUser\":true}}");
-				document.getElementById('addUserBtn').innerHTML = "Done";
-			}
-		};
-
-		for(var i = 0; i < users.length; i++) {
-			document.getElementById('remove_' + users[i]).onclick = function(event) {
-						let user = event.target.attributes.id.value.replace("remove_", "");
-						let msg = "{ \"eventType\":\"users\", \"payload\": {\"removeUser\":\"" + user + "\"}}";
-						webSocket.send(msg);
-			};
-		}
-
-	}
-}
+document.addEventListener('DOMContentLoaded', initialise);
