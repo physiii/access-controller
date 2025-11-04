@@ -20,6 +20,31 @@ bool should_send_data = 0; // wait for data to be received so hd an fd can be in
  */
 static const char *WS_TAG = "ws_echo_server";
 
+/* Forward declaration to send tunnel broadcasts */
+extern void tunnel_ws_broadcast(const char *message);
+
+static void ws_process_payload_internal(const char *payload);
+
+static void ws_process_payload_internal(const char *payload) {
+    if (!payload) {
+        return;
+    }
+
+    cJSON *msg = cJSON_Parse(payload);
+    if (msg) {
+        ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
+        should_send_data = true;
+        addServiceMessageToQueue(msg);
+        cJSON_Delete(msg);
+    } else {
+        ESP_LOGE(WS_TAG, "Failed to parse JSON: %s", payload);
+    }
+}
+
+void ws_handle_tunnel_message(const char *payload) {
+    ws_process_payload_internal(payload);
+}
+
 /*
  * Structure holding server handle
  * and internal socket fd in order
@@ -76,45 +101,33 @@ static esp_err_t echo_handler(httpd_req_t *req)
             return ret;
         }
 
-        // Validate that we received a valid JSON string
         if (ws_pkt.payload == NULL || ws_pkt.len == 0) {
             ESP_LOGE(WS_TAG, "Empty or null payload received");
             free(buf);
             return ESP_ERR_INVALID_ARG;
         }
 
-        cJSON *msg;
-        msg = cJSON_Parse((char *)ws_pkt.payload);
-        if (msg) {
-            ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
-            should_send_data = true;
-            addServiceMessageToQueue(msg);
-            cJSON_Delete(msg); // Free the parsed message
-            
-            if (xSemaphoreTake(ws_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-                // Add client to list if not already present
-                int client_fd = httpd_req_to_sockfd(req);
-                bool client_exists = false;
-                for (int i = 0; i < active_clients; i++) {
-                    if (ws_clients[i].fd == client_fd) {
-                        client_exists = true;
-                        break;
-                    }
+        ws_process_payload_internal((const char *)ws_pkt.payload);
+
+        if (xSemaphoreTake(ws_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            int client_fd = httpd_req_to_sockfd(req);
+            bool client_exists = false;
+            for (int i = 0; i < active_clients; i++) {
+                if (ws_clients[i].fd == client_fd) {
+                    client_exists = true;
+                    break;
                 }
-                
-                if (!client_exists && active_clients < MAX_WS_CLIENTS) {
-                    ws_clients[active_clients].hd = req->handle;
-                    ws_clients[active_clients].fd = client_fd;
-                    active_clients++;
-                    ESP_LOGI(WS_TAG, "Added new client, total clients: %d", active_clients);
-                }
-                xSemaphoreGive(ws_mutex);
-            } else {
-                ESP_LOGW(WS_TAG, "Timeout waiting for ws_mutex in echo_handler");
             }
+
+            if (!client_exists && active_clients < MAX_WS_CLIENTS) {
+                ws_clients[active_clients].hd = req->handle;
+                ws_clients[active_clients].fd = client_fd;
+                active_clients++;
+                ESP_LOGI(WS_TAG, "Added new client, total clients: %d", active_clients);
+            }
+            xSemaphoreGive(ws_mutex);
         } else {
-            ESP_LOGE(WS_TAG, "Failed to parse JSON: %s", (char *)ws_pkt.payload);
-            // Don't return error for invalid JSON, just log it
+            ESP_LOGW(WS_TAG, "Timeout waiting for ws_mutex in echo_handler");
         }
         free(buf);
     }
@@ -141,6 +154,8 @@ ws_service (void *pvParameter)
 
                     if (data) {
                         printf("Sending (%d): %s\n", clientMessage.queueCount, data);
+
+                        tunnel_ws_broadcast(data);
 
                         if (xSemaphoreTake(ws_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
                             bool message_sent = false;

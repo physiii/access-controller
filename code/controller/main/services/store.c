@@ -330,14 +330,14 @@ void load_server_info_from_flash(char *server_ip, char *server_port) {
 
     if (strcmp(ip_str, "")==0) {
         ESP_LOGI(STORE_TAG, "No server IP found in flash, setting to default.");
-        strcpy(server_ip, "192.168.1.42");
+        strcpy(server_ip, "192.168.1.43");
     } else {
         strcpy(server_ip, ip_str);
     }
     
     if (strcmp(port_str, "")==0) {
         ESP_LOGI(STORE_TAG, "No server port found in flash, setting to default.");
-        strcpy(server_port, "80");
+        strcpy(server_port, "9000");
     } else {
         strcpy(server_port, port_str);
     }

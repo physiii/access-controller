@@ -164,16 +164,30 @@ void handle_authorize_message(cJSON * payload) {
             }
         }
     } else if (cJSON_GetObjectItem(payload,"uuid")) {
-        sprintf(device_id, "%s", cJSON_GetObjectItem(payload,"uuid")->valuestring);
-        store_char("device_id", device_id);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-        esp_restart();
+        const cJSON *uuid_item = cJSON_GetObjectItem(payload, "uuid");
+        if (cJSON_IsString(uuid_item) && uuid_item->valuestring) {
+            if (strcmp(device_id, uuid_item->valuestring) != 0) {
+                snprintf(device_id, sizeof(device_id), "%s", uuid_item->valuestring);
+                store_char("device_id", device_id);
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+                esp_restart();
+            } else {
+                ESP_LOGI(TAG, "UUID unchanged, skipping restart");
+            }
+        }
 
     } else if (cJSON_GetObjectItem(payload,"token")) {
-        sprintf(token, "%s", cJSON_GetObjectItem(payload,"token")->valuestring);
-        store_char("token",token);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-        esp_restart();
+        const cJSON *token_item = cJSON_GetObjectItem(payload, "token");
+        if (cJSON_IsString(token_item) && token_item->valuestring) {
+            if (strcmp(token, token_item->valuestring) != 0) {
+                snprintf(token, sizeof(token), "%s", token_item->valuestring);
+                store_char("token", token);
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+                esp_restart();
+            } else {
+                ESP_LOGI(TAG, "Token unchanged, skipping restart");
+            }
+        }
 
     } else if (cJSON_GetObjectItem(payload,"serverIp")) {
         char serverIp[32] = "";

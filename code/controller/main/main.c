@@ -18,11 +18,14 @@
 #include "services/keypad.c"
 #include "services/fob.c"
 #include "services/server.c"
+#include "services/tunnel.c"
 #include "services/ap.c"
 #include "esp_http_client.h"
+#include "esp_random.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -42,17 +45,86 @@
 char stored_firmware_md5[33];
 bool need_to_update_firmware = true;
 
-void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
-    if (device_id && strlen(device_id) >= 5) {
-        // Use the last 5 characters from device_id
-        snprintf(ssid, size, "ac_%s", device_id + strlen(device_id) - 5);
-    } else if (strcmp(device_id, "") == 0) {
-        // If there's no device_id, use "ac_uuid"
-        snprintf(ssid, size, "ac_uuid");
-    } else {
-        // If device_id length is less than 5 but not empty, use what's available
-        snprintf(ssid, size, "ac_%s", device_id);
+static void generate_uuid_v4(char *uuid, size_t size) {
+    if (!uuid || size < 37) {
+        if (uuid && size > 0) {
+            uuid[0] = '\0';
+        }
+        return;
     }
+
+    uint8_t bytes[16];
+    for (int i = 0; i < 16; i += 4) {
+        uint32_t value = esp_random();
+        bytes[i] = (value >> 24) & 0xFF;
+        bytes[i + 1] = (value >> 16) & 0xFF;
+        bytes[i + 2] = (value >> 8) & 0xFF;
+        bytes[i + 3] = value & 0xFF;
+    }
+
+    bytes[6] = (bytes[6] & 0x0F) | 0x40; // Version 4
+    bytes[8] = (bytes[8] & 0x3F) | 0x80; // RFC 4122 variant
+
+    snprintf(uuid, size,
+             "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+             bytes[0], bytes[1], bytes[2], bytes[3],
+             bytes[4], bytes[5],
+             bytes[6], bytes[7],
+             bytes[8], bytes[9],
+             bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]);
+}
+
+static void ensure_device_identity(void) {
+    char *stored_device_id = get_char("device_id");
+    bool need_new_device_id = true;
+    if (stored_device_id && stored_device_id[0] != '\0') {
+        size_t len = strlen(stored_device_id);
+        need_new_device_id = len < 8; // basic sanity check
+    }
+
+    if (need_new_device_id) {
+        generate_uuid_v4(device_id, sizeof(device_id));
+        store_char("device_id", device_id);
+        ESP_LOGI(TAG, "Generated new device UUID: %s", device_id);
+    } else {
+        strncpy(device_id, stored_device_id, sizeof(device_id) - 1);
+        device_id[sizeof(device_id) - 1] = '\0';
+    }
+
+    if (stored_device_id) {
+        free(stored_device_id);
+    }
+
+    char *stored_token = get_char("token");
+    if (stored_token && stored_token[0] != '\0') {
+        strncpy(token, stored_token, sizeof(token) - 1);
+        token[sizeof(token) - 1] = '\0';
+    } else {
+        strncpy(token, device_id, sizeof(token) - 1);
+        token[sizeof(token) - 1] = '\0';
+        store_char("token", token);
+        ESP_LOGI(TAG, "Token not found; defaulting to device UUID");
+    }
+
+    if (stored_token) {
+        free(stored_token);
+    }
+}
+
+void generate_ssid_from_device_id(char *device_id, char *ssid, size_t size) {
+    char suffix[5] = "uuid";
+    if (device_id && device_id[0] != '\0') {
+        int count = 0;
+        for (int i = (int)strlen(device_id) - 1; i >= 0 && count < 4; --i) {
+            if (device_id[i] == '-') {
+                continue;
+            }
+            suffix[3 - count] = (char)tolower((unsigned char)device_id[i]);
+            count++;
+        }
+    }
+
+    snprintf(ssid, size, "ac_%s", suffix);
 }
 
 void perform_ota_update(const char *ota_url) {
@@ -131,16 +203,8 @@ void app_main(void) {
 
     init_automation_queues();
 
-    // Get device ID
-    strcpy(device_id, get_char("device_id"));
-
-    strcpy(token, get_char("token"));
-    if (strcmp(token, "") == 0) {
-        strcpy(token, device_id);
-        ESP_LOGI(TAG, "No token found, setting as device id");
-    } else {
-        ESP_LOGI(TAG, "Token: %s", token);
-    }
+    ensure_device_identity();
+    ESP_LOGI(TAG, "Device UUID: %s", device_id);
     
     char wifi_ssid[32];
     char wifi_password[64];
@@ -175,6 +239,8 @@ void app_main(void) {
         if (strcmp(device_id, "") == 0) {
             ESP_LOGE(TAG, "Device ID not found");
         }
+
+        tunnel_start();
     } else {
         ESP_LOGI(TAG, "Starting Access Point...");
         

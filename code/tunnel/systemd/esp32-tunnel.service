@@ -1,0 +1,36 @@
+[Unit]
+Description=ESP32 Reverse HTTP Tunnel Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=esp32-tunnel
+Group=esp32-tunnel
+WorkingDirectory=/opt/esp32-tunnel
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/esp32-tunnel/.env
+ExecStart=/usr/bin/node /opt/esp32-tunnel/src/server.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=full
+PrivateTmp=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/opt/esp32-tunnel
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+

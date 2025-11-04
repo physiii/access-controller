@@ -1,0 +1,19 @@
+{
+  "name": "esp32-tunnel",
+  "version": "0.1.0",
+  "description": "Reverse HTTP tunnel server for ESP32 devices",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "mock-client": "node src/mock-client.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
+

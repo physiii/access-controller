@@ -8,3 +8,5 @@ sdkconfig*
 *cache.dcm
 *_saved_*
 *.zip
+node_modules/
+.package-lock.json

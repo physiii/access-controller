@@ -1,5 +1,6 @@
-var url = "ws://" + location.host + '/ws';
-var webSocket = new WebSocket(url);
+const wsUrl = new URL('ws', window.location.href);
+wsUrl.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+var webSocket = new WebSocket(wsUrl.href);
 
 webSocket.onopen = function (event) {
 	webSocket.send("{ \"eventType\":\"exit\", \"payload\": {\"getState\": true}}");
