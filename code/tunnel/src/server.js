@@ -511,7 +511,7 @@ class TunnelManager {
       }
 
       if (url.pathname === '/devices' && req.method === 'GET') {
-        this.handleDeviceList(res);
+        this.handleDeviceList(req, res);
         return;
       }
 
@@ -570,8 +570,14 @@ class TunnelManager {
     res.end(JSON.stringify(payload, null, 2));
   }
 
-  handleDeviceList(res) {
-    const devices = Array.from(this.devices.values()).map((device) => device.info);
+  handleDeviceList(req, res) {
+    const protocol = req.socket.encrypted ? 'https' : 'http';
+    const host = req.headers.host ?? `${this.config.httpBind}:${this.config.httpPort}`;
+    const baseUrl = `${protocol}://${host}`;
+    const devices = Array.from(this.devices.values()).map((device) => ({
+      ...device.info,
+      url: `${baseUrl}/device/${encodeURIComponent(device.deviceId)}/`,
+    }));
     res.setHeader('content-type', 'application/json; charset=utf-8');
     res.end(JSON.stringify({ devices }, null, 2));
   }

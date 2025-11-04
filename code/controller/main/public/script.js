@@ -1,5 +1,5 @@
 const fetchJSON = async (path, options = {}) => {
-  const url = new URL(path, window.location.origin);
+  const url = new URL(path, window.location.href);
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
@@ -55,7 +55,7 @@ const applyState = (state = {}) => {
 
 const loadState = async () => {
   try {
-    const state = await fetchJSON('/api/state');
+    const state = await fetchJSON('api/state');
     applyState(state);
   } catch (error) {
     console.error('Failed to load state', error);
@@ -65,7 +65,7 @@ const loadState = async () => {
 const updateLock = async (channel, updates) => {
   const body = { channel, ...updates };
   try {
-    const locks = await fetchJSON('/api/lock', {
+    const locks = await fetchJSON('api/lock', {
       method: 'POST',
       body: JSON.stringify(body),
     });
@@ -78,7 +78,7 @@ const updateLock = async (channel, updates) => {
 const updateExit = async (channel, updates) => {
   const body = { channel, ...updates };
   try {
-    const exits = await fetchJSON('/api/exit', {
+    const exits = await fetchJSON('api/exit', {
       method: 'POST',
       body: JSON.stringify(body),
     });
@@ -91,7 +91,7 @@ const updateExit = async (channel, updates) => {
 const updateFob = async (channel, updates) => {
   const body = { channel, ...updates };
   try {
-    const fobs = await fetchJSON('/api/fob', {
+    const fobs = await fetchJSON('api/fob', {
       method: 'POST',
       body: JSON.stringify(body),
     });
@@ -159,7 +159,7 @@ const setupForms = () => {
     const wifiName = document.getElementById('wifiName').value;
     const wifiPassword = document.getElementById('wifiPassword').value;
     try {
-      await fetchJSON('/api/wifi', {
+      await fetchJSON('api/wifi', {
         method: 'POST',
         body: JSON.stringify({ wifiName, wifiPassword }),
       });
@@ -175,7 +175,7 @@ const setupForms = () => {
     const serverIp = document.getElementById('ipAddress').value;
     const serverPort = document.getElementById('port').value;
     try {
-      await fetchJSON('/api/server', {
+      await fetchJSON('api/server', {
         method: 'POST',
         body: JSON.stringify({ serverIp, serverPort }),
       });

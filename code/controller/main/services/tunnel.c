@@ -40,7 +40,7 @@ typedef struct {
 typedef struct {
     int sock;
     bool identified;
-    char assigned_id[32];
+    char assigned_id[100];
     tunnel_config_t config;
 } tunnel_client_t;
 
@@ -671,16 +671,26 @@ static void tunnel_main_loop(tunnel_client_t *client) {
             if (strlen(client->assigned_id) > 0) {
                 cJSON *identify = cJSON_CreateObject();
                 if (identify) {
+                    const char *identity = (device_id[0] != '\0') ? device_id : client->assigned_id;
                     cJSON_AddStringToObject(identify, "type", "identify");
-                    cJSON_AddStringToObject(identify, "deviceId", client->assigned_id);
+                    cJSON_AddStringToObject(identify, "deviceId", identity);
                     if (send_frame(client->sock, identify, NULL, 0) == ESP_OK) {
                         client->identified = true;
+                        if (identity != client->assigned_id) {
+                            snprintf(client->assigned_id, sizeof(client->assigned_id), "%s", identity);
+                        }
                     }
                     cJSON_Delete(identify);
                 }
             }
         } else if (strcmp(type, "ready") == 0) {
-            ESP_LOGI(TUNNEL_TAG, "Tunnel ready acknowledged by server");
+            cJSON *device_id_item = cJSON_GetObjectItemCaseSensitive(header, "deviceId");
+            if (cJSON_IsString(device_id_item)) {
+                snprintf(client->assigned_id, sizeof(client->assigned_id), "%s", device_id_item->valuestring);
+                ESP_LOGI(TUNNEL_TAG, "Tunnel ready acknowledged by server (deviceId=%s)", client->assigned_id);
+            } else {
+                ESP_LOGI(TUNNEL_TAG, "Tunnel ready acknowledged by server");
+            }
         } else if (strcmp(type, "ping") == 0) {
             send_simple_frame(client->sock, "pong");
         } else if (strcmp(type, "httpRequest") == 0) {
