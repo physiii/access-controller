@@ -28,7 +28,12 @@ int ws_event_handler(cJSON * root)
     cJSON *payload = cJSON_GetObjectItemCaseSensitive(root, "payload");
     if (payload) {
         if (cJSON_IsObject(payload)) {
-            addServiceMessageToQueue(payload);
+            cJSON *copy = cJSON_Duplicate(root, 1);
+            if (copy) {
+                addServiceMessageToQueue(copy);
+            } else {
+                ESP_LOGE(TAG, "Failed to duplicate message for queue");
+            }
         } else {
             ESP_LOGW(TAG, "Payload is not a JSON object.");
         }

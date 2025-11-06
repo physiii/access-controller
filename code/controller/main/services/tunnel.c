@@ -30,7 +30,6 @@ static const char *TUNNEL_TAG = "tunnel";
 #define TUNNEL_MAX_HEADER_BYTES (64 * 1024)
 #define TUNNEL_MAX_BODY_BYTES   (128 * 1024)
 #define LOCAL_HTTP_TIMEOUT_MS   8000
-#define LOCAL_HTTP_MAX_BODY_BYTES (256 * 1024)
 
 typedef struct {
     char host[64];
@@ -45,17 +44,43 @@ typedef struct {
 } tunnel_client_t;
 
 typedef struct {
-    uint8_t *body;
-    size_t length;
-    size_t capacity;
-    bool overflow;
-    bool error;
-    struct {
-        char key[64];
-        char value[128];
-    } headers[20];
+    char key[64];
+    char value[128];
+} header_pair_t;
+
+#define MAX_STREAM_HEADERS 20
+
+typedef struct {
+    tunnel_client_t *client;
+    char request_id[64];
+    header_pair_t headers[MAX_STREAM_HEADERS];
     int header_count;
-} http_response_buffer_t;
+    bool start_sent;
+    bool finished;
+    bool error;
+    esp_err_t last_err;
+} http_stream_context_t;
+
+static void add_header_to_json(cJSON *headers_obj, const char *key, const char *value);
+static void handle_abort_frame(tunnel_client_t *client, cJSON *header);
+
+static const char *normalize_target(const char *target, char *buffer, size_t buffer_len) {
+    if (!target) {
+        return "/";
+    }
+
+    if (strncmp(target, "/device/", 8) == 0) {
+        const char *after_id = strchr(target + 8, '/');
+        if (after_id) {
+            strlcpy(buffer, after_id, buffer_len);
+            return buffer;
+        }
+        strlcpy(buffer, "/", buffer_len);
+        return buffer;
+    }
+
+    return target;
+}
 
 static bool tunnel_task_started = false;
 
@@ -229,100 +254,167 @@ static esp_err_t send_http_error(int sock, const char *request_id, const char *m
     return err;
 }
 
-static void http_response_buffer_init(http_response_buffer_t *buffer) {
-    if (!buffer) {
-        return;
+static esp_err_t send_http_response_start(http_stream_context_t *ctx, esp_http_client_handle_t http_client) {
+    if (!ctx || ctx->start_sent) {
+        return ESP_OK;
     }
-    memset(buffer, 0, sizeof(*buffer));
-    buffer->capacity = 2048;
-    buffer->body = malloc(buffer->capacity);
-    if (!buffer->body) {
-        buffer->capacity = 0;
+
+    cJSON *response_header = cJSON_CreateObject();
+    if (!response_header) {
+        return ESP_ERR_NO_MEM;
     }
+
+    cJSON_AddStringToObject(response_header, "type", "httpResponseStart");
+    cJSON_AddStringToObject(response_header, "requestId", ctx->request_id);
+
+    int status_code = esp_http_client_get_status_code(http_client);
+    cJSON_AddNumberToObject(response_header, "statusCode", status_code);
+
+    cJSON *headers_obj = cJSON_CreateObject();
+    if (!headers_obj) {
+        cJSON_Delete(response_header);
+        return ESP_ERR_NO_MEM;
+    }
+
+    for (int i = 0; i < ctx->header_count; ++i) {
+        add_header_to_json(headers_obj, ctx->headers[i].key, ctx->headers[i].value);
+    }
+
+    int64_t content_length = esp_http_client_get_content_length(http_client);
+    if (content_length >= 0 && !cJSON_HasObjectItem(headers_obj, "content-length")) {
+        char content_length_str[24];
+        snprintf(content_length_str, sizeof(content_length_str), "%lld", (long long)content_length);
+        add_header_to_json(headers_obj, "content-length", content_length_str);
+    }
+
+    if (!cJSON_HasObjectItem(headers_obj, "connection")) {
+        add_header_to_json(headers_obj, "connection", "close");
+    }
+
+    if (!cJSON_HasObjectItem(headers_obj, "content-type")) {
+        char *content_type = NULL;
+        if (esp_http_client_get_header(http_client, "Content-Type", &content_type) == ESP_OK && content_type) {
+            add_header_to_json(headers_obj, "content-type", content_type);
+        }
+    }
+
+    cJSON_AddItemToObject(response_header, "headers", headers_obj);
+
+    esp_err_t err = send_frame(ctx->client->sock, response_header, NULL, 0);
+    cJSON_Delete(response_header);
+    if (err == ESP_OK) {
+        ctx->start_sent = true;
+    }
+    return err;
 }
 
-static void http_response_buffer_deinit(http_response_buffer_t *buffer) {
-    if (!buffer) {
-        return;
+static esp_err_t send_http_response_chunk(http_stream_context_t *ctx, const uint8_t *data, size_t len) {
+    if (!ctx || !data || len == 0) {
+        return ESP_OK;
     }
-    if (buffer->body) {
-        free(buffer->body);
-        buffer->body = NULL;
+
+    cJSON *chunk_header = cJSON_CreateObject();
+    if (!chunk_header) {
+        return ESP_ERR_NO_MEM;
     }
-    buffer->length = 0;
-    buffer->capacity = 0;
-    buffer->overflow = false;
-    buffer->error = false;
-    buffer->header_count = 0;
+
+    cJSON_AddStringToObject(chunk_header, "type", "httpResponseChunk");
+    cJSON_AddStringToObject(chunk_header, "requestId", ctx->request_id);
+
+    esp_err_t err = send_frame(ctx->client->sock, chunk_header, data, len);
+    cJSON_Delete(chunk_header);
+    return err;
 }
 
-static esp_err_t http_response_event_handler(esp_http_client_event_t *evt) {
-    http_response_buffer_t *ctx = (http_response_buffer_t *)evt->user_data;
+static esp_err_t send_http_response_end(http_stream_context_t *ctx) {
+    if (!ctx || ctx->finished) {
+        return ESP_OK;
+    }
+
+    cJSON *end_header = cJSON_CreateObject();
+    if (!end_header) {
+        return ESP_ERR_NO_MEM;
+    }
+
+    cJSON_AddStringToObject(end_header, "type", "httpResponseEnd");
+    cJSON_AddStringToObject(end_header, "requestId", ctx->request_id);
+
+    esp_err_t err = send_frame(ctx->client->sock, end_header, NULL, 0);
+    cJSON_Delete(end_header);
+    if (err == ESP_OK) {
+        ctx->finished = true;
+    }
+    return err;
+}
+
+static esp_err_t http_stream_event_handler(esp_http_client_event_t *evt) {
+    http_stream_context_t *ctx = (http_stream_context_t *)evt->user_data;
     if (!ctx) {
         return ESP_OK;
     }
 
     switch (evt->event_id) {
+    case HTTP_EVENT_ON_HEADER:
+        if (evt->header_key && evt->header_value && ctx->header_count < MAX_STREAM_HEADERS) {
+            snprintf(ctx->headers[ctx->header_count].key,
+                     sizeof(ctx->headers[ctx->header_count].key),
+                     "%s", evt->header_key);
+            snprintf(ctx->headers[ctx->header_count].value,
+                     sizeof(ctx->headers[ctx->header_count].value),
+                     "%s", evt->header_value);
+            ctx->header_count++;
+        }
+        break;
     case HTTP_EVENT_ON_DATA: {
-        if (!evt->data || evt->data_len <= 0) {
-            break;
-        }
-        if (!ctx->body) {
-            ctx->body = malloc(evt->data_len);
-            if (!ctx->body) {
-                ctx->overflow = true;
+        if (!ctx->start_sent) {
+            esp_err_t err = send_http_response_start(ctx, evt->client);
+            if (err != ESP_OK) {
+                ctx->error = true;
+                ctx->last_err = err;
                 break;
             }
-            ctx->capacity = evt->data_len;
         }
-        size_t required = ctx->length + (size_t)evt->data_len;
-        if (required > LOCAL_HTTP_MAX_BODY_BYTES) {
-            ctx->overflow = true;
-            break;
-        }
-        if (required > ctx->capacity) {
-            size_t new_capacity = ctx->capacity ? ctx->capacity : 1;
-            while (new_capacity < required) {
-                new_capacity *= 2;
-                if (new_capacity > LOCAL_HTTP_MAX_BODY_BYTES) {
-                    new_capacity = LOCAL_HTTP_MAX_BODY_BYTES;
-                    break;
-                }
+        if (evt->data && evt->data_len > 0) {
+            esp_err_t err = send_http_response_chunk(ctx, (const uint8_t *)evt->data, evt->data_len);
+            if (err != ESP_OK) {
+                ctx->error = true;
+                ctx->last_err = err;
             }
-            uint8_t *new_body = realloc(ctx->body, new_capacity);
-            if (!new_body) {
-                ctx->overflow = true;
-                break;
-            }
-            ctx->body = new_body;
-            ctx->capacity = new_capacity;
         }
-        memcpy(ctx->body + ctx->length, evt->data, evt->data_len);
-        ctx->length += evt->data_len;
         break;
     }
-    case HTTP_EVENT_ON_HEADER: {
-        if (ctx->header_count >= (int)(sizeof(ctx->headers) / sizeof(ctx->headers[0]))) {
-            break;
+    case HTTP_EVENT_ON_FINISH:
+        if (!ctx->start_sent) {
+            esp_err_t err = send_http_response_start(ctx, evt->client);
+            if (err != ESP_OK) {
+                ctx->error = true;
+                ctx->last_err = err;
+            }
         }
-        if (!evt->header_key || !evt->header_value) {
-            break;
+        if (!ctx->finished) {
+            esp_err_t err = send_http_response_end(ctx);
+            if (err != ESP_OK) {
+                ctx->error = true;
+                ctx->last_err = err;
+            }
         }
-        snprintf(ctx->headers[ctx->header_count].key,
-                 sizeof(ctx->headers[ctx->header_count].key),
-                 "%s", evt->header_key);
-        snprintf(ctx->headers[ctx->header_count].value,
-                 sizeof(ctx->headers[ctx->header_count].value),
-                 "%s", evt->header_value);
-        ctx->header_count++;
         break;
-    }
+    case HTTP_EVENT_DISCONNECTED:
+        if (ctx->start_sent && !ctx->finished) {
+            esp_err_t err = send_http_response_end(ctx);
+            if (err != ESP_OK) {
+                ctx->last_err = err;
+            }
+        }
+        ctx->finished = true;
+        break;
     case HTTP_EVENT_ERROR:
         ctx->error = true;
         break;
     default:
         break;
     }
+
     return ESP_OK;
 }
 
@@ -350,6 +442,20 @@ static void add_header_to_json(cJSON *headers_obj, const char *key, const char *
     cJSON_AddItemToArray(array, cJSON_CreateString(value));
 }
 
+static void handle_abort_frame(tunnel_client_t *client, cJSON *header) {
+    (void)client;
+    if (!header) {
+        return;
+    }
+    cJSON *request_id_item = cJSON_GetObjectItemCaseSensitive(header, "requestId");
+    const char *request_id = cJSON_IsString(request_id_item) ? request_id_item->valuestring : NULL;
+    if (request_id && request_id[0] != '\0') {
+        ESP_LOGI(TUNNEL_TAG, "Request %s aborted by tunnel server", request_id);
+    } else {
+        ESP_LOGI(TUNNEL_TAG, "Tunnel server aborted request");
+    }
+}
+
 static esp_err_t forward_request_to_local_http(tunnel_client_t *client, const char *request_id, const char *method,
                                                const char *target, cJSON *headers, const uint8_t *body, size_t body_len) {
     if (!client || !request_id || !method || !target) {
@@ -361,23 +467,34 @@ static esp_err_t forward_request_to_local_http(tunnel_client_t *client, const ch
         return send_http_error(client->sock, request_id, "Request body too large");
     }
 
+    char normalized_path[256];
+    const char *local_path = normalize_target(target, normalized_path, sizeof(normalized_path));
+
     char url[256];
-    snprintf(url, sizeof(url), "http://127.0.0.1%s", (*target) ? target : "/");
+    snprintf(url, sizeof(url), "http://127.0.0.1%s", (*local_path) ? local_path : "/");
 
     esp_http_client_config_t http_cfg = {
         .url = url,
         .method = http_method_from_string(method),
         .timeout_ms = LOCAL_HTTP_TIMEOUT_MS,
-        .event_handler = http_response_event_handler,
+        .event_handler = http_stream_event_handler,
+        .buffer_size = 1024,
+        .buffer_size_tx = 1024,
     };
 
-    http_response_buffer_t response_buffer;
-    http_response_buffer_init(&response_buffer);
-    http_cfg.user_data = &response_buffer;
+    http_stream_context_t stream_ctx = {
+        .client = client,
+        .header_count = 0,
+        .start_sent = false,
+        .finished = false,
+        .error = false,
+        .last_err = ESP_OK,
+    };
+    snprintf(stream_ctx.request_id, sizeof(stream_ctx.request_id), "%s", request_id);
+    http_cfg.user_data = &stream_ctx;
 
     esp_http_client_handle_t http_client = esp_http_client_init(&http_cfg);
     if (!http_client) {
-        http_response_buffer_deinit(&response_buffer);
         return send_http_error(client->sock, request_id, "Failed to init local HTTP client");
     }
 
@@ -408,70 +525,36 @@ static esp_err_t forward_request_to_local_http(tunnel_client_t *client, const ch
     }
 
     esp_err_t err = esp_http_client_perform(http_client);
-    if (err != ESP_OK || response_buffer.error) {
+    if (err != ESP_OK) {
         ESP_LOGE(TUNNEL_TAG, "Local HTTP request failed: %s", esp_err_to_name(err));
-        esp_http_client_cleanup(http_client);
-        http_response_buffer_deinit(&response_buffer);
-        return send_http_error(client->sock, request_id, "Local HTTP request failed");
     }
 
-    if (response_buffer.overflow) {
-        ESP_LOGW(TUNNEL_TAG, "Local HTTP response too large");
-        esp_http_client_cleanup(http_client);
-        http_response_buffer_deinit(&response_buffer);
-        return send_http_error(client->sock, request_id, "Local response too large");
+    if (!stream_ctx.start_sent && !stream_ctx.error) {
+        esp_err_t start_err = send_http_response_start(&stream_ctx, http_client);
+        if (start_err != ESP_OK) {
+            stream_ctx.error = true;
+            stream_ctx.last_err = start_err;
+        }
     }
 
-    int status_code = esp_http_client_get_status_code(http_client);
-
-    cJSON *response_header = cJSON_CreateObject();
-    if (!response_header) {
-        esp_http_client_cleanup(http_client);
-        http_response_buffer_deinit(&response_buffer);
-        return send_http_error(client->sock, request_id, "Failed to allocate response header");
+    if (stream_ctx.start_sent && !stream_ctx.finished) {
+        esp_err_t end_err = send_http_response_end(&stream_ctx);
+        if (end_err != ESP_OK) {
+            stream_ctx.error = true;
+            stream_ctx.last_err = end_err;
+        }
     }
 
-    cJSON_AddStringToObject(response_header, "type", "httpResponse");
-    cJSON_AddStringToObject(response_header, "requestId", request_id);
-    cJSON_AddNumberToObject(response_header, "statusCode", status_code);
-
-    cJSON *headers_obj = cJSON_CreateObject();
-    if (!headers_obj) {
-        cJSON_Delete(response_header);
-        esp_http_client_cleanup(http_client);
-        http_response_buffer_deinit(&response_buffer);
-        return send_http_error(client->sock, request_id, "Failed to prepare headers");
-    }
-
-    for (int i = 0; i < response_buffer.header_count; ++i) {
-        add_header_to_json(headers_obj, response_buffer.headers[i].key, response_buffer.headers[i].value);
-    }
-
-    if (!cJSON_HasObjectItem(headers_obj, "content-length")) {
-        char content_length_str[16];
-        snprintf(content_length_str, sizeof(content_length_str), "%u", (unsigned int)response_buffer.length);
-        add_header_to_json(headers_obj, "content-length", content_length_str);
-    }
-
-    if (!cJSON_HasObjectItem(headers_obj, "connection")) {
-        add_header_to_json(headers_obj, "connection", "close");
-    }
-
-    char *content_type = NULL;
-    if (esp_http_client_get_header(http_client, "Content-Type", &content_type) == ESP_OK && content_type) {
-        add_header_to_json(headers_obj, "content-type", content_type);
-    }
-
-    cJSON_AddItemToObject(response_header, "headers", headers_obj);
-
-    esp_err_t send_err = send_frame(client->sock, response_header, response_buffer.body, response_buffer.length);
-    cJSON_Delete(response_header);
     esp_http_client_cleanup(http_client);
-    http_response_buffer_deinit(&response_buffer);
 
-    if (send_err != ESP_OK) {
-        ESP_LOGE(TUNNEL_TAG, "Failed to send response frame: %s", esp_err_to_name(send_err));
-        return send_http_error(client->sock, request_id, "Failed to send response");
+    if (err != ESP_OK || stream_ctx.error) {
+        if (!stream_ctx.start_sent) {
+            return send_http_error(client->sock, request_id, "Local HTTP request failed");
+        }
+        if (!stream_ctx.finished) {
+            send_http_response_end(&stream_ctx);
+        }
+        return ESP_FAIL;
     }
 
     return ESP_OK;
@@ -695,6 +778,8 @@ static void tunnel_main_loop(tunnel_client_t *client) {
             send_simple_frame(client->sock, "pong");
         } else if (strcmp(type, "httpRequest") == 0) {
             handle_http_request_frame(client, header, body, body_len);
+        } else if (strcmp(type, "abort") == 0) {
+            handle_abort_frame(client, header);
         } else if (strcmp(type, "disconnect") == 0) {
             ESP_LOGW(TUNNEL_TAG, "Server requested disconnect");
             cJSON_Delete(header);

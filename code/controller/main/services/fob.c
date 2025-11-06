@@ -191,6 +191,8 @@ void handle_fob_message(cJSON * payload)
 		}
 		storeFobSettings();
 	}
+
+	cJSON_Delete(payload);
 }
 
 static void

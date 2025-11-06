@@ -32,10 +32,15 @@ static void ws_process_payload_internal(const char *payload) {
 
     cJSON *msg = cJSON_Parse(payload);
     if (msg) {
-        ESP_LOGI(WS_TAG, "Received: %s", cJSON_PrintUnformatted(msg));
+        char *serialized = cJSON_PrintUnformatted(msg);
+        if (serialized) {
+            ESP_LOGI(WS_TAG, "Received: %s", serialized);
+            free(serialized);
+        } else {
+            ESP_LOGI(WS_TAG, "Received message (serialization failed)");
+        }
         should_send_data = true;
-        addServiceMessageToQueue(msg);
-        cJSON_Delete(msg);
+        addServiceMessageToQueue(msg); // ownership transferred
     } else {
         ESP_LOGE(WS_TAG, "Failed to parse JSON: %s", payload);
     }
@@ -58,6 +63,20 @@ struct async_resp_arg {
 struct async_resp_arg ws_clients[MAX_WS_CLIENTS];
 int active_clients = 0;
 SemaphoreHandle_t ws_mutex = NULL;
+
+bool ws_has_active_clients(void) {
+    if (!ws_mutex) {
+        return active_clients > 0;
+    }
+    bool has_clients = false;
+    if (xSemaphoreTake(ws_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        has_clients = (active_clients > 0);
+        xSemaphoreGive(ws_mutex);
+    } else {
+        has_clients = (active_clients > 0);
+    }
+    return has_clients;
+}
 
 static esp_err_t echo_handler(httpd_req_t *req)
 {
@@ -183,7 +202,10 @@ ws_service (void *pvParameter)
                             }
                             xSemaphoreGive(ws_mutex);
                             
-                            // Only remove message from queue if it was sent successfully
+                            if (!message_sent) {
+                                message_sent = (active_clients == 0);
+                            }
+
                             if (message_sent) {
                                 cJSON_Delete(message_to_send);
                                 for (int j = 0; j < clientMessage.queueCount - 1; j++) {

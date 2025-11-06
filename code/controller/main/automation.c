@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "esp_log.h"
 #include "esp_system.h"
+#include "esp_timer.h"
 #include "cJSON.h"
 #include "automation.h"
+#include "services/log_store.h"
 
 static const char *TAG = "open-automation";
 
@@ -19,7 +23,138 @@ char server_port[8];
 struct ServiceMessage serviceMessage;
 struct ServiceMessage clientMessage;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+bool ws_has_active_clients(void);
+#ifdef __cplusplus
+}
+#endif
+
+#define SYSTEM_LOG_CAPACITY LOG_STORE_CAPACITY
+#define SYSTEM_LOG_MESSAGE_MAX LOG_STORE_MESSAGE_MAX
+#define SYSTEM_LOG_EXPORT_MAX 20
+
+typedef struct {
+    uint64_t timestamp_ms;
+    int64_t unix_time;
+    char message[SYSTEM_LOG_MESSAGE_MAX];
+} system_log_entry_t;
+
+static system_log_entry_t s_system_logs[SYSTEM_LOG_CAPACITY];
+static size_t s_system_log_count = 0;
+static size_t s_system_log_next = 0;
+static bool s_ntp_synced = false;
+static int64_t s_unix_offset = 0;
+
+static void record_log_internal(const char *message) {
+    if (!message || message[0] == '\0') {
+        return;
+    }
+
+    uint64_t now_ms = esp_timer_get_time() / 1000ULL;
+    system_log_entry_t *entry = &s_system_logs[s_system_log_next];
+    entry->timestamp_ms = now_ms;
+    strlcpy(entry->message, message, SYSTEM_LOG_MESSAGE_MAX);
+    entry->unix_time = s_ntp_synced ? s_unix_offset + (int64_t)(now_ms / 1000ULL) : 0;
+
+    s_system_log_next = (s_system_log_next + 1) % SYSTEM_LOG_CAPACITY;
+    if (s_system_log_count < SYSTEM_LOG_CAPACITY) {
+        s_system_log_count++;
+    }
+
+    log_store_append(entry->timestamp_ms, entry->unix_time, message);
+}
+
+void automation_record_log(const char *message) {
+    static char last_message[SYSTEM_LOG_MESSAGE_MAX];
+    static uint64_t last_timestamp_ms = 0;
+
+    if (!message) {
+        return;
+    }
+
+    uint64_t now_ms = esp_timer_get_time() / 1000ULL;
+    if (last_message[0] != '\0') {
+        if (strncmp(last_message, message, SYSTEM_LOG_MESSAGE_MAX) == 0) {
+            if (now_ms - last_timestamp_ms < 5000ULL) {
+                return;
+            }
+        }
+    }
+
+    record_log_internal(message);
+    strlcpy(last_message, message, SYSTEM_LOG_MESSAGE_MAX);
+    last_timestamp_ms = now_ms;
+}
+
+void automation_update_unix_time(int64_t unix_time_seconds) {
+    if (unix_time_seconds <= 0) {
+        return;
+    }
+
+    uint64_t now_ms = esp_timer_get_time() / 1000ULL;
+    int64_t new_offset = unix_time_seconds - (int64_t)(now_ms / 1000ULL);
+    bool first_sync = !s_ntp_synced;
+    s_ntp_synced = true;
+    s_unix_offset = new_offset;
+    if (first_sync) {
+        automation_record_log("Time synchronised via network");
+    }
+}
+
+static const char *reset_reason_to_string(esp_reset_reason_t reason) {
+    switch (reason) {
+        case ESP_RST_POWERON: return "Power-on";
+        case ESP_RST_EXT: return "External";
+        case ESP_RST_SW: return "Software";
+        case ESP_RST_PANIC: return "Panic";
+        case ESP_RST_INT_WDT: return "Interrupt WDT";
+        case ESP_RST_TASK_WDT: return "Task WDT";
+        case ESP_RST_WDT: return "Other WDT";
+        case ESP_RST_DEEPSLEEP: return "Deep sleep";
+        case ESP_RST_BROWNOUT: return "Brownout";
+        case ESP_RST_SDIO: return "SDIO";
+        default: return "Unknown";
+    }
+}
+
+void automation_log_boot_event(void) {
+    char message[128];
+    esp_reset_reason_t reason = esp_reset_reason();
+    snprintf(message, sizeof(message), "Boot complete (reset reason: %s)", reset_reason_to_string(reason));
+    automation_record_log(message);
+}
+
+cJSON *system_logs_snapshot(void) {
+    cJSON *array = cJSON_CreateArray();
+    if (!array) {
+        return NULL;
+    }
+
+    stored_log_entry_t persisted[SYSTEM_LOG_EXPORT_MAX];
+    size_t persisted_count = log_store_read(persisted, SYSTEM_LOG_EXPORT_MAX);
+
+    for (size_t i = 0; i < persisted_count; i++) {
+        cJSON *entry = cJSON_CreateObject();
+        if (!entry) {
+            continue;
+        }
+        cJSON_AddNumberToObject(entry, "timestamp", (double)persisted[i].timestamp_ms);
+        if (persisted[i].unix_time > 0) {
+            cJSON_AddNumberToObject(entry, "unixTime", (double)persisted[i].unix_time);
+        }
+        cJSON_AddStringToObject(entry, "message", persisted[i].message ? persisted[i].message : "");
+        cJSON_AddItemToArray(array, entry);
+    }
+
+    log_store_free_entries(persisted, persisted_count);
+
+    return array;
+}
+
 void init_automation_queues() {
+    log_store_init();
     serviceMessage.queueCount = 0;
     serviceMessage.mutex = xSemaphoreCreateMutex();
     clientMessage.queueCount = 0;
@@ -131,6 +266,7 @@ void addServiceMessageToQueue(cJSON *message) {
     size_t free_heap = esp_get_free_heap_size();
     if (free_heap < 10240) { // 10KB threshold
         ESP_LOGW(TAG, "Low memory (%d bytes), clearing service queue", free_heap);
+        automation_record_log("Service queue cleared due to low memory");
         if (xSemaphoreTake(serviceMessage.mutex, portMAX_DELAY)) {
             for (int i = 0; i < serviceMessage.queueCount; i++) {
                 if (serviceMessage.messageQueue[i]) {
@@ -141,6 +277,8 @@ void addServiceMessageToQueue(cJSON *message) {
             serviceMessage.queueCount = 0;
             xSemaphoreGive(serviceMessage.mutex);
         }
+        // We cannot safely keep the incoming message either
+        cJSON_Delete(message);
         return;
     }
 
@@ -155,16 +293,13 @@ void addServiceMessageToQueue(cJSON *message) {
             }
             serviceMessage.messageQueue[serviceMessage.queueCount - 1] = NULL;
             serviceMessage.queueCount--;
+            automation_record_log("Service queue full: dropped oldest message");
         }
 
-        cJSON *duplicateMessage = cJSON_Duplicate(message, 1);
-        if (!duplicateMessage) {
-            ESP_LOGE(TAG, "Failed to duplicate service message. Potential memory issue.");
-        } else {
-            serviceMessage.messageQueue[serviceMessage.queueCount] = duplicateMessage;
-            serviceMessage.queueCount++;
-            ESP_LOGI(TAG, "Added message to service queue.");
-        }
+        // Take ownership without duplicating to reduce heap pressure
+        serviceMessage.messageQueue[serviceMessage.queueCount] = message;
+        serviceMessage.queueCount++;
+        ESP_LOGI(TAG, "Added message to service queue.");
         xSemaphoreGive(serviceMessage.mutex);
     }
 }
@@ -172,6 +307,10 @@ void addServiceMessageToQueue(cJSON *message) {
 void addClientMessageToQueue(cJSON *message) {
     if (!message) {
         ESP_LOGE(TAG, "Attempting to add a null message to client queue.");
+        return;
+    }
+
+    if (!ws_has_active_clients()) {
         return;
     }
 
@@ -186,6 +325,7 @@ void addClientMessageToQueue(cJSON *message) {
             }
             clientMessage.messageQueue[clientMessage.queueCount - 1] = NULL;
             clientMessage.queueCount--;
+            automation_record_log("Client queue full: dropped oldest message");
         }
 
         cJSON *duplicateMessage = cJSON_Duplicate(message, 1);
@@ -194,11 +334,7 @@ void addClientMessageToQueue(cJSON *message) {
         } else {
             clientMessage.messageQueue[clientMessage.queueCount] = duplicateMessage;
             clientMessage.queueCount++;
-            char *json_string = cJSON_PrintUnformatted(duplicateMessage);
-            if (json_string) {
-                ESP_LOGI(TAG, "Added message to client queue: %s", json_string);
-                free(json_string);
-            }
+            ESP_LOGI(TAG, "Added message to client queue.");
         }
         xSemaphoreGive(clientMessage.mutex);
     }
@@ -216,6 +352,6 @@ void addServerMessageToQueue(const char *message) {
         return;
     }
 
+    // Transfer ownership to service queue; it will free the object
     addServiceMessageToQueue(json_msg);
-    cJSON_Delete(json_msg);
 } 

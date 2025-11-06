@@ -14,46 +14,46 @@
 
 ## Work Plan
 
-### 1. Establish Baseline
-- Build and flash the current firmware (`/home/andy/devices/access-controller/code/controller`) to confirm existing endpoints and UI behaviour.
+### 1. Establish Baseline *(In Progress)*
+- Build and flash the current firmware (`/home/andy/devices/access-controller/code/controller`) to confirm existing endpoints and UI behaviour. *(Blocked: `idf.py` missing from environment; coordinate environment setup or document requirement.)*
 - Capture current REST contract for `/api/state`, `/api/lock`, `/api/exit`, `/api/fob`, `/api/wifi`, and `/api/server` for regression comparison after refactor.
-- Document available FreeRTOS tasks and queues relevant to Wiegand (`wiegand_main`, `addServiceMessageToQueue`) to avoid conflict with new logic.
+- Document available FreeRTOS tasks and queues relevant to Wiegand (`wiegand_main`, `addServiceMessageToQueue`) to avoid conflict with new logic. *(Done via source review.)*
 
-### 2. Design Data Structures for Wiegand Enrollment
-- Define an internal representation for enrolled RFID/tag users (UUID/code, display name, channel, timestamps, enrolment status).
-- Specify flash/NVS storage keys and maximum counts; decide on JSON vs binary storage using the existing `store_*` helpers.
-- Plan a lightweight in-memory cache that mirrors persisted entries for quick lookup during access checks.
+### 2. Design Data Structures for Wiegand Enrollment *(Completed)*
+- Define an internal representation for enrolled RFID/tag users (UUID/code, display name, channel, timestamps, enrolment status). *(Decision: use `wiegand_user_t` with fields `id`, `code`, `name`, `channel`, `created_at`, `updated_at`, `status`.)*
+- Specify flash/NVS storage keys and maximum counts; decide on JSON vs binary storage using the existing `store_*` helpers. *(Decision: persist array as compact JSON in NVS key `wiegand_users`, cap at 256 entries.)*
+- Plan a lightweight in-memory cache that mirrors persisted entries for quick lookup during access checks. *(Approach: maintain RAM list updated on boot and on any mutation, protected by mutex.)*
 
-### 3. Implement Flash Persistence Utilities
+### 3. Implement Flash Persistence Utilities *(In Progress)*
 - Replace stub functions in `services/store.c` with real NVS-backed implementations for:
-  - `store_user_to_flash`, `load_user_from_flash`, `modify_user_from_flash`, `delete_user_from_flash`.
-  - `find_pin_in_flash` (and equivalent lookups for RFID codes if stored separately).
-- Add helper routines to list all enrolled users and to synchronise cache ↔ flash on boot.
-- Write unit-style tests (hosted or on-target) where feasible to validate serialization/deserialization logic.
+  - `store_user_to_flash`, `load_user_from_flash`, `modify_user_from_flash`, `delete_user_from_flash`. *(Done: SPIFFS-backed JSON records with automated indexing.)*
+  - `find_pin_in_flash` (and equivalent lookups for RFID codes if stored separately). *(Done: keypad PIN lookup returns stored user names.)*
+- Add helper routines to list all enrolled users and to synchronise cache ↔ flash on boot. *(Done: `wiegand_state_snapshot` surfaces registry data and `wiegand_registry_reload` runs during init.)*
+- Write unit-style tests (hosted or on-target) where feasible to validate serialization/deserialization logic. *(Pending: outline feasible test harness.)*
 
-### 4. Extend Wiegand Service Behaviour
+### 4. Extend Wiegand Service Behaviour *(In Progress)*
 - Introduce a registration state machine in `services/wiegand.c`:
-  - `Register` command arms capture mode, accumulates distinct tag IDs, labels them sequentially (`User 1`, `User 2`, …), and surfaces events via a queue or observer.
-  - `Stop` command exits capture mode, freezes the list, and re-enables normal authorisation checks.
-- Ensure captured codes are immediately validated against persisted authorised codes when `Stop` is pressed and flag duplicates.
-- Provide functions to rename users and update storage, ensuring active authorisation checks pull the latest data.
-- Guard concurrency with mutexes/semaphores to avoid interfering with ISR-driven keypad reads.
+  - `Register` command arms capture mode, accumulates distinct tag IDs, labels them sequentially (`User 1`, `User 2`, …), and surfaces events via a queue or observer. *(Done: `wiegand_registration_start`/`wiegand_process_code` manage session state and storage.)*
+  - `Stop` command exits capture mode, freezes the list, and re-enables normal authorisation checks. *(In Progress: registration stop promotes pending users; keypad authorisation hooks in place.)*
+- Ensure captured codes are immediately validated against persisted authorised codes when `Stop` is pressed and flag duplicates. *(Done: `wiegand_process_code` authorises stored codes and tracks duplicates.)*
+- Provide functions to rename users and update storage, ensuring active authorisation checks pull the latest data. *(Done: `wiegand_registry_update_name` + REST rename endpoint.)*
+- Guard concurrency with mutexes/semaphores to avoid interfering with ISR-driven keypad reads. *(Done: registration state protected by `registrationMutex`, registry guarded by dedicated mutex.)*
 
-### 5. Add Firmware APIs & Messaging Hooks
-- Define new HTTP endpoints (e.g. `/api/wiegand/register`, `/api/wiegand/users`, `/api/wiegand/rename`, `/api/wiegand/capture`) inside `services/api.c` alongside response builders.
-- Extend websocket/server message pathways (`addClientMessageToQueue`, `addServiceMessageToQueue`) if live push updates are desired during registration.
-- Update `build_state_snapshot` (or create a dedicated snapshot) to expose current Wiegand/keypad status, active registration flag, and enrolled users for the UI.
-- Add keypad-specific configuration endpoints if additional settings are needed (timeouts, alerts, etc.).
+### 5. Add Firmware APIs & Messaging Hooks *(In Progress)*
+- Define new HTTP endpoints (e.g. `/api/wiegand/register`, `/api/wiegand/users`, `/api/wiegand/rename`, `/api/wiegand/capture`) inside `services/api.c` alongside response builders. *(Done: `/api/wiegand`, `/api/wiegand/register`, `/api/wiegand/stop`, `/api/wiegand/rename` implemented.)*
+- Extend websocket/server message pathways (`addClientMessageToQueue`, `addServiceMessageToQueue`) if live push updates are desired during registration. *(Pending decision on push vs polling.)*
+- Update `build_state_snapshot` (or create a dedicated snapshot) to expose current Wiegand/keypad status, active registration flag, and enrolled users for the UI. *(Done via `wiegand_state_snapshot`.)*
+- Add keypad-specific configuration endpoints if additional settings are needed (timeouts, alerts, etc.). *(Pending.)*
 
-### 6. Front-End Refactor (Material Design Layout)
-- Replace `public/index.html`, `script.js`, and `style.css` with a modular layout:
+### 6. Front-End Refactor (Material Design Layout) *(In Progress)*
+- Replace `public/index.html`, `script.js`, and `style.css` with a modular layout: *(Done: new navigation shell with Material-inspired cards and components.)*
   - Introduce a top app bar + side navigation (or tabs) for `Device`, `System`, and `Settings` views using Material-inspired components (pure CSS or a lightweight library that fits ESP32 constraints).
   - `Device` view: channel 1/2 toggles, lock/exit/FOB controls grouped with improved UX.
   - `System` view: display UUID, firmware info, and any diagnostics from `/api/state`.
   - `Settings` view: WiFi and server forms with validation and feedback.
 - Under `Device`, add a dedicated Wiegand section featuring:
-  - `Register` button to start capture, live list of detected tags (auto-labelled `User #` until renamed), `Stop` button, and rename inputs per entry.
-  - Visual state showing whether new tags are accepted or normal mode is active.
+  - `Register` button to start capture, live list of detected tags (auto-labelled `User #` until renamed), `Stop` button, and rename inputs per entry. *(Done: dynamic list with rename actions and status banners.)*
+  - Visual state showing whether new tags are accepted or normal mode is active. *(Done: status chip + duplicate indicator.)*
 - Add a sibling keypad subsection for keypad-specific configuration/status (e.g. last keypress, PIN slots, alert toggles).
 - Refactor `script.js` into smaller modules (state loading, API clients, UI controllers) and update requests to use new endpoints.
 - Ensure styles remain lightweight to meet ESP32 hosting limitations (minify assets as needed).

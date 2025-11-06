@@ -32,7 +32,7 @@
 #define MAX_FILE_SIZE_STR "200KB"
 
 /* Scratch buffer size */
-#define SCRATCH_BUFSIZE  8192
+#define SCRATCH_BUFSIZE  4096
 
 httpd_handle_t server = NULL;
 
@@ -76,7 +76,7 @@ static esp_err_t script_get_handler(httpd_req_t *req)
     extern const unsigned char script_js_start[] asm("_binary_script_js_start");
     extern const unsigned char script_js_end[]   asm("_binary_script_js_end");
     const size_t script_js_size = (script_js_end - script_js_start);
-    httpd_resp_set_type(req, "text/html");
+    httpd_resp_set_type(req, "application/javascript");
     httpd_resp_send(req, (const char *)script_js_start, script_js_size);
     return ESP_OK;
 }
@@ -86,7 +86,7 @@ static esp_err_t style_get_handler(httpd_req_t *req)
     extern const unsigned char style_css_start[] asm("_binary_style_css_start");
     extern const unsigned char style_css_end[]   asm("_binary_style_css_end");
     const size_t style_css_size = (style_css_end - style_css_start);
-    httpd_resp_set_type(req, "text/html");
+    httpd_resp_set_type(req, "text/css");
     httpd_resp_send(req, (const char *)style_css_start, style_css_size);
     return ESP_OK;
 }
@@ -436,6 +436,7 @@ esp_err_t start_file_server(const char *base_path)
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.max_uri_handlers = 20;
+    config.stack_size = 8192;
 
     /* Use the URI wildcard matching function in order to
      * allow the same handler to respond to multiple different

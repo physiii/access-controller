@@ -5,6 +5,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "cJSON.h"
+#include <stdint.h>
 
 #define SERVICE_LOOP 100
 #define MAX_QUEUE_SIZE 20  // Conservative size
@@ -41,6 +42,10 @@ void addServiceMessageToQueue(cJSON *message);
 void addClientMessageToQueue(cJSON *message);
 void addServerMessageToQueue(const char *message);
 void init_automation_queues(void);
+cJSON *system_logs_snapshot(void);
+void automation_record_log(const char *message);
+void automation_update_unix_time(int64_t unix_time_seconds);
+void automation_log_boot_event(void);
 
 
 #endif // AUTOMATION_H

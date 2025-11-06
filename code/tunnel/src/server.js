@@ -160,6 +160,8 @@ class DeviceConnection {
         startedAt: Date.now(),
         method: req.method,
         requestTarget,
+        streaming: false,
+        responseStarted: false,
       };
 
       this.pendingRequests.set(requestId, pending);
@@ -229,6 +231,18 @@ class DeviceConnection {
         });
         break;
       }
+      case 'httpResponseStart': {
+        this.handleHttpResponseStart(header);
+        break;
+      }
+      case 'httpResponseChunk': {
+        this.handleHttpResponseChunk(header, body);
+        break;
+      }
+      case 'httpResponseEnd': {
+        this.handleHttpResponseEnd(header);
+        break;
+      }
       case 'httpResponse': {
         this.handleHttpResponse(header, body);
         break;
@@ -246,6 +260,135 @@ class DeviceConnection {
     }
   }
 
+  setResponseHeaders(res, headers) {
+    if (!headers || typeof headers !== 'object') {
+      return;
+    }
+
+    for (const [key, values] of Object.entries(headers)) {
+      if (!key) {
+        continue;
+      }
+      if (Array.isArray(values)) {
+        res.setHeader(key, values.length === 1 ? values[0] : values);
+      } else if (typeof values !== 'undefined') {
+        res.setHeader(key, values);
+      }
+    }
+  }
+
+  handleHttpResponseStart(header) {
+    const requestId = header?.requestId;
+    if (!requestId || !this.pendingRequests.has(requestId)) {
+      log('warn', 'Received streamed response start for unknown request', {
+        deviceId: this.deviceId,
+        requestId,
+      });
+      return;
+    }
+
+    const pending = this.pendingRequests.get(requestId);
+    if (pending.streaming) {
+      log('warn', 'Received duplicate streamed response start', {
+        deviceId: this.deviceId,
+        requestId,
+      });
+      return;
+    }
+
+    pending.streaming = true;
+    pending.responseStarted = true;
+
+    const res = pending.res;
+    const statusCode = Number.isInteger(header.statusCode) ? header.statusCode : 200;
+    if (header.statusMessage) {
+      res.statusMessage = header.statusMessage;
+    }
+    res.statusCode = statusCode;
+
+    this.setResponseHeaders(res, header.headers);
+  }
+
+  handleHttpResponseChunk(header, body) {
+    const requestId = header?.requestId;
+    if (!requestId || !this.pendingRequests.has(requestId)) {
+      log('warn', 'Received streamed chunk for unknown request', {
+        deviceId: this.deviceId,
+        requestId,
+      });
+      return;
+    }
+
+    const pending = this.pendingRequests.get(requestId);
+    if (!pending.streaming) {
+      log('warn', 'Received streamed chunk before start frame', {
+        deviceId: this.deviceId,
+        requestId,
+      });
+      return;
+    }
+
+    try {
+      if (body && body.length) {
+        pending.res.write(body);
+      }
+    } catch (err) {
+      log('error', 'Failed to forward streamed response chunk', {
+        deviceId: this.deviceId,
+        requestId,
+        error: err.message,
+      });
+      clearTimeout(pending.timeout);
+      this.pendingRequests.delete(requestId);
+      if (!pending.res.headersSent) {
+        pending.res.writeHead(500, 'Tunnel Stream Error');
+      }
+      try {
+        pending.res.end('Failed to forward device response');
+      } catch (endErr) {
+        log('warn', 'Failed to close HTTP response after stream error', {
+          deviceId: this.deviceId,
+          requestId,
+          error: endErr.message,
+        });
+      }
+      pending.reject(err);
+    }
+  }
+
+  handleHttpResponseEnd(header) {
+    const requestId = header?.requestId;
+    if (!requestId || !this.pendingRequests.has(requestId)) {
+      log('warn', 'Received streamed response end for unknown request', {
+        deviceId: this.deviceId,
+        requestId,
+      });
+      return;
+    }
+
+    const pending = this.pendingRequests.get(requestId);
+    this.pendingRequests.delete(requestId);
+    clearTimeout(pending.timeout);
+
+    try {
+      if (!pending.res.writableEnded) {
+        pending.res.end();
+      }
+      pending.resolve();
+    } catch (err) {
+      pending.reject(err);
+      if (!pending.res.headersSent) {
+        pending.res.writeHead(500, 'Tunnel Response Error');
+      }
+      pending.res.end('Failed to complete device response');
+      log('error', 'Failed to finalise streamed response to HTTP client', {
+        deviceId: this.deviceId,
+        requestId,
+        error: err.message,
+      });
+    }
+  }
+
   handleHttpResponse(header, body) {
     const { requestId } = header;
     if (!requestId || !this.pendingRequests.has(requestId)) {
@@ -257,6 +400,21 @@ class DeviceConnection {
     }
 
     const pending = this.pendingRequests.get(requestId);
+    if (pending.streaming) {
+      if (body && body.length) {
+        try {
+          pending.res.write(body);
+        } catch (err) {
+          log('error', 'Failed to forward buffered response body during streaming fallback', {
+            deviceId: this.deviceId,
+            requestId,
+            error: err.message,
+          });
+        }
+      }
+      this.handleHttpResponseEnd(header);
+      return;
+    }
     this.pendingRequests.delete(requestId);
     clearTimeout(pending.timeout);
 
@@ -268,18 +426,7 @@ class DeviceConnection {
       }
       res.statusCode = statusCode;
 
-      if (header.headers && typeof header.headers === 'object') {
-        for (const [key, values] of Object.entries(header.headers)) {
-          if (!key) {
-            continue;
-          }
-          if (Array.isArray(values)) {
-            res.setHeader(key, values.length === 1 ? values[0] : values);
-          } else if (typeof values !== 'undefined') {
-            res.setHeader(key, values);
-          }
-        }
-      }
+      this.setResponseHeaders(res, header.headers);
 
       res.end(body);
       pending.resolve();
@@ -525,6 +672,15 @@ class TunnelManager {
       if (segments.length < 2) {
         res.writeHead(400, 'Bad Request');
         res.end('Missing device ID in path');
+        return;
+      }
+
+      const needsTrailingSlash = segments.length === 2 && !url.pathname.endsWith('/')
+        && (req.method === 'GET' || req.method === 'HEAD');
+      if (needsTrailingSlash) {
+        const location = `${url.pathname}/${url.search ?? ''}`;
+        res.writeHead(302, { Location: location });
+        res.end();
         return;
       }
 

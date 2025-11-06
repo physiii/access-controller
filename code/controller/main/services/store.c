@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <inttypes.h>
+#include <errno.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
@@ -9,53 +12,94 @@
 #include "esp_spiffs.h"
 #include "cJSON.h"
 #include "automation.h"
+#include "log_store.h"
+#include "store.h"
 
 static const char* STORE_TAG = "storage.c";
 
-void set_char(const char* key, const char* value) {
+#define USER_FILE_PATH_FORMAT "/spiffs/user_%05lu.json"
+#define USER_FILE_MAX_PATH 64
+#define MAX_USER_COUNT 400
+
+static bool spiffs_mounted = false;
+
+static esp_err_t ensure_spiffs(void) {
+    if (spiffs_mounted) {
+        return ESP_OK;
+    }
+
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = "/spiffs",
+        .partition_label = NULL,
+        .max_files = 8,
+        .format_if_mount_failed = true
+    };
+
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE(STORE_TAG, "Failed to mount or format filesystem");
+        } else if (ret == ESP_ERR_NOT_FOUND) {
+            ESP_LOGE(STORE_TAG, "Failed to find SPIFFS partition");
+        } else {
+            ESP_LOGE(STORE_TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        }
+        return ret;
+    }
+
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) {
+        ESP_LOGE(STORE_TAG, "Failed to get SPIFFS info (%s)", esp_err_to_name(ret));
+    } else {
+        ESP_LOGI(STORE_TAG, "SPIFFS mounted: total=%d, used=%d", total, used);
+    }
+
+    spiffs_mounted = true;
+    return ESP_OK;
+}
+
+static esp_err_t set_char(const char* key, const char* value) {
     nvs_handle_t my_handle;
     esp_err_t err;
 
     err = nvs_open("storage", NVS_READWRITE, &my_handle);
     if (err != ESP_OK) {
         ESP_LOGE(STORE_TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        return;
+        return err;
     }
 
     err = nvs_set_str(my_handle, key, value);
     if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE) {
-        ESP_LOGW(STORE_TAG, "NVS partition full, erasing and retrying...");
+        ESP_LOGW(STORE_TAG, "NVS full while saving %s; clearing system logs and retrying", key);
         nvs_close(my_handle);
-        
-        // Erase and reinitialize NVS
-        esp_err_t ret = nvs_flash_erase();
-        if (ret == ESP_OK) {
-            ret = nvs_flash_init();
-            if (ret == ESP_OK) {
-                // Retry the operation
+        log_store_clear();
+        char log_msg[LOG_STORE_MESSAGE_MAX];
+        snprintf(log_msg, sizeof(log_msg), "Cleared logs to free space for key %s", key);
+        automation_record_log(log_msg);
+
                 err = nvs_open("storage", NVS_READWRITE, &my_handle);
                 if (err == ESP_OK) {
                     err = nvs_set_str(my_handle, key, value);
-                    if (err == ESP_OK) {
-                        ESP_LOGI(STORE_TAG, "Successfully saved %s after NVS cleanup", key);
-                    } else {
-                        ESP_LOGE(STORE_TAG, "Failed to save %s even after cleanup: %s", key, esp_err_to_name(err));
-                    }
-                }
-            }
         }
     } else if (err != ESP_OK) {
         ESP_LOGW(STORE_TAG, "Error (%s) setting string %s, continuing anyway", esp_err_to_name(err), key);
+    }
+
+    if (err == ESP_OK) {
+        esp_err_t commit_err = nvs_commit(my_handle);
+        if (commit_err != ESP_OK) {
+            ESP_LOGW(STORE_TAG, "Error (%s) committing %s", esp_err_to_name(commit_err), key);
+            err = commit_err;
     } else {
         ESP_LOGI(STORE_TAG, "Successfully saved %s", key);
     }
-
-    err = nvs_commit(my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGW(STORE_TAG, "Error (%s) committing %s", esp_err_to_name(err), key);
+    } else {
+        ESP_LOGE(STORE_TAG, "Failed to save %s: %s", key, esp_err_to_name(err));
     }
 
     nvs_close(my_handle);
+    return err;
 }
 
 char* get_char(const char* key) {
@@ -128,41 +172,47 @@ void set_bool(const char* key, bool value) {
     }
 
     uint8_t val = value ? 1 : 0;
+    bool retried = false;
+
+    while (true) {
     err = nvs_set_u8(my_handle, key, val);
-    if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE) {
-        ESP_LOGW(STORE_TAG, "NVS partition full, erasing and retrying...");
+        if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE && !retried) {
+            ESP_LOGW(STORE_TAG, "NVS full while saving bool %s; clearing system logs and retrying", key);
         nvs_close(my_handle);
-        
-        // Erase and reinitialize NVS
-        esp_err_t ret = nvs_flash_erase();
-        if (ret == ESP_OK) {
-            ret = nvs_flash_init();
-            if (ret == ESP_OK) {
-                // Retry the operation
+            log_store_clear();
+            char log_msg[LOG_STORE_MESSAGE_MAX];
+            snprintf(log_msg, sizeof(log_msg), "Cleared logs to free space for key %s", key);
+            automation_record_log(log_msg);
+            retried = true;
                 err = nvs_open("storage", NVS_READWRITE, &my_handle);
-                if (err == ESP_OK) {
-                    err = nvs_set_u8(my_handle, key, val);
-                    if (err == ESP_OK) {
-                        ESP_LOGI(STORE_TAG, "Successfully saved bool %s after NVS cleanup", key);
-                    } else {
-                        ESP_LOGE(STORE_TAG, "Failed to save bool %s even after cleanup: %s", key, esp_err_to_name(err));
-                    }
-                }
+            if (err != ESP_OK) {
+                break;
             }
+            continue;
         }
-    } else if (err != ESP_OK) {
-        ESP_LOGW(STORE_TAG, "Error (%s) setting bool %s, continuing anyway", esp_err_to_name(err), key);
+        break;
+    }
+
+    if (err == ESP_OK) {
+        esp_err_t commit_err = nvs_commit(my_handle);
+        if (commit_err != ESP_OK) {
+            ESP_LOGE(STORE_TAG, "Error (%s) committing bool %s", esp_err_to_name(commit_err), key);
+            err = commit_err;
     } else {
         ESP_LOGI(STORE_TAG, "Successfully saved bool %s", key);
     }
-
-    err = nvs_commit(my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGW(STORE_TAG, "Error (%s) committing bool %s", esp_err_to_name(err), key);
+    } else {
+        ESP_LOGE(STORE_TAG, "Failed to save bool %s: %s", key, esp_err_to_name(err));
     }
 
     nvs_close(my_handle);
     xSemaphoreGive(storage_mutex);
+
+    if (err != ESP_OK) {
+        char msg[LOG_STORE_MESSAGE_MAX];
+        snprintf(msg, sizeof(msg), "Failed to persist bool %s (err=%s)", key, esp_err_to_name(err));
+        automation_record_log(msg);
+    }
 }
 
 bool get_bool(const char* key, bool default_value) {
@@ -191,50 +241,55 @@ bool get_bool(const char* key, bool default_value) {
     return value != 0;
 }
 
-void set_u32(const char* key, uint32_t value) {
+static esp_err_t set_u32(const char* key, uint32_t value) {
     nvs_handle_t my_handle;
-    esp_err_t err;
-
-    err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
     if (err != ESP_OK) {
         ESP_LOGE(STORE_TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        return;
+        return err;
     }
 
+    bool retried = false;
+    while (true) {
     err = nvs_set_u32(my_handle, key, value);
-    if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE) {
-        ESP_LOGW(STORE_TAG, "NVS partition full, erasing and retrying...");
+        if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE && !retried) {
+            ESP_LOGW(STORE_TAG, "NVS full while saving u32 %s; clearing system logs and retrying", key);
         nvs_close(my_handle);
-        
-        // Erase and reinitialize NVS
-        esp_err_t ret = nvs_flash_erase();
-        if (ret == ESP_OK) {
-            ret = nvs_flash_init();
-            if (ret == ESP_OK) {
-                // Retry the operation
+            log_store_clear();
+            char log_msg[LOG_STORE_MESSAGE_MAX];
+            snprintf(log_msg, sizeof(log_msg), "Cleared logs to free space for key %s", key);
+            automation_record_log(log_msg);
+            retried = true;
                 err = nvs_open("storage", NVS_READWRITE, &my_handle);
-                if (err == ESP_OK) {
-                    err = nvs_set_u32(my_handle, key, value);
-                    if (err == ESP_OK) {
-                        ESP_LOGI(STORE_TAG, "Successfully saved u32 %s after NVS cleanup", key);
-                    } else {
-                        ESP_LOGE(STORE_TAG, "Failed to save u32 %s even after cleanup: %s", key, esp_err_to_name(err));
-                    }
-                }
+            if (err != ESP_OK) {
+                break;
             }
+            continue;
         }
-    } else if (err != ESP_OK) {
-        ESP_LOGW(STORE_TAG, "Error (%s) setting u32 %s, continuing anyway", esp_err_to_name(err), key);
+        break;
+    }
+
+    if (err == ESP_OK) {
+        esp_err_t commit_err = nvs_commit(my_handle);
+        if (commit_err != ESP_OK) {
+            ESP_LOGE(STORE_TAG, "Error (%s) committing u32 %s", esp_err_to_name(commit_err), key);
+            err = commit_err;
     } else {
         ESP_LOGI(STORE_TAG, "Successfully saved u32 %s", key);
     }
-
-    err = nvs_commit(my_handle);
-    if (err != ESP_OK) {
-        ESP_LOGW(STORE_TAG, "Error (%s) committing u32 %s", esp_err_to_name(err), key);
+    } else {
+        ESP_LOGE(STORE_TAG, "Failed to save u32 %s: %s", key, esp_err_to_name(err));
     }
 
     nvs_close(my_handle);
+
+    if (err != ESP_OK) {
+        char msg[LOG_STORE_MESSAGE_MAX];
+        snprintf(msg, sizeof(msg), "Failed to persist u32 %s (err=%s)", key, esp_err_to_name(err));
+        automation_record_log(msg);
+    }
+
+    return err;
 }
 
 uint32_t get_u32(const char* key, uint32_t default_value) {
@@ -264,61 +319,48 @@ uint32_t get_u32(const char* key, uint32_t default_value) {
 }
 
 // Wrapper functions for backward compatibility
-void store_char(const char* key, const char* value) {
-    set_char(key, value);
+esp_err_t store_char(const char* key, const char* value) {
+    return set_char(key, value);
 }
 
 void store_u32(const char* key, uint32_t value) {
-    set_u32(key, value);
+    esp_err_t err = set_u32(key, value);
+    if (err != ESP_OK) {
+        ESP_LOGW(STORE_TAG, "store_u32 failed for %s (err=%s)", key, esp_err_to_name(err));
+    }
 }
 
 // Dummy implementations for missing functions
 esp_err_t initialize_spiffs(void) {
-    esp_vfs_spiffs_conf_t conf = {
-        .base_path = "/spiffs",
-        .partition_label = NULL,
-        .max_files = 5,
-        .format_if_mount_failed = true
-    };
-
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
-    if (ret != ESP_OK) {
-        if (ret == ESP_FAIL) {
-            ESP_LOGE(STORE_TAG, "Failed to mount or format filesystem");
-        } else if (ret == ESP_ERR_NOT_FOUND) {
-            ESP_LOGE(STORE_TAG, "Failed to find SPIFFS partition");
-        } else {
-            ESP_LOGE(STORE_TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
-        }
-        return ret;
-    }
-
-    size_t total = 0, used = 0;
-    ret = esp_spiffs_info(NULL, &total, &used);
-    if (ret != ESP_OK) {
-        ESP_LOGE(STORE_TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
-    } else {
-        ESP_LOGI(STORE_TAG, "Partition size: total: %d, used: %d", total, used);
-    }
-
-    return ESP_OK;
+    return ensure_spiffs();
 }
 
-// Dummy user management functions
 void load_wifi_credentials_from_flash(char *ssid, char *password) {
     ESP_LOGI(STORE_TAG, "Loading WiFi credentials from flash");
     char *ssid_str = get_char("wifi_ssid");
     char *password_str = get_char("wifi_password");
 
+    char log_msg[LOG_STORE_MESSAGE_MAX];
+
     if (strcmp(ssid_str, "")==0 || strcmp(password_str, "")==0) {
         ESP_LOGI(STORE_TAG, "No WiFi credentials found in flash");
         strcpy(ssid, "");
         strcpy(password, "");
+        snprintf(log_msg, sizeof(log_msg), "WiFi credentials not found in NVS");
     } else {
         ESP_LOGI(STORE_TAG, "WiFi credentials found in flash: %s, %s.", ssid_str, password_str);
         strcpy(ssid, ssid_str);
         strcpy(password, password_str);
+
+        size_t pass_len = strlen(password_str);
+        size_t mask_len = pass_len < 32 ? pass_len : 32;
+        char mask[33];
+        memset(mask, '*', mask_len);
+        mask[mask_len] = '\0';
+        snprintf(log_msg, sizeof(log_msg), "WiFi credentials loaded (SSID=%s, password=%s)", ssid_str, pass_len > 0 ? mask : "empty");
     }
+
+    automation_record_log(log_msg);
     free(ssid_str);
     free(password_str);
 }
@@ -357,32 +399,268 @@ void get_md5_from_flash(char *md5_hash, size_t size) {
     free(stored_md5);
 }
 
-// Dummy implementations for missing user functions
-cJSON* load_user_from_flash(uint32_t user_id) { return NULL; }
-void store_user_to_flash(char *uuid, char *name, char *pin) {}
-char* find_pin_in_flash(const char* pin) { return NULL; }
-void modify_user_from_flash(const char *uuid, const char *newName, const char *newPin) {}
-void delete_user_from_flash(const char *uuid_to_delete) {}
-void store_server_info_to_flash(const char *server_ip, const char *server_port) {
-    store_char("server_ip", server_ip);
-    store_char("server_port", server_port);
+cJSON* load_user_from_flash(uint32_t user_id) {
+    if (user_id == 0 || user_id > MAX_USER_COUNT) {
+        return NULL;
+    }
+
+    if (ensure_spiffs() != ESP_OK) {
+        return NULL;
+    }
+
+    char file_path[USER_FILE_MAX_PATH];
+    snprintf(file_path, sizeof(file_path), USER_FILE_PATH_FORMAT, (unsigned long)(user_id - 1));
+
+    FILE *file = fopen(file_path, "r");
+    if (!file) {
+        ESP_LOGW(STORE_TAG, "User file %s not found", file_path);
+        return NULL;
+    }
+
+    if (fseek(file, 0, SEEK_END) != 0) {
+        fclose(file);
+        return NULL;
+    }
+    long length = ftell(file);
+    if (length < 0) {
+        fclose(file);
+        return NULL;
+    }
+    rewind(file);
+
+    char *buffer = malloc(length + 1);
+    if (!buffer) {
+        fclose(file);
+        return NULL;
+    }
+
+    size_t read = fread(buffer, 1, length, file);
+    fclose(file);
+    buffer[read] = '\0';
+
+    cJSON *user = cJSON_Parse(buffer);
+    free(buffer);
+    return user;
 }
-void store_wifi_credentials_to_flash(const char *ssid, const char *password) {
-    store_char("wifi_ssid", ssid);
-    store_char("wifi_password", password);
+
+static esp_err_t write_user_to_file(size_t index, cJSON *user) {
+    if (!user) return ESP_ERR_INVALID_ARG;
+    if (ensure_spiffs() != ESP_OK) {
+        return ESP_FAIL;
+    }
+
+    char file_path[USER_FILE_MAX_PATH];
+    snprintf(file_path, sizeof(file_path), USER_FILE_PATH_FORMAT, (unsigned long)index);
+
+    FILE *file = fopen(file_path, "w");
+    if (!file) {
+        ESP_LOGE(STORE_TAG, "Failed to open %s for writing", file_path);
+        return ESP_FAIL;
+    }
+
+    char *json = cJSON_PrintUnformatted(user);
+    if (!json) {
+        fclose(file);
+        return ESP_ERR_NO_MEM;
+    }
+
+    fprintf(file, "%s", json);
+    fclose(file);
+    free(json);
+    return ESP_OK;
+}
+
+void store_user_to_flash(char *uuid, char *name, char *pin) {
+    if (!uuid || !name || !pin) {
+        ESP_LOGE(STORE_TAG, "Invalid user payload");
+        return;
+    }
+
+    uint32_t user_index = get_u32("auth_user_count", 0);
+    if (user_index >= MAX_USER_COUNT) {
+        ESP_LOGE(STORE_TAG, "Reached maximum user count");
+        return;
+    }
+
+    cJSON *user = cJSON_CreateObject();
+    if (!user) {
+        ESP_LOGE(STORE_TAG, "Failed to allocate user json");
+        return;
+    }
+
+    cJSON_AddStringToObject(user, "uuid", uuid);
+    cJSON_AddStringToObject(user, "name", name);
+    cJSON_AddStringToObject(user, "pin", pin);
+
+    if (write_user_to_file(user_index, user) == ESP_OK) {
+        store_u32("auth_user_count", user_index + 1);
+        ESP_LOGI(STORE_TAG, "Stored user %s", uuid);
+    }
+    cJSON_Delete(user);
+}
+
+char* find_pin_in_flash(const char* pin) {
+    if (!pin) return NULL;
+
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    ESP_LOGI(STORE_TAG, "Total User Count: %" PRIu32, user_count);
+
+    for (uint32_t i = 0; i < user_count; i++) {
+        cJSON *user = load_user_from_flash(i + 1);
+        if (!user) continue;
+
+        cJSON *pin_json = cJSON_GetObjectItemCaseSensitive(user, "pin");
+        if (cJSON_IsString(pin_json) && strcmp(pin_json->valuestring, pin) == 0) {
+            cJSON *name_json = cJSON_GetObjectItemCaseSensitive(user, "name");
+            char *name = NULL;
+            if (cJSON_IsString(name_json) && name_json->valuestring) {
+                name = strdup(name_json->valuestring);
+            }
+            cJSON_Delete(user);
+            return name;
+        }
+        cJSON_Delete(user);
+    }
+
+    return NULL;
+}
+
+void modify_user_from_flash(const char *uuid, const char *newName, const char *newPin) {
+    if (!uuid) return;
+
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    for (uint32_t i = 0; i < user_count; i++) {
+        cJSON *user = load_user_from_flash(i + 1);
+        if (!user) continue;
+
+        cJSON *uuid_json = cJSON_GetObjectItemCaseSensitive(user, "uuid");
+        if (cJSON_IsString(uuid_json) && strcmp(uuid_json->valuestring, uuid) == 0) {
+            if (newName) {
+                cJSON_ReplaceItemInObject(user, "name", cJSON_CreateString(newName));
+            }
+            if (newPin) {
+                cJSON_ReplaceItemInObject(user, "pin", cJSON_CreateString(newPin));
+            }
+            write_user_to_file(i, user);
+            cJSON_Delete(user);
+            return;
+        }
+        cJSON_Delete(user);
+    }
+}
+
+void delete_user_from_flash(const char *uuid_to_delete) {
+    if (!uuid_to_delete) return;
+
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    for (uint32_t i = 0; i < user_count; i++) {
+        cJSON *user = load_user_from_flash(i + 1);
+        if (!user) continue;
+
+        cJSON *uuid_json = cJSON_GetObjectItemCaseSensitive(user, "uuid");
+        bool match = cJSON_IsString(uuid_json) && strcmp(uuid_json->valuestring, uuid_to_delete) == 0;
+        cJSON_Delete(user);
+
+        if (!match) continue;
+
+        for (uint32_t j = i; j < user_count - 1; j++) {
+            char src_path[USER_FILE_MAX_PATH];
+            char dest_path[USER_FILE_MAX_PATH];
+            snprintf(src_path, sizeof(src_path), USER_FILE_PATH_FORMAT, (unsigned long)(j + 1));
+            snprintf(dest_path, sizeof(dest_path), USER_FILE_PATH_FORMAT, (unsigned long)j);
+            rename(src_path, dest_path);
+        }
+
+        char last_path[USER_FILE_MAX_PATH];
+        snprintf(last_path, sizeof(last_path), USER_FILE_PATH_FORMAT, (unsigned long)(user_count - 1));
+        remove(last_path);
+        store_u32("auth_user_count", user_count - 1);
+        ESP_LOGI(STORE_TAG, "Deleted user %s", uuid_to_delete);
+        return;
+    }
+}
+esp_err_t store_server_info_to_flash(const char *server_ip, const char *server_port) {
+    esp_err_t err_ip = store_char("server_ip", server_ip);
+    esp_err_t err_port = store_char("server_port", server_port);
+
+    if (err_ip == ESP_OK && err_port == ESP_OK) {
+        char log_msg[LOG_STORE_MESSAGE_MAX];
+        snprintf(log_msg, sizeof(log_msg), "Server settings updated (IP=%s, port=%s)", server_ip, server_port);
+        automation_record_log(log_msg);
+        return ESP_OK;
+    }
+
+    if (err_ip != ESP_OK) {
+        ESP_LOGE(STORE_TAG, "Failed to store server IP: %s", esp_err_to_name(err_ip));
+        automation_record_log("Failed to update server IP in NVS");
+        return err_ip;
+    }
+
+    ESP_LOGE(STORE_TAG, "Failed to store server port: %s", esp_err_to_name(err_port));
+    automation_record_log("Failed to update server port in NVS");
+    return err_port;
+}
+esp_err_t store_wifi_credentials_to_flash(const char *ssid, const char *password) {
+    esp_err_t err_ssid = store_char("wifi_ssid", ssid);
+    esp_err_t err_pass = store_char("wifi_password", password);
+
+    if (err_ssid == ESP_OK && err_pass == ESP_OK) {
+        size_t pass_len = strlen(password);
+        char mask_buf[LOG_STORE_MESSAGE_MAX];
+        if (pass_len == 0) {
+            snprintf(mask_buf, sizeof(mask_buf), "WiFi credentials updated (SSID=%s, password empty)", ssid);
+        } else {
+            size_t mask_len = pass_len < 32 ? pass_len : 32;
+            char mask[33];
+            memset(mask, '*', mask_len);
+            mask[mask_len] = '\0';
+            snprintf(mask_buf, sizeof(mask_buf), "WiFi credentials updated (SSID=%s, password=%s)", ssid, mask);
+        }
+        ESP_LOGI(STORE_TAG, "Stored WiFi credentials for SSID '%s' (password length=%zu)", ssid, pass_len);
+        automation_record_log(mask_buf);
+        return ESP_OK;
+    }
+
+    if (err_ssid != ESP_OK) {
+        char msg[LOG_STORE_MESSAGE_MAX];
+        snprintf(msg, sizeof(msg), "Failed to store WiFi SSID (err=%s)", esp_err_to_name(err_ssid));
+        ESP_LOGE(STORE_TAG, "%s", msg);
+        automation_record_log(msg);
+        return err_ssid;
+    }
+
+    char msg[LOG_STORE_MESSAGE_MAX];
+    snprintf(msg, sizeof(msg), "Failed to store WiFi password (err=%s)", esp_err_to_name(err_pass));
+    ESP_LOGE(STORE_TAG, "%s", msg);
+    automation_record_log(msg);
+    return err_pass;
 }
 
 // Dummy implementations for missing setting functions
 int storeSetting(char *key, cJSON *payload) {
-    store_char(key, cJSON_PrintUnformatted(payload));
-    return 0;
+    if (!payload) {
+        return -1;
+    }
+
+    char *json = cJSON_PrintUnformatted(payload);
+    if (!json) {
+        cJSON_Delete(payload);
+        return -1;
+    }
+
+    esp_err_t err = store_char(key, json);
+    free(json);
+    cJSON_Delete(payload);
+    return err == ESP_OK ? 0 : -1;
 }
 
 int restoreSetting(char *key) {
     char *stored = get_char(key);
     if (strcmp(stored, "") != 0) {
         cJSON *msg = cJSON_Parse(stored);
-        if (msg) addServiceMessageToQueue(msg);
+        if (msg) {
+            addServiceMessageToQueue(msg); // ownership transferred
+        }
     }
     free(stored);
     return 0;

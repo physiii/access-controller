@@ -7,6 +7,10 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "esp_sntp.h"
+#include "automation.h"
+#include <sys/time.h>
+#include <stdbool.h>
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -20,6 +24,13 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_FAIL_BIT      BIT1
 
 static int s_retry_num = 0;
+static bool s_sntp_started = false;
+
+static void time_sync_notification_cb(struct timeval *tv) {
+    time_t now = 0;
+    time(&now);
+    automation_update_unix_time((int64_t)now);
+}
 
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
@@ -40,6 +51,14 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+        if (!s_sntp_started) {
+            esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+            esp_sntp_setservername(0, "pool.ntp.org");
+            esp_sntp_set_time_sync_notification_cb(time_sync_notification_cb);
+            esp_sntp_init();
+            s_sntp_started = true;
+            ESP_LOGI(TAG, "SNTP initialised");
+        }
     }
 }
 

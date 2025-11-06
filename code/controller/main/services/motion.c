@@ -159,6 +159,8 @@ void handle_motion_message(cJSON * payload)
 	 	}
 		storeMotionSettings();
 	}
+
+	cJSON_Delete(payload);
 }
 
 void motion_timer_func(struct motionButton *mot)

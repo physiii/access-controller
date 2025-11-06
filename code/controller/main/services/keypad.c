@@ -1,6 +1,11 @@
+#include <stdio.h>
+#include "esp_log.h"
+#include "cJSON.h"
+#include "automation.h"
+
 #define KEYPAD_MCP_IO_1         A3
 #define KEYPAD_MCP_IO_2         B3
-#define NUM_OF_KEYPADS			    2
+#define NUM_OF_KEYPADS          2
 
 char keypad_service_message[2000];
 bool keypad_service_message_ready = false;
@@ -24,6 +29,9 @@ struct keypadButton
 };
 
 struct keypadButton keypads[NUM_OF_KEYPADS];
+
+void sendKeypadState(void);
+cJSON *keypad_state_snapshot(void);
 
 void start_keypad_timer (struct keypadButton *pad, bool val)
 {
@@ -78,6 +86,39 @@ int storeKeypadSettings()
   return 0;
 }
 
+void sendKeypadState(void) {
+    for (int i = 0; i < NUM_OF_KEYPADS; i++) {
+        if (strlen(keypads[i].settings) > 2) {
+            cJSON *json_msg = cJSON_Parse(keypads[i].settings);
+            if (json_msg) {
+                addClientMessageToQueue(json_msg);
+                cJSON_Delete(json_msg);
+            }
+        }
+    }
+}
+
+cJSON *keypad_state_snapshot(void) {
+    cJSON *array = cJSON_CreateArray();
+    if (!array) {
+        return NULL;
+    }
+
+    for (int i = 0; i < NUM_OF_KEYPADS; i++) {
+        cJSON *entry = cJSON_CreateObject();
+        if (!entry) {
+            continue;
+        }
+        cJSON_AddNumberToObject(entry, "channel", keypads[i].channel);
+        cJSON_AddBoolToObject(entry, "enable", keypads[i].enable);
+        cJSON_AddBoolToObject(entry, "alert", keypads[i].alert);
+        cJSON_AddNumberToObject(entry, "delay", keypads[i].delay);
+        cJSON_AddItemToArray(array, entry);
+    }
+
+    return array;
+}
+
 int restoreKeypadSettings()
 {
 	for (uint8_t i=0; i < NUM_OF_KEYPADS; i++) {
@@ -106,7 +147,7 @@ int load_keypad_state_from_flash()
 
 int handle_keypad_property (char * prop)
 {
-  printf("keypad property: %s\n",prop);
+	printf("keypad property: %s\n",prop);
 
 	if (strcmp(prop,"keypad")==0) {
 	}
@@ -156,7 +197,7 @@ void handle_keypad_message(cJSON * payload)
 	if (payload == NULL) return;
 
 	if (cJSON_GetObjectItem(payload,"getState")) {
-		sendExitState();
+		sendKeypadState();
 	}
 
 	if (cJSON_GetObjectItem(payload,"channel")) {
@@ -179,7 +220,7 @@ void handle_keypad_message(cJSON * payload)
 		 storeKeypadSettings();
 	}
 
-	return;
+	cJSON_Delete(payload);
 }
 
 static void
@@ -213,6 +254,8 @@ void keypad_main()
 	keypads[1].enable = true;
 	keypads[1].alert = true;
 	strcpy(keypads[1].type, "keypad");
+
+	storeKeypadSettings();
 
 	
 	if (USE_MCP23017) {

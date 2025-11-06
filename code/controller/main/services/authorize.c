@@ -195,9 +195,13 @@ void handle_authorize_message(cJSON * payload) {
         if (cJSON_GetObjectItem(payload, "serverIp") && cJSON_GetObjectItem(payload, "serverPort")) {
             snprintf(serverIp, sizeof(serverIp), "%s", cJSON_GetObjectItem(payload, "serverIp")->valuestring);
             snprintf(serverPort, sizeof(serverPort), "%s", cJSON_GetObjectItem(payload, "serverPort")->valuestring);
-            store_server_info_to_flash(serverIp, serverPort);
-            vTaskDelay(100 / portTICK_PERIOD_MS);
-            esp_restart();
+            esp_err_t err = store_server_info_to_flash(serverIp, serverPort);
+            if (err == ESP_OK) {
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+                esp_restart();
+            } else {
+                ESP_LOGE(TAG, "Failed to update server settings: %s", esp_err_to_name(err));
+            }
         }
 
     } else if (cJSON_GetObjectItem(payload,"wifiName")) {
@@ -206,9 +210,13 @@ void handle_authorize_message(cJSON * payload) {
         if (cJSON_GetObjectItem(payload, "wifiName") && cJSON_GetObjectItem(payload, "wifiPassword")) {
             snprintf(wifiName, sizeof(wifiName), "%s", cJSON_GetObjectItem(payload, "wifiName")->valuestring);
             snprintf(wifiPassword, sizeof(wifiPassword), "%s", cJSON_GetObjectItem(payload, "wifiPassword")->valuestring);
-            store_wifi_credentials_to_flash(wifiName, wifiPassword);
-            vTaskDelay(100 / portTICK_PERIOD_MS);
-            esp_restart();
+            esp_err_t err = store_wifi_credentials_to_flash(wifiName, wifiPassword);
+            if (err == ESP_OK) {
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+                esp_restart();
+            } else {
+                ESP_LOGE(TAG, "Failed to update WiFi credentials: %s", esp_err_to_name(err));
+            }
         }
 
     } else if (cJSON_GetObjectItem(payload,"getInfo")) {

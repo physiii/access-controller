@@ -197,6 +197,8 @@ void handle_exit_message(cJSON * payload)
 	 	}
 		storeExitSettings();
 	}
+
+	cJSON_Delete(payload);
 }
 
 static void

@@ -9,6 +9,7 @@
 #include "services/drivers/mcp23x17.c"
 #include "services/gpio.c"
 #include "services/store.c"
+#include "services/wiegand_registry.c"
 #include "services/authorize.c"
 #include "services/buzzer.c"
 #include "services/lock.c"
@@ -23,6 +24,7 @@
 #include "services/api.c"
 #include "esp_http_client.h"
 #include "esp_random.h"
+#include "esp_heap_caps.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -85,7 +87,9 @@ static void ensure_device_identity(void) {
 
     if (need_new_device_id) {
         generate_uuid_v4(device_id, sizeof(device_id));
-        store_char("device_id", device_id);
+        if (store_char("device_id", device_id) != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to persist device UUID");
+        }
         ESP_LOGI(TAG, "Generated new device UUID: %s", device_id);
     } else {
         strncpy(device_id, stored_device_id, sizeof(device_id) - 1);
@@ -103,7 +107,9 @@ static void ensure_device_identity(void) {
     } else {
         strncpy(token, device_id, sizeof(token) - 1);
         token[sizeof(token) - 1] = '\0';
-        store_char("token", token);
+        if (store_char("token", token) != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to persist token");
+        }
         ESP_LOGI(TAG, "Token not found; defaulting to device UUID");
     }
 
@@ -203,6 +209,7 @@ void app_main(void) {
     ESP_ERROR_CHECK(ret);
 
     init_automation_queues();
+    automation_log_boot_event();
 
     ensure_device_identity();
     ESP_LOGI(TAG, "Device UUID: %s", device_id);
@@ -256,6 +263,7 @@ void app_main(void) {
     mcp23x17_main();
     auth_main();
     buzzer_main();
+    wiegand_registry_init();
     wiegand_main();
     exit_main();
     motion_main();
@@ -281,7 +289,9 @@ void app_main(void) {
         int minutes = uptime_s / 60;
         int seconds = uptime_s % 60;
 
+        size_t current_free_heap = esp_get_free_heap_size();
         size_t min_free_heap = esp_get_minimum_free_heap_size();
+        size_t largest_free_block = heap_caps_get_largest_free_block(MALLOC_CAP_8BIT);
 
         // Get NVS stats for the 'nvs' partition
         nvs_stats_t nvs_stats;
@@ -293,7 +303,7 @@ void app_main(void) {
         // Log system status
         ESP_LOGI(TAG, "------ SYSTEM STATUS ------");
         ESP_LOGI(TAG, "Uptime: %d days %d hours %d minutes %d seconds", days, hours, minutes, seconds);
-        ESP_LOGI(TAG, "Minimum Free Heap: %zu bytes", min_free_heap);
+        ESP_LOGI(TAG, "Free Heap: %zu bytes (min: %zu, largest block: %zu)", current_free_heap, min_free_heap, largest_free_block);
         ESP_LOGI(TAG, "NVS Free Entries: %u", nvs_stats.free_entries);
         ESP_LOGI(TAG, "NVS Used Entries: %u", nvs_stats.used_entries);
         ESP_LOGI(TAG, "Loop Count: %d", cnt++);

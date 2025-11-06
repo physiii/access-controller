@@ -1,285 +1,323 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Access Controller</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Access Controller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function ensureTrailingSlash() {
+      var path = window.location.pathname || '';
+      if (path && !path.endsWith('/')) {
+        var redirect = path + '/' + (window.location.search || '') + (window.location.hash || '');
+        window.location.replace(redirect);
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="titleDiv">
-        <h1>Access Controller</h1>
+  <header class="app-bar">
+    <div class="app-brand">
+      <span class="app-title">Access Controller</span>
+      <span class="app-subtitle">Device Manager</span>
     </div>
+  </header>
 
-    <!-- Device Info -->
-	<div class="table-container">
-		<table>
-			<thead>
-				<tr>
-					<th colspan="2">Device Info</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>UUID</td>
-					<td id="uuid" name="uuid"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+  <nav class="nav-tabs" aria-label="Primary navigation">
+    <button class="nav-item active" data-target="device" type="button">Device</button>
+    <button class="nav-item" data-target="system" type="button">System</button>
+    <button class="nav-item" data-target="settings" type="button">Settings</button>
+  </nav>
 
-	<!-- Channel 1 -->
-	<div class="table-container">
-		<table>
-			<thead>
-				<tr>
-					<th colspan="2">Channel 1</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Enable or disable lock</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableLock_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Arm or disarm the lock</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="arm_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Enable or disable contact alerts</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableContactAlert_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Enable or disable exit button</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableExit_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Alert when exit button is pressed</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="alertExit_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Enable or disable FOB button</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableFob_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Alert when remote FOB is used</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="alertFob_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>FOB Latch</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="latchFob_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Set polarity</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="polarity_1">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Time for system to re-arm after pulsed in seconds</td>
-					<td>
-						<input id="armDelay_1" type="number" value="5">
-						<button id="relock" type="button">Save</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+  <main class="page-container">
+    <section id="page-device" class="page active" aria-labelledby="device-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="device-heading">Relay Channels</h2>
+            <p class="subtitle">Control locks, exit buttons, and FOB inputs per channel.</p>
+          </div>
+        </div>
+        <div class="channel-grid">
+          <div class="channel-card" data-channel="1">
+            <div class="card-section-header">
+              <h3>Channel 1</h3>
+            </div>
+            <div class="control-section">
+              <h4>Lock</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableLock_1">
+                <span>Enable lock</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="arm_1">
+                <span>Arm lock</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="enableContactAlert_1">
+                <span>Contact alert</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="polarity_1">
+                <span>Reverse polarity</span>
+              </label>
+            </div>
+            <div class="control-section">
+              <h4>Exit</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableExit_1">
+                <span>Enable exit button</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="alertExit_1">
+                <span>Exit button alert</span>
+              </label>
+              <div class="input-row">
+                <label for="armDelay_1">Re-arm delay (seconds)</label>
+                <div class="input-group">
+                  <input type="number" id="armDelay_1" min="0" step="1" value="5">
+                  <button id="relock" type="button" class="secondary">Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="control-section">
+              <h4>Keypad</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableKeypad_1">
+                <span>Enable keypad</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="alertKeypad_1">
+                <span>Keypad alert</span>
+              </label>
+              <div class="input-row">
+                <label for="keypadDelay_1">Re-arm delay (seconds)</label>
+                <div class="input-group">
+                  <input type="number" id="keypadDelay_1" min="0" step="1" value="5">
+                  <button id="keypadSave_1" type="button" class="secondary">Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="control-section">
+              <h4>FOB</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableFob_1">
+                <span>Enable FOB button</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="alertFob_1">
+                <span>FOB alert</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="latchFob_1">
+                <span>FOB latch</span>
+              </label>
+            </div>
+          </div>
 
+          <div class="channel-card" data-channel="2">
+            <div class="card-section-header">
+              <h3>Channel 2</h3>
+            </div>
+            <div class="control-section">
+              <h4>Lock</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableLock_2">
+                <span>Enable lock</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="arm_2">
+                <span>Arm lock</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="enableContactAlert_2">
+                <span>Contact alert</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="polarity_2">
+                <span>Reverse polarity</span>
+              </label>
+            </div>
+            <div class="control-section">
+              <h4>Exit</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableExit_2">
+                <span>Enable exit button</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="alertExit_2">
+                <span>Exit button alert</span>
+              </label>
+              <div class="input-row">
+                <label for="armDelay_2">Re-arm delay (seconds)</label>
+                <div class="input-group">
+                  <input type="number" id="armDelay_2" min="0" step="1" value="5">
+                  <button id="relock_2" type="button" class="secondary">Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="control-section">
+              <h4>Keypad</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableKeypad_2">
+                <span>Enable keypad</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="alertKeypad_2">
+                <span>Keypad alert</span>
+              </label>
+              <div class="input-row">
+                <label for="keypadDelay_2">Re-arm delay (seconds)</label>
+                <div class="input-group">
+                  <input type="number" id="keypadDelay_2" min="0" step="1" value="5">
+                  <button id="keypadSave_2" type="button" class="secondary">Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="control-section">
+              <h4>FOB</h4>
+              <label class="form-switch">
+                <input type="checkbox" id="enableFob_2">
+                <span>Enable FOB button</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="alertFob_2">
+                <span>FOB alert</span>
+              </label>
+              <label class="form-switch">
+                <input type="checkbox" id="latchFob_2">
+                <span>FOB latch</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
 
-	<!-- Channel 2 -->
-	<div class="table-container">
-		<table>
-			<thead>
-				<tr>
-					<th colspan="2">Channel 2</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Enable or disable lock</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableLock_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Arm or disarm the lock</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="arm_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Enable or disable contact alerts</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableContactAlert_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Enable or disable exit button</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableExit_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Alert when exit button is pressed</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="alertExit_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Enable or disable FOB button</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="enableFob_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Alert when remote FOB is used</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="alertFob_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>FOB Latch</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="latchFob_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Set polarity</td>
-					<td>
-						<label class="switch">
-							<input type="checkbox" id="polarity_2">
-							<span class="slider round"></span>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Time for system to re-arm after pulsed in seconds</td>
-					<td>
-						<input id="armDelay_2" type="number" value="5">
-						<button id="relock_2" type="button">Save</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-    <!-- WiFi Settings -->
-	<div class="table-container">
-		<form id="wifiForm">
-			<table>
-				<thead>
-					<tr>
-						<th colspan="2">WiFi Settings</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>WiFi Name:</td>
-						<td><input type="text" id="wifiName" placeholder="Enter WiFi Name" /></td>
-					</tr>
-					<tr>
-						<td>Password:</td>
-						<td><input type="password" id="wifiPassword" placeholder="Enter Password" /></td>
-					</tr>
-					<tr>
-						<td colspan="2"><button type="submit">Submit</button></td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>	
+      <div class="card" id="wiegand-card">
+        <div class="card-header">
+          <div>
+            <h2>Wiegand</h2>
+            <p class="subtitle">Register RFID taps and keypad identifiers.</p>
+          </div>
+          <div class="card-actions">
+            <select id="wiegandChannelSelect" aria-label="Wiegand channel">
+              <option value="0">All channels</option>
+              <option value="1">Channel 1</option>
+              <option value="2">Channel 2</option>
+            </select>
+            <button id="wiegandRegisterBtn" type="button">Register</button>
+            <button id="wiegandStopBtn" type="button" class="secondary">Stop</button>
+          </div>
+        </div>
+        <div class="status-grid">
+          <div>
+            <span class="label">Status</span>
+            <span id="wiegandStatus" class="value">Inactive</span>
+          </div>
+          <div>
+            <span class="label">Pending</span>
+            <span id="wiegandPending" class="value">0</span>
+          </div>
+          <div>
+            <span class="label">Last duplicate</span>
+            <span id="wiegandDuplicate" class="value muted">None</span>
+          </div>
+        </div>
+        <div id="wiegandUserList" class="wiegand-user-list"></div>
+      </div>
 
-    <!-- Server Info -->
-	<div class="table-container">
-		<form id="serverForm">
-			<table>
-				<thead>
-					<tr>
-						<th colspan="2">Server Info</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>IP Address:</td>
-						<td><input type="text" id="ipAddress" placeholder="Enter IP Address" /></td>
-					</tr>
-					<tr>
-						<td>Port:</td>
-						<td><input type="text" id="port" placeholder="Enter Port" /></td>
-					</tr>
-					<tr>
-						<td colspan="2"><button type="submit">Submit</button></td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-    
-    <script src="script.js"></script>
+      <div class="card" id="keypad-card">
+        <div class="card-header">
+          <div>
+            <h2>Keypad Codes</h2>
+            <p class="subtitle">Manage keypad timers and alerts.</p>
+          </div>
+        </div>
+        <div id="keypadContent" class="keypad-content">
+          <p class="muted">Keypad configuration coming soon.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-system" class="page" aria-labelledby="system-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="system-heading">System Overview</h2>
+            <p class="subtitle">Hardware identity and diagnostics.</p>
+          </div>
+        </div>
+        <div class="info-list">
+          <div class="info-row">
+            <span class="label">UUID</span>
+            <span class="value" id="uuid">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Recent Activity</h2>
+            <p class="subtitle">Latest controller events (most recent first).</p>
+          </div>
+        </div>
+        <div id="systemLogs" class="log-list">
+          <p class="muted" id="logEmptyState">No activity recorded yet.</p>
+          <ul id="logItems" class="log-items" hidden></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-settings" class="page" aria-labelledby="settings-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="settings-heading">Wi-Fi Settings</h2>
+            <p class="subtitle">Update network credentials for station mode.</p>
+          </div>
+        </div>
+        <form id="wifiForm" class="form">
+          <label class="form-field">
+            <span>Wi-Fi name (SSID)</span>
+            <input type="text" id="wifiName" placeholder="Network name">
+          </label>
+          <label class="form-field">
+            <span>Password</span>
+            <input type="password" id="wifiPassword" placeholder="Password">
+          </label>
+          <div class="form-actions">
+            <button type="submit">Save Wi-Fi</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Server Settings</h2>
+            <p class="subtitle">Define upstream controller IP and port.</p>
+          </div>
+        </div>
+        <form id="serverForm" class="form">
+          <label class="form-field">
+            <span>Server IP</span>
+            <input type="text" id="ipAddress" placeholder="192.168.1.100">
+          </label>
+          <label class="form-field">
+            <span>Server port</span>
+            <input type="text" id="port" placeholder="9000">
+          </label>
+          <div class="form-actions">
+            <button type="submit">Save Server</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="script.js"></script>
 </body>
 </html>

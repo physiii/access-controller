@@ -4,18 +4,28 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "cJSON.h"
+#include "freertos/semphr.h"
 
 #include "automation.h"
 
 static const char *API_TAG = "api_server";
 
+#define STATE_RESPONSE_BUFFER_SIZE 24576
+
+static SemaphoreHandle_t s_response_mutex;
+static char s_state_response_buffer[STATE_RESPONSE_BUFFER_SIZE];
+
 extern cJSON *lock_state_snapshot(void);
 extern cJSON *exit_state_snapshot(void);
 extern cJSON *fob_state_snapshot(void);
+extern cJSON *keypad_state_snapshot(void);
+extern cJSON *wiegand_state_snapshot(void);
+extern cJSON *system_logs_snapshot(void);
 
 extern void handle_lock_message(cJSON *payload);
 extern void handle_exit_message(cJSON *payload);
 extern void handle_fob_message(cJSON *payload);
+extern void handle_keypad_message(cJSON *payload);
 extern void handle_authorize_message(cJSON *payload);
 
 extern char device_id[100];
@@ -50,6 +60,24 @@ static cJSON *build_state_snapshot(void) {
     }
     cJSON_AddItemToObject(root, "fobs", fobs);
 
+    cJSON *keypads = keypad_state_snapshot();
+    if (!keypads) {
+        keypads = cJSON_CreateArray();
+    }
+    cJSON_AddItemToObject(root, "keypads", keypads);
+
+    cJSON *wiegand = wiegand_state_snapshot();
+    if (!wiegand) {
+        wiegand = cJSON_CreateObject();
+    }
+    cJSON_AddItemToObject(root, "wiegand", wiegand);
+
+    cJSON *logs = system_logs_snapshot();
+    if (!logs) {
+        logs = cJSON_CreateArray();
+    }
+    cJSON_AddItemToObject(root, "logs", logs);
+
     return root;
 }
 
@@ -58,17 +86,83 @@ static esp_err_t send_json_response(httpd_req_t *req, cJSON *json) {
         return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to build JSON response");
     }
 
-    char *resp_str = cJSON_PrintUnformatted(json);
-    if (!resp_str) {
-        cJSON_Delete(json);
-        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to serialise JSON");
+    bool used_preallocated = false;
+    bool mutex_held = false;
+    char *resp_str = NULL;
+
+    if (!s_response_mutex) {
+        s_response_mutex = xSemaphoreCreateMutex();
     }
 
+    if (s_response_mutex && xSemaphoreTake(s_response_mutex, pdMS_TO_TICKS(500)) == pdTRUE) {
+        mutex_held = true;
+        if (cJSON_PrintPreallocated(json, s_state_response_buffer, STATE_RESPONSE_BUFFER_SIZE, false)) {
+            resp_str = s_state_response_buffer;
+            used_preallocated = true;
+        }
+    }
+
+    if (!resp_str) {
+        resp_str = cJSON_PrintUnformatted(json);
+        if (!resp_str) {
+            if (mutex_held) {
+                xSemaphoreGive(s_response_mutex);
+            }
+            cJSON_Delete(json);
+            return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to serialise JSON");
+        }
+    }
+
+    size_t resp_len = strlen(resp_str);
+    ESP_LOGI(API_TAG, "state response size=%zu (prealloc=%s)", resp_len, used_preallocated ? "yes" : "no");
+
     httpd_resp_set_type(req, "application/json");
-    esp_err_t result = httpd_resp_send(req, resp_str, HTTPD_RESP_USE_STRLEN);
+    esp_err_t result = httpd_resp_send(req, resp_str, resp_len);
     cJSON_Delete(json);
-    free(resp_str);
+    if (!used_preallocated) {
+        free(resp_str);
+    }
+    if (mutex_held) {
+        xSemaphoreGive(s_response_mutex);
+    }
     return result;
+}
+
+static esp_err_t read_json_body(httpd_req_t *req, cJSON **out_payload) {
+    if (!out_payload) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    const size_t max_len = 4096;
+    int total_len = req->content_len;
+    if (total_len <= 0 || total_len > (int)max_len) {
+        ESP_LOGE(API_TAG, "Invalid JSON body length: %d", total_len);
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    char *buf = malloc(total_len + 1);
+    if (!buf) {
+        return ESP_ERR_NO_MEM;
+    }
+
+    int received = 0;
+    while (received < total_len) {
+        int ret = httpd_req_recv(req, buf + received, total_len - received);
+        if (ret <= 0) {
+            free(buf);
+            return ESP_FAIL;
+        }
+        received += ret;
+    }
+    buf[total_len] = '\0';
+
+    cJSON *payload = cJSON_Parse(buf);
+    free(buf);
+    if (!payload) {
+        return ESP_ERR_INVALID_RESPONSE;
+    }
+
+    *out_payload = payload;
+    return ESP_OK;
 }
 
 static esp_err_t api_state_get_handler(httpd_req_t *req) {
@@ -134,6 +228,12 @@ static void fob_message_wrapper(cJSON *payload) {
     }
 }
 
+static void keypad_message_wrapper(cJSON *payload) {
+    if (payload) {
+        handle_keypad_message(payload);
+    }
+}
+
 static esp_err_t api_lock_post_handler(httpd_req_t *req) {
     return handle_json_post(req, lock_message_wrapper, lock_state_snapshot);
 }
@@ -146,6 +246,10 @@ static esp_err_t api_fob_post_handler(httpd_req_t *req) {
     return handle_json_post(req, fob_message_wrapper, fob_state_snapshot);
 }
 
+static esp_err_t api_keypad_post_handler(httpd_req_t *req) {
+    return handle_json_post(req, keypad_message_wrapper, keypad_state_snapshot);
+}
+
 static esp_err_t api_wifi_post_handler(httpd_req_t *req) {
     return handle_json_post(req, handle_authorize_message, build_state_snapshot);
 }
@@ -153,6 +257,7 @@ static esp_err_t api_wifi_post_handler(httpd_req_t *req) {
 static esp_err_t api_server_post_handler(httpd_req_t *req) {
     return handle_json_post(req, handle_authorize_message, build_state_snapshot);
 }
+
 
 static esp_err_t api_favicon_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "image/x-icon");
@@ -187,6 +292,13 @@ void register_api_routes(httpd_handle_t server) {
         .handler = api_fob_post_handler,
     };
     httpd_register_uri_handler(server, &fob_post);
+
+    httpd_uri_t keypad_post = {
+        .uri = "/api/keypad",
+        .method = HTTP_POST,
+        .handler = api_keypad_post_handler,
+    };
+    httpd_register_uri_handler(server, &keypad_post);
 
     httpd_uri_t wifi_post = {
         .uri = "/api/wifi",
