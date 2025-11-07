@@ -2489,6 +2489,10 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 5d92a6da-f01c-4a5e-844b-56f41203d337)
   )
+  (label "WG0_DATA_SENSE1" (at 71.5772 152.9842 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 5e316c14-ad57-4d51-8194-f5e57d4fa486)
+  )
   (label "KEYPAD1_SENSE" (at 173.6598 119.634 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 5e605035-3612-4905-9586-115c6a85da80)
@@ -2597,6 +2601,10 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 811f5389-c208-4640-ab1a-b454491bb330)
   )
+  (label "WG0_DATA_SENSE0" (at 71.5772 150.6982 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 81f570d8-cad3-4ef1-b3d5-e03d1626a3ef)
+  )
   (label "FOB1" (at 378.079 131.953 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 838ca9b6-65a6-4914-b5be-2ab512589b1a)
@@ -2668,6 +2676,10 @@
   (label "POWER" (at 147.3454 71.2724 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 9e3920d6-0267-4537-98c8-12eb0d3a8b38)
+  )
+  (label "WG1_DATA_SENSE0" (at 71.5772 155.3972 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 9f057e64-e231-48da-9aa1-f39a6022e8c5)
   )
   (label "SDA" (at 47.244 151.765 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right bottom))
@@ -2776,6 +2788,10 @@
   (label "EXIT0_SENSE" (at 173.6598 147.574 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid d90df05a-3b1d-488f-ba66-64ba8e04ec68)
+  )
+  (label "WG1_DATA_SENSE1" (at 71.5772 157.6832 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid dcb576ae-883e-4dd1-96ed-1f843bde0291)
   )
   (label "EXIT0_SENSE" (at 251.9934 163.3728 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
@@ -3235,7 +3251,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 377.19 40.894 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 023377ae-7508-457c-a1f4-207d318f568b)
-    (property "Reference" "R11" (at 377.19 42.164 90)
+    (property "Reference" "R4" (at 377.19 42.164 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 379.3236 43.4848 90)
@@ -3257,9 +3273,6 @@
     (pin "2" (uuid c360d865-dd83-4216-acac-7cc6868cc456))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R4") (unit 1)
         )
@@ -3328,7 +3341,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 379.857 183.007 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0a1d6e48-4768-4ea8-a005-2edadf5cc84d)
-    (property "Reference" "R11" (at 379.857 184.277 90)
+    (property "Reference" "R34" (at 379.857 184.277 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 381.9906 185.5978 90)
@@ -3350,9 +3363,6 @@
     (pin "2" (uuid 606a3c75-bb3b-4be0-a37f-46aa4da7c09c))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R34") (unit 1)
         )
@@ -3446,7 +3456,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 316.484 64.516 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 164c793d-b4d9-4660-b0a3-a95c13777e40)
-    (property "Reference" "D4" (at 317.8048 62.6618 90)
+    (property "Reference" "D20" (at 317.8048 62.6618 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 317.9318 64.7954 90)
@@ -3468,9 +3478,6 @@
     (pin "2" (uuid cc681406-9722-4aeb-9d34-4e80b6b674bf))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D20") (unit 1)
         )
@@ -3516,7 +3523,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 305.816 209.296 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2042939d-5207-4c3d-9213-06675063ba69)
-    (property "Reference" "R11" (at 305.816 210.566 90)
+    (property "Reference" "R74" (at 305.816 210.566 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 307.9496 211.8868 90)
@@ -3538,9 +3545,6 @@
     (pin "2" (uuid 7f0158dc-f432-4153-8509-cc1ffb142a31))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R74") (unit 1)
         )
@@ -3551,7 +3555,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 316.357 29.21 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 20fa2150-dce2-4882-964d-e0fa390ce03f)
-    (property "Reference" "D4" (at 317.6778 27.3558 90)
+    (property "Reference" "D18" (at 317.6778 27.3558 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 317.8048 29.4894 90)
@@ -3573,9 +3577,6 @@
     (pin "2" (uuid fe779266-7afb-4bb6-92c0-93be217f7e18))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D18") (unit 1)
         )
@@ -3636,7 +3637,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 311.785 175.768 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 25b22138-53cf-4de0-9e96-3f0aa868fb7a)
-    (property "Reference" "R11" (at 311.785 177.038 90)
+    (property "Reference" "R82" (at 311.785 177.038 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 313.9186 178.3588 90)
@@ -3658,9 +3659,6 @@
     (pin "2" (uuid 30e61fd7-b88e-4dc7-bba6-c757052b30a2))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R82") (unit 1)
         )
@@ -3696,7 +3694,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 305.816 199.136 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2916b902-b2df-4dd5-a82f-d2d408f997e4)
-    (property "Reference" "D4" (at 307.1368 197.2818 90)
+    (property "Reference" "D26" (at 307.1368 197.2818 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 307.2638 199.4154 90)
@@ -3718,9 +3716,6 @@
     (pin "2" (uuid 23ccbab9-d755-4f13-b14d-6ed266308be1))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D26") (unit 1)
         )
@@ -3731,7 +3726,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 311.785 165.608 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3069353f-7642-4b1f-befd-b4074f7c8d12)
-    (property "Reference" "D4" (at 313.1058 163.7538 90)
+    (property "Reference" "D34" (at 313.1058 163.7538 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 313.2328 165.8874 90)
@@ -3753,9 +3748,6 @@
     (pin "2" (uuid 74f552b2-8196-48af-b216-95096e9be2ad))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D34") (unit 1)
         )
@@ -3766,7 +3758,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 378.079 146.685 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 342a3173-82bc-4905-9cd1-bcf8bec0ce6b)
-    (property "Reference" "R11" (at 378.079 147.955 90)
+    (property "Reference" "R33" (at 378.079 147.955 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 380.2126 149.2758 90)
@@ -3788,9 +3780,6 @@
     (pin "2" (uuid 5191372e-4601-45e5-b66b-dd7914eddc5e))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R33") (unit 1)
         )
@@ -3974,7 +3963,7 @@
   (symbol (lib_name "Q_MMBT5551_1") (lib_id "Open_Automation:Q_MMBT5551") (at 97.282 29.464 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 487e41fd-e3b7-4573-9890-85d1245e5a58)
-    (property "Reference" "Q14" (at 102.1334 28.2956 0)
+    (property "Reference" "Q3" (at 102.1334 28.2956 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Q_MMBT5551" (at 102.1334 30.607 0)
@@ -3997,9 +3986,6 @@
     (pin "3" (uuid 12652f68-c5c4-4cf7-a7c1-657402d9df58))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/005469d7-c68b-49c4-bf56-ec8dda5800ff"
-          (reference "Q14") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "Q3") (unit 1)
         )
@@ -4010,7 +3996,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 384.556 203.073 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4f923d37-7555-4213-8719-d687b74eb44f)
-    (property "Reference" "D4" (at 385.8768 201.2188 90)
+    (property "Reference" "D29" (at 385.8768 201.2188 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 386.0038 203.3524 90)
@@ -4032,9 +4018,6 @@
     (pin "2" (uuid 52c0e05b-1a4a-4b2b-a025-588b2c59aaaa))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D29") (unit 1)
         )
@@ -4080,7 +4063,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 45.593 86.36 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 550b2368-e09f-41eb-a359-569ca15bf1c5)
-    (property "Reference" "R11" (at 45.593 87.63 90)
+    (property "Reference" "R1" (at 45.593 87.63 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 47.7266 88.9508 90)
@@ -4102,9 +4085,6 @@
     (pin "2" (uuid c979e35c-26bf-4a19-bfcd-bf6a98a75b23))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R1") (unit 1)
         )
@@ -4115,7 +4095,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 377.317 75.311 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 587b789d-1603-4da7-82ec-1d22e4a3f436)
-    (property "Reference" "R11" (at 377.317 76.581 90)
+    (property "Reference" "R2" (at 377.317 76.581 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 379.4506 77.9018 90)
@@ -4137,9 +4117,6 @@
     (pin "2" (uuid 3fb6432f-2db0-4b75-a961-8eae7af78916))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R2") (unit 1)
         )
@@ -4150,7 +4127,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 378.079 136.525 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5be58c65-bad4-429d-a62d-dd644bc4eddb)
-    (property "Reference" "D4" (at 379.3998 134.6708 90)
+    (property "Reference" "D22" (at 379.3998 134.6708 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 379.5268 136.8044 90)
@@ -4172,9 +4149,6 @@
     (pin "2" (uuid 3a6278d4-4729-4bd9-9598-57cda07c069c))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D22") (unit 1)
         )
@@ -4210,7 +4184,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 397.256 177.165 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6138b54a-8807-4732-9cec-efeb706b04e2)
-    (property "Reference" "R11" (at 397.256 178.435 90)
+    (property "Reference" "R79" (at 397.256 178.435 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 399.3896 179.7558 90)
@@ -4232,9 +4206,6 @@
     (pin "2" (uuid fc90e5aa-fe39-4bb1-a598-ae58c3f2675c))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R79") (unit 1)
         )
@@ -4245,7 +4216,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 302.641 167.894 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 61427815-9489-406c-a9a3-da1ea3afc526)
-    (property "Reference" "D4" (at 303.9618 166.0398 90)
+    (property "Reference" "D33" (at 303.9618 166.0398 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 304.0888 168.1734 90)
@@ -4267,9 +4238,6 @@
     (pin "2" (uuid 86f53d91-8fec-491e-a1c7-474ec77c70cb))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D33") (unit 1)
         )
@@ -4280,7 +4248,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 316.357 39.37 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 614e81e6-c10e-4b86-bcb4-1457d533d123)
-    (property "Reference" "R11" (at 316.357 40.64 90)
+    (property "Reference" "R3" (at 316.357 40.64 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 318.4906 41.9608 90)
@@ -4302,9 +4270,6 @@
     (pin "2" (uuid 860e14ac-bd64-4da3-b5b2-41a431edb505))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R3") (unit 1)
         )
@@ -4340,7 +4305,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 315.341 211.455 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 62402662-73b4-4c4d-846c-cc6dde98ee4e)
-    (property "Reference" "R11" (at 315.341 212.725 90)
+    (property "Reference" "R78" (at 315.341 212.725 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 317.4746 214.0458 90)
@@ -4362,9 +4327,6 @@
     (pin "2" (uuid 0de9d0b3-c477-4337-873c-2661165feca7))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R78") (unit 1)
         )
@@ -4375,7 +4337,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 294.386 171.45 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6985a57f-7d32-481b-adba-9b0a235602dc)
-    (property "Reference" "D4" (at 295.7068 169.5958 90)
+    (property "Reference" "D32" (at 295.7068 169.5958 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 295.8338 171.7294 90)
@@ -4397,9 +4359,6 @@
     (pin "2" (uuid 26b13253-499f-4a86-a8d3-fcf12e100ccf))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D32") (unit 1)
         )
@@ -4435,7 +4394,7 @@
   (symbol (lib_id "power:GND") (at 99.822 35.814 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6d6a83dd-a1f8-4601-932f-05b26ca0e7b6)
-    (property "Reference" "#PWR087" (at 99.822 42.164 0)
+    (property "Reference" "#PWR055" (at 99.822 42.164 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 99.822 39.624 0)
@@ -4450,9 +4409,6 @@
     (pin "1" (uuid 380b86c4-cd11-4df3-85a7-f6d922eb3aae))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/005469d7-c68b-49c4-bf56-ec8dda5800ff"
-          (reference "#PWR087") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "#PWR055") (unit 1)
         )
@@ -4522,7 +4478,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 294.386 181.61 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 75da3a6b-4896-4ad8-a962-8368f3cc49c4)
-    (property "Reference" "R11" (at 294.386 182.88 90)
+    (property "Reference" "R80" (at 294.386 182.88 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 296.5196 184.2008 90)
@@ -4544,9 +4500,6 @@
     (pin "2" (uuid 120c5e02-18b7-4f0f-ab3f-c820ffac8986))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R80") (unit 1)
         )
@@ -4723,7 +4676,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 45.593 76.2 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8d5c68f7-eece-4f43-a6f9-e6f37fc04ead)
-    (property "Reference" "D4" (at 46.9138 74.3458 90)
+    (property "Reference" "D2" (at 46.9138 74.3458 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 47.0408 76.4794 90)
@@ -4745,9 +4698,6 @@
     (pin "2" (uuid 462fd2e2-357c-4f46-ac92-fa5e537d6b73))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D2") (unit 1)
         )
@@ -4901,7 +4851,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 377.952 112.268 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9eb35121-3e78-461b-b4ea-78d9b67b9851)
-    (property "Reference" "R11" (at 377.952 113.538 90)
+    (property "Reference" "R32" (at 377.952 113.538 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 380.0856 114.8588 90)
@@ -4923,9 +4873,6 @@
     (pin "2" (uuid ad2a295f-0cb6-4dee-b875-71033ca53a44))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R32") (unit 1)
         )
@@ -4936,7 +4883,7 @@
   (symbol (lib_name "R_100_1") (lib_id "Open_Automation:R_100") (at 87.122 29.464 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a109b3e9-3af9-4e44-84fa-27480bb63f40)
-    (property "Reference" "R63" (at 87.122 29.464 90)
+    (property "Reference" "R31" (at 87.122 29.464 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "R_100" (at 87.122 32.004 90)
@@ -4958,9 +4905,6 @@
     (pin "2" (uuid 2ad1a77e-5b85-4401-ad30-64dbcccdc1ab))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/005469d7-c68b-49c4-bf56-ec8dda5800ff"
-          (reference "R63") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R31") (unit 1)
         )
@@ -4996,7 +4940,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 388.112 169.291 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a2bc4ae6-b69a-4de2-8371-1927013ad3fb)
-    (property "Reference" "D4" (at 389.4328 167.4368 90)
+    (property "Reference" "D25" (at 389.4328 167.4368 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 389.5598 169.5704 90)
@@ -5018,9 +4962,6 @@
     (pin "2" (uuid 5e86051d-09c9-4832-9be5-6ddefaeca82b))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D25") (unit 1)
         )
@@ -5096,7 +5037,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 377.317 65.151 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ae9fbe6a-8744-44a6-b9fd-a575061e524b)
-    (property "Reference" "D4" (at 378.6378 63.2968 90)
+    (property "Reference" "D13" (at 378.6378 63.2968 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 378.7648 65.4304 90)
@@ -5118,9 +5059,6 @@
     (pin "2" (uuid 05ae3e1a-f9cb-4742-87ec-8572870f1937))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D13") (unit 1)
         )
@@ -5131,7 +5069,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 311.404 99.06 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b5254c2b-363a-4041-9286-de72446afad6)
-    (property "Reference" "D4" (at 312.7248 97.2058 90)
+    (property "Reference" "D27" (at 312.7248 97.2058 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 312.8518 99.3394 90)
@@ -5153,9 +5091,6 @@
     (pin "2" (uuid d0498d17-a7da-4db5-8433-d248601a623c))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D27") (unit 1)
         )
@@ -5166,7 +5101,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 388.112 179.451 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid babcc399-22cd-4e7f-912d-aaf5127e3300)
-    (property "Reference" "R11" (at 388.112 180.721 90)
+    (property "Reference" "R36" (at 388.112 180.721 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 390.2456 182.0418 90)
@@ -5188,9 +5123,6 @@
     (pin "2" (uuid fbecdd67-1846-48b3-b8e3-662a18a588f1))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R36") (unit 1)
         )
@@ -5201,7 +5133,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 302.641 178.054 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bad9a121-3bff-4792-8f96-0d5e91df46c9)
-    (property "Reference" "R11" (at 302.641 179.324 90)
+    (property "Reference" "R81" (at 302.641 179.324 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 304.7746 180.6448 90)
@@ -5223,9 +5155,6 @@
     (pin "2" (uuid abbecc44-128b-4e66-af89-55c102ca6d2c))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R81") (unit 1)
         )
@@ -5261,7 +5190,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 311.531 143.637 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c44cc9e0-17e9-4764-9fc6-7c6bd37bec8c)
-    (property "Reference" "R11" (at 311.531 144.907 90)
+    (property "Reference" "R76" (at 311.531 144.907 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 313.6646 146.2278 90)
@@ -5283,9 +5212,6 @@
     (pin "2" (uuid 355a1397-5b93-4bc1-a741-9b8dd1a8a2a8))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R76") (unit 1)
         )
@@ -5354,7 +5280,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 379.857 172.847 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid cff93ca4-df68-4889-8507-40ec3d111c1f)
-    (property "Reference" "D4" (at 381.1778 170.9928 90)
+    (property "Reference" "D23" (at 381.1778 170.9928 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 381.3048 173.1264 90)
@@ -5376,9 +5302,6 @@
     (pin "2" (uuid f2b90235-1ab7-4f78-8f5a-3a2f9ac97fc6))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D23") (unit 1)
         )
@@ -5464,7 +5387,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 311.404 109.22 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid da1eb780-3361-4477-aa26-f3ea9feb8f3f)
-    (property "Reference" "R11" (at 311.404 110.49 90)
+    (property "Reference" "R75" (at 311.404 110.49 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 313.5376 111.8108 90)
@@ -5486,9 +5409,6 @@
     (pin "2" (uuid 6362b817-0a53-47fa-97a0-c7df230349f6))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R75") (unit 1)
         )
@@ -5499,7 +5419,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 375.031 211.074 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid dba651c3-a2c1-48fe-a412-eb3dea7c36dd)
-    (property "Reference" "R11" (at 375.031 212.344 90)
+    (property "Reference" "R35" (at 375.031 212.344 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 377.1646 213.6648 90)
@@ -5521,9 +5441,6 @@
     (pin "2" (uuid 8bc5647f-1cf4-4939-aec8-b4c5c2cef87e))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R35") (unit 1)
         )
@@ -5559,7 +5476,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 397.256 167.005 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e562d5f6-aae3-4509-95a9-9fd5ae8a5882)
-    (property "Reference" "D4" (at 398.5768 165.1508 90)
+    (property "Reference" "D31" (at 398.5768 165.1508 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 398.7038 167.2844 90)
@@ -5581,9 +5498,6 @@
     (pin "2" (uuid f3e56507-77c2-4f5f-bae0-c656da63df18))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D31") (unit 1)
         )
@@ -5632,7 +5546,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 316.484 74.676 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ed3d44be-ed80-4004-8eed-34067c1d6ec6)
-    (property "Reference" "R11" (at 316.484 75.946 90)
+    (property "Reference" "R5" (at 316.484 75.946 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 318.6176 77.2668 90)
@@ -5654,9 +5568,6 @@
     (pin "2" (uuid 00833b9c-638d-47b5-9fe7-7dba41f758b2))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R5") (unit 1)
         )
@@ -5667,7 +5578,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 377.952 102.108 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid edc93615-e058-4fbd-ad4a-f27350b323bc)
-    (property "Reference" "D4" (at 379.2728 100.2538 90)
+    (property "Reference" "D21" (at 379.2728 100.2538 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 379.3998 102.3874 90)
@@ -5689,9 +5600,6 @@
     (pin "2" (uuid 660d2f61-b896-4b2d-9a9e-209ecea964aa))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D21") (unit 1)
         )
@@ -5734,7 +5642,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 315.341 201.295 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid efae6f50-6c90-4f06-859a-072fdda3ee58)
-    (property "Reference" "D4" (at 316.6618 199.4408 90)
+    (property "Reference" "D30" (at 316.6618 199.4408 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 316.7888 201.5744 90)
@@ -5756,9 +5664,6 @@
     (pin "2" (uuid dd385b13-540e-465d-abd8-adb82fb0b106))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D30") (unit 1)
         )
@@ -5769,7 +5674,7 @@
   (symbol (lib_name "R_10K_0402_3") (lib_id "Open_Automation:R_10K_0402") (at 384.556 213.233 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f800535f-d9a2-4245-bcd4-96c766327689)
-    (property "Reference" "R11" (at 384.556 214.503 90)
+    (property "Reference" "R77" (at 384.556 214.503 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 386.6896 215.8238 90)
@@ -5791,9 +5696,6 @@
     (pin "2" (uuid 76ab6446-0301-49f7-af4a-b6d19275b218))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R11") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "R77") (unit 1)
         )
@@ -5804,7 +5706,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 377.19 30.734 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f9fbc8ff-3972-4d4a-902f-9b01247bfafc)
-    (property "Reference" "D4" (at 378.5108 28.8798 90)
+    (property "Reference" "D19" (at 378.5108 28.8798 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 378.6378 31.0134 90)
@@ -5826,9 +5728,6 @@
     (pin "2" (uuid a7f28576-d4a9-4e95-a288-6997ff41cfd1))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D19") (unit 1)
         )
@@ -5839,7 +5738,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 311.531 133.477 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fa357b6c-8df6-4fd8-aec3-d656884722b5)
-    (property "Reference" "D4" (at 312.8518 131.6228 90)
+    (property "Reference" "D28" (at 312.8518 131.6228 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 312.9788 133.7564 90)
@@ -5861,9 +5760,6 @@
     (pin "2" (uuid 00a4e977-fccd-46ad-8e48-3d5b3d9a9c0d))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D28") (unit 1)
         )
@@ -5874,7 +5770,7 @@
   (symbol (lib_id "open_automation:LED-0603-W") (at 375.031 200.914 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fcd52a18-d415-440f-b0fe-c5a23c189aa4)
-    (property "Reference" "D4" (at 376.3518 199.0598 90)
+    (property "Reference" "D24" (at 376.3518 199.0598 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "White" (at 376.4788 201.1934 90)
@@ -5896,9 +5792,6 @@
     (pin "2" (uuid 83471d8f-a0dd-4274-9c83-b2b69082dc5c))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "D4") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
           (reference "D24") (unit 1)
         )

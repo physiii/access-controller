@@ -76,7 +76,8 @@ static void assign_defaults(wiegand_user_t *user) {
         snprintf(user->name, sizeof(user->name), "User %lu", (unsigned long)(user->sequence + 1));
     }
     if (user->status != WIEGAND_USER_STATUS_ACTIVE &&
-        user->status != WIEGAND_USER_STATUS_DISABLED) {
+        user->status != WIEGAND_USER_STATUS_DISABLED &&
+        user->status != WIEGAND_USER_STATUS_PENDING) {
         user->status = WIEGAND_USER_STATUS_ACTIVE;
     }
 }
@@ -383,7 +384,7 @@ esp_err_t wiegand_registry_add(const char *code, uint8_t channel, wiegand_user_t
 
     wiegand_user_t user = {
         .channel = channel,
-        .status = WIEGAND_USER_STATUS_ACTIVE,
+        .status = WIEGAND_USER_STATUS_PENDING,
         .sequence = next_sequence(),
         .created_at_ms = current_time_ms(),
         .updated_at_ms = current_time_ms(),

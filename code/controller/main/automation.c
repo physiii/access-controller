@@ -46,6 +46,11 @@ static size_t s_system_log_count = 0;
 static size_t s_system_log_next = 0;
 static bool s_ntp_synced = false;
 static int64_t s_unix_offset = 0;
+static bool s_shutdown_handler_registered = false;
+
+static void automation_shutdown_handler(void) {
+    log_store_flush_now();
+}
 
 static void record_log_internal(const char *message) {
     if (!message || message[0] == '\0') {
@@ -63,7 +68,9 @@ static void record_log_internal(const char *message) {
         s_system_log_count++;
     }
 
-    log_store_append(entry->timestamp_ms, entry->unix_time, message);
+    if (log_store_append(entry->timestamp_ms, entry->unix_time, message) != 0) {
+        ESP_LOGW(TAG, "Failed to persist log message: %s", message);
+    }
 }
 
 void automation_record_log(const char *message) {
@@ -95,11 +102,23 @@ void automation_update_unix_time(int64_t unix_time_seconds) {
 
     uint64_t now_ms = esp_timer_get_time() / 1000ULL;
     int64_t new_offset = unix_time_seconds - (int64_t)(now_ms / 1000ULL);
-    bool first_sync = !s_ntp_synced;
+    bool was_synced = s_ntp_synced;
+    int64_t delta_seconds = 0;
+
+    if (was_synced) {
+        delta_seconds = new_offset - s_unix_offset;
+    }
+
     s_ntp_synced = true;
     s_unix_offset = new_offset;
-    if (first_sync) {
+
+    if (!was_synced) {
         automation_record_log("Time synchronised via network");
+    } else {
+        char message[SYSTEM_LOG_MESSAGE_MAX];
+        snprintf(message, sizeof(message), "Time re-synced (delta=%+llds unix=%lld)",
+                 (long long)delta_seconds, (long long)unix_time_seconds);
+        automation_record_log(message);
     }
 }
 
@@ -124,6 +143,22 @@ void automation_log_boot_event(void) {
     esp_reset_reason_t reason = esp_reset_reason();
     snprintf(message, sizeof(message), "Boot complete (reset reason: %s)", reset_reason_to_string(reason));
     automation_record_log(message);
+
+    switch (reason) {
+        case ESP_RST_BROWNOUT:
+            automation_record_log("Warning: Brownout reset detected");
+            break;
+        case ESP_RST_PANIC:
+            automation_record_log("Warning: CPU panic reset detected");
+            break;
+        case ESP_RST_TASK_WDT:
+        case ESP_RST_INT_WDT:
+        case ESP_RST_WDT:
+            automation_record_log("Warning: Watchdog reset detected");
+            break;
+        default:
+            break;
+    }
 }
 
 cJSON *system_logs_snapshot(void) {
@@ -155,6 +190,13 @@ cJSON *system_logs_snapshot(void) {
 
 void init_automation_queues() {
     log_store_init();
+    if (!s_shutdown_handler_registered) {
+        if (esp_register_shutdown_handler(automation_shutdown_handler) == ESP_OK) {
+            s_shutdown_handler_registered = true;
+        } else {
+            ESP_LOGW(TAG, "Failed to register shutdown handler for log flushing");
+        }
+    }
     serviceMessage.queueCount = 0;
     serviceMessage.mutex = xSemaphoreCreateMutex();
     clientMessage.queueCount = 0;

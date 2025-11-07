@@ -1207,7 +1207,7 @@
   (symbol (lib_name "R_10K_0402_2") (lib_id "Open_Automation:R_10K_0402") (at 90.8558 88.0872 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 06d22ee1-54f1-4b19-90b5-fef6f9d40998)
-    (property "Reference" "R5" (at 92.6338 88.2142 90)
+    (property "Reference" "R68" (at 92.6338 88.2142 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 92.5068 90.3732 90)
@@ -1229,9 +1229,6 @@
     (pin "2" (uuid 5eaf67b0-9c9c-4ce5-9793-510a3dc35d02))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R5") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "R68") (unit 1)
         )
@@ -1242,7 +1239,7 @@
   (symbol (lib_id "power:GND") (at 96.0628 100.7872 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 14d9a485-a867-45ca-96d4-7d34d0e1ae98)
-    (property "Reference" "#PWR02" (at 89.7128 100.7872 0)
+    (property "Reference" "#PWR089" (at 89.7128 100.7872 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 92.2528 99.5172 90)
@@ -1257,9 +1254,6 @@
     (pin "1" (uuid 2fefb9e5-2e04-4864-84b8-f393a6c03ebc))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR02") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR089") (unit 1)
         )
@@ -1270,7 +1264,7 @@
   (symbol (lib_id "power:GND") (at 201.041 97.3582 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 180a826b-2a3c-4a33-a4bc-9594b4423400)
-    (property "Reference" "#PWR019" (at 207.391 97.3582 0)
+    (property "Reference" "#PWR093" (at 207.391 97.3582 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 204.851 97.3582 0)
@@ -1285,9 +1279,6 @@
     (pin "1" (uuid b0a00854-2fc0-40c5-b110-ec7ea636ca6b))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR093") (unit 1)
         )
@@ -1298,7 +1289,7 @@
   (symbol (lib_id "power:GND") (at 157.0228 125.5522 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 19ae06e1-2544-45d7-bd70-26fbeec64103)
-    (property "Reference" "#PWR019" (at 157.0228 131.9022 0)
+    (property "Reference" "#PWR078" (at 157.0228 131.9022 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 157.0228 129.3622 0)
@@ -1313,9 +1304,6 @@
     (pin "1" (uuid 8001656b-262e-4121-a54c-58ec15f7484a))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR078") (unit 1)
         )
@@ -1390,7 +1378,7 @@
   (symbol (lib_id "power:GND") (at 200.8378 105.4862 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2bbed31b-fa47-4e12-bdb1-74e98ffc874e)
-    (property "Reference" "#PWR019" (at 207.1878 105.4862 0)
+    (property "Reference" "#PWR094" (at 207.1878 105.4862 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 204.6478 105.4862 0)
@@ -1405,9 +1393,6 @@
     (pin "1" (uuid e5f44717-659a-4729-b1d4-acbd86eff644))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR094") (unit 1)
         )
@@ -1418,7 +1403,7 @@
   (symbol (lib_id "power:GND") (at 141.7828 120.4722 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3589113f-5e32-4724-9d8d-4e85cafa161e)
-    (property "Reference" "#PWR019" (at 141.7828 126.8222 0)
+    (property "Reference" "#PWR091" (at 141.7828 126.8222 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 141.7828 124.2822 0)
@@ -1433,9 +1418,6 @@
     (pin "1" (uuid 64a2e570-5a3d-4f23-875e-1e33a36ff7d9))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR091") (unit 1)
         )
@@ -1478,7 +1460,7 @@
   (symbol (lib_id "power:GND") (at 96.0628 85.5472 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3b596ba6-1e6c-4bae-b3b8-820accead9c1)
-    (property "Reference" "#PWR02" (at 89.7128 85.5472 0)
+    (property "Reference" "#PWR090" (at 89.7128 85.5472 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 92.2528 84.2772 90)
@@ -1493,9 +1475,6 @@
     (pin "1" (uuid 1e56b04c-1331-4d3d-9596-d8972b9a9667))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR02") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR090") (unit 1)
         )
@@ -1506,7 +1485,7 @@
   (symbol (lib_id "open_automation:CONN_RJ45") (at 107.2388 95.7072 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3cf9f508-4403-4a23-befb-eefe7b8e7453)
-    (property "Reference" "J17" (at 107.2388 77.6732 0)
+    (property "Reference" "J23" (at 107.2388 77.6732 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "CONN_RJ45" (at 107.2388 80.2132 0)
@@ -1538,9 +1517,6 @@
     (pin "12" (uuid a689570e-eca5-4bf2-8e9d-fe568bd4f378))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "J17") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "J23") (unit 1)
         )
@@ -1661,7 +1637,7 @@
   (symbol (lib_id "power:GND") (at 200.8886 113.157 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7acdbe44-e1a7-4b75-a879-2b8b019610a2)
-    (property "Reference" "#PWR019" (at 207.2386 113.157 0)
+    (property "Reference" "#PWR095" (at 207.2386 113.157 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 204.6986 113.157 0)
@@ -1676,9 +1652,6 @@
     (pin "1" (uuid 4c280412-6a51-4fef-af23-2f6bb7dfe154))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR095") (unit 1)
         )
@@ -1689,7 +1662,7 @@
   (symbol (lib_name "R_10K_0402_2") (lib_id "Open_Automation:R_10K_0402") (at 90.8558 103.3272 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8fbc8037-fed9-4921-8965-61eead0fd651)
-    (property "Reference" "R5" (at 92.6338 103.4542 90)
+    (property "Reference" "R67" (at 92.6338 103.4542 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10K" (at 92.5068 105.6132 90)
@@ -1711,9 +1684,6 @@
     (pin "2" (uuid 93adfef9-f28a-49b4-a1bb-9112aea808b6))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-00006045445b"
-          (reference "R5") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "R67") (unit 1)
         )
@@ -1724,7 +1694,7 @@
   (symbol (lib_id "power:GND") (at 140.8684 86.1822 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9457fe87-a2cc-461b-a391-3c225e5d4aca)
-    (property "Reference" "#PWR019" (at 134.5184 86.1822 0)
+    (property "Reference" "#PWR096" (at 134.5184 86.1822 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 136.7536 84.8106 90)
@@ -1739,9 +1709,6 @@
     (pin "1" (uuid 33193dc1-5c69-479d-96f9-eaf2813d448a))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR096") (unit 1)
         )
@@ -1784,7 +1751,7 @@
   (symbol (lib_id "power:GND") (at 200.9902 89.8398 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b1c8e0ee-b37a-45ac-b47a-4cb334357166)
-    (property "Reference" "#PWR019" (at 207.3402 89.8398 0)
+    (property "Reference" "#PWR092" (at 207.3402 89.8398 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 204.8002 89.8398 0)
@@ -1799,9 +1766,6 @@
     (pin "1" (uuid 6e636717-59cf-406b-8a9e-731c412cf8c1))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR019") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR092") (unit 1)
         )
@@ -1940,7 +1904,7 @@
   (symbol (lib_id "power:GND") (at 118.9228 85.5472 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid eaf4593c-bbe5-4b0d-844c-292c23ed1764)
-    (property "Reference" "#PWR02" (at 125.2728 85.5472 0)
+    (property "Reference" "#PWR077" (at 125.2728 85.5472 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 122.7328 86.8172 90)
@@ -1955,9 +1919,6 @@
     (pin "1" (uuid 04095059-4050-4114-b461-5e8a319d237d))
     (instances
       (project "access-controller"
-        (path "/89df70f4-3579-42b9-861e-6beb04a3b25e"
-          (reference "#PWR02") (unit 1)
-        )
         (path "/89df70f4-3579-42b9-861e-6beb04a3b25e/00000000-0000-0000-0000-0000618d2964"
           (reference "#PWR077") (unit 1)
         )

@@ -46,6 +46,8 @@ cJSON *system_logs_snapshot(void);
 void automation_record_log(const char *message);
 void automation_update_unix_time(int64_t unix_time_seconds);
 void automation_log_boot_event(void);
+void arm_lock(int channel, bool arm, bool alert);
+void lock_set_action_source(const char *source);
 
 
 #endif // AUTOMATION_H

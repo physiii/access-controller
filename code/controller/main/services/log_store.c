@@ -10,6 +10,7 @@
 #include "nvs.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "esp_timer.h"
 
 #define LOG_STORE_NAMESPACE "syslog"
 #define LOG_STORE_KEY       "ring"
@@ -54,7 +55,7 @@ static uint8_t s_blob_buffer[LOG_STORE_BUFFER_SIZE];
 static uint32_t s_dirty_entries = 0;
 static uint64_t s_last_flush_timestamp = 0;
 
-#define LOG_STORE_FLUSH_THRESHOLD 5
+#define LOG_STORE_FLUSH_THRESHOLD 1
 #define LOG_STORE_FLUSH_INTERVAL_MS 60000ULL
 
 static esp_err_t open_handle(nvs_handle_t *handle) {
@@ -171,36 +172,65 @@ static esp_err_t flush_ring_locked(void) {
         return err;
     }
 
-    size_t count = s_ring.count;
-    size_t buffer_size = sizeof(persisted_log_header_t) + count * sizeof(persisted_log_entry_t);
-    if (buffer_size > sizeof(s_blob_buffer)) {
-        ESP_LOGW(TAG, "Persist buffer too small (%zu needed)", buffer_size);
-        nvs_close(handle);
-        return ESP_ERR_NO_MEM;
+    size_t target_count = s_ring.count;
+    size_t original_count = target_count;
+    esp_err_t set_err = ESP_FAIL;
+
+    while (target_count > 0) {
+        size_t buffer_size = sizeof(persisted_log_header_t) + target_count * sizeof(persisted_log_entry_t);
+        if (buffer_size > sizeof(s_blob_buffer)) {
+            ESP_LOGW(TAG, "Persist buffer too small (%zu needed for %zu entries)", buffer_size, target_count);
+            set_err = ESP_ERR_NO_MEM;
+            break;
+        }
+
+        persisted_log_header_t *header = (persisted_log_header_t *)s_blob_buffer;
+        header->version = LOG_STORE_BLOB_VERSION;
+        header->count = target_count;
+
+        persisted_log_entry_t *entries = (persisted_log_entry_t *)(s_blob_buffer + sizeof(persisted_log_header_t));
+        for (size_t i = 0; i < target_count; ++i) {
+            size_t index = (s_ring.next_index + LOG_STORE_CAPACITY - target_count + i) % LOG_STORE_CAPACITY;
+            entries[i] = s_ring.entries[index];
+        }
+
+        set_err = nvs_set_blob(handle, LOG_STORE_KEY, s_blob_buffer, buffer_size);
+        if (set_err == ESP_OK) {
+            break;
+        }
+
+        if (set_err == ESP_ERR_NVS_NOT_ENOUGH_SPACE) {
+            size_t drop = (target_count > 10) ? (target_count / 4) : 1;
+            if (drop > target_count) {
+                drop = target_count;
+            }
+            ESP_LOGW(TAG, "NVS full while persisting logs; dropping %zu oldest entries (keep %zu)", drop, target_count - drop);
+            target_count -= drop;
+            s_ring.count = target_count;
+            continue;
+        }
+
+        ESP_LOGW(TAG, "Failed to persist logs (err=%s) while writing %zu entries", esp_err_to_name(set_err), target_count);
+        break;
     }
 
-    persisted_log_header_t *header = (persisted_log_header_t *)s_blob_buffer;
-    header->version = LOG_STORE_BLOB_VERSION;
-    header->count = count;
-
-    persisted_log_entry_t *entries = (persisted_log_entry_t *)(s_blob_buffer + sizeof(persisted_log_header_t));
-    for (size_t i = 0; i < count; ++i) {
-        size_t index = (s_ring.next_index + LOG_STORE_CAPACITY - count + i) % LOG_STORE_CAPACITY;
-        entries[i] = s_ring.entries[index];
-    }
-
-    err = nvs_set_blob(handle, LOG_STORE_KEY, s_blob_buffer, buffer_size);
-    if (err == ESP_ERR_NVS_NOT_ENOUGH_SPACE) {
-        ESP_LOGW(TAG, "Insufficient NVS space to persist logs; clearing stored logs to preserve other data");
-        ring_reset();
-        erase_persisted_ring(handle);
-    } else if (err == ESP_OK) {
+    if (set_err == ESP_OK) {
         err = nvs_commit(handle);
         if (err == ESP_OK) {
+            if (target_count < original_count) {
+                ESP_LOGW(TAG, "Persisted trimmed log ring: %zu/%zu entries stored", target_count, original_count);
+            }
             s_dirty_entries = 0;
+        } else {
+            ESP_LOGW(TAG, "Failed to commit log blob: %s", esp_err_to_name(err));
         }
+    } else if (target_count == 0) {
+        ESP_LOGW(TAG, "Unable to persist any log entries; clearing log storage");
+        ring_reset();
+        erase_persisted_ring(handle);
+        err = set_err;
     } else {
-        ESP_LOGW(TAG, "Failed to persist logs: %s", esp_err_to_name(err));
+        err = set_err;
     }
 
     nvs_close(handle);
@@ -339,5 +369,31 @@ void log_store_free_entries(stored_log_entry_t *entries, size_t count) {
         free(entries[i].message);
         entries[i].message = NULL;
     }
+}
+
+int log_store_flush_now(void) {
+    if (s_mutex == NULL && log_store_init() != 0) {
+        return -1;
+    }
+
+    if (xSemaphoreTake(s_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
+        ESP_LOGW(TAG, "Timeout acquiring log store mutex for manual flush");
+        return -1;
+    }
+
+    ensure_loaded_locked();
+
+    esp_err_t err = ESP_OK;
+    if (s_dirty_entries > 0) {
+        err = flush_ring_locked();
+        if (err == ESP_OK) {
+            s_last_flush_timestamp = esp_timer_get_time() / 1000ULL;
+        } else {
+            ESP_LOGW(TAG, "Manual flush failed: %s", esp_err_to_name(err));
+        }
+    }
+
+    xSemaphoreGive(s_mutex);
+    return (err == ESP_OK) ? 0 : -1;
 }
 

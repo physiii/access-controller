@@ -3,10 +3,13 @@
 
 #include "esp_http_server.h"
 #include "esp_log.h"
+#include "esp_err.h"
 #include "cJSON.h"
 #include "freertos/semphr.h"
 
 #include "automation.h"
+#include "wiegand.h"
+#include "wiegand_registry.h"
 
 static const char *API_TAG = "api_server";
 
@@ -169,6 +172,114 @@ static esp_err_t api_state_get_handler(httpd_req_t *req) {
     return send_json_response(req, build_state_snapshot());
 }
 
+static esp_err_t send_wiegand_state_response(httpd_req_t *req) {
+    return send_json_response(req, wiegand_state_snapshot());
+}
+
+static esp_err_t api_wiegand_get_handler(httpd_req_t *req) {
+    ESP_LOGI(API_TAG, "Wiegand state requested");
+    return send_wiegand_state_response(req);
+}
+
+static esp_err_t api_wiegand_register_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        ESP_LOGW(API_TAG, "Invalid Wiegand register payload (%s)", esp_err_to_name(err));
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON payload");
+    }
+
+    int channel = 0;
+    const cJSON *channel_item = cJSON_GetObjectItemCaseSensitive(payload, "channel");
+    if (cJSON_IsNumber(channel_item)) {
+        channel = (int)channel_item->valuedouble;
+    }
+
+    ESP_LOGI(API_TAG, "Starting Wiegand registration (channel=%d)", channel);
+    err = wiegand_registration_start((uint8_t)channel);
+    cJSON_Delete(payload);
+
+    if (err == ESP_ERR_INVALID_STATE) {
+        ESP_LOGW(API_TAG, "Wiegand registration already active");
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Registration already active");
+    }
+    if (err != ESP_OK) {
+        ESP_LOGE(API_TAG, "Failed to start Wiegand registration (%s)", esp_err_to_name(err));
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to start registration");
+    }
+
+    return send_wiegand_state_response(req);
+}
+
+static esp_err_t api_wiegand_stop_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        ESP_LOGW(API_TAG, "Invalid Wiegand stop payload (%s)", esp_err_to_name(err));
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON payload");
+    }
+
+    bool promote = false;
+    const cJSON *promote_item = cJSON_GetObjectItemCaseSensitive(payload, "promote");
+    if (cJSON_IsBool(promote_item)) {
+        promote = cJSON_IsTrue(promote_item);
+    }
+    cJSON_Delete(payload);
+
+    ESP_LOGI(API_TAG, "Stopping Wiegand registration (promote=%s)", promote ? "true" : "false");
+    err = wiegand_registration_stop(promote);
+    if (err == ESP_ERR_INVALID_STATE) {
+        ESP_LOGW(API_TAG, "Attempted to stop inactive Wiegand registration");
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Registration is not active");
+    }
+    if (err != ESP_OK) {
+        ESP_LOGE(API_TAG, "Failed to stop Wiegand registration (%s)", esp_err_to_name(err));
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to stop registration");
+    }
+
+    return send_wiegand_state_response(req);
+}
+
+static esp_err_t api_wiegand_rename_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        ESP_LOGW(API_TAG, "Invalid Wiegand rename payload (%s)", esp_err_to_name(err));
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON payload");
+    }
+
+    const cJSON *id_item = cJSON_GetObjectItemCaseSensitive(payload, "id");
+    const cJSON *name_item = cJSON_GetObjectItemCaseSensitive(payload, "name");
+    const char *id = (cJSON_IsString(id_item) && id_item->valuestring) ? id_item->valuestring : NULL;
+    const char *name = (cJSON_IsString(name_item) && name_item->valuestring) ? name_item->valuestring : NULL;
+
+    if (!id || id[0] == '\0' || !name || name[0] == '\0') {
+        cJSON_Delete(payload);
+        ESP_LOGW(API_TAG, "Wiegand rename missing id or name");
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Both id and name are required");
+    }
+    if (strlen(name) >= WIEGAND_USER_NAME_MAX) {
+        cJSON_Delete(payload);
+        ESP_LOGW(API_TAG, "Wiegand rename name too long (%u >= %d)", (unsigned)strlen(name), WIEGAND_USER_NAME_MAX);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Name exceeds maximum length");
+    }
+
+    ESP_LOGI(API_TAG, "Renaming Wiegand user %s to '%s'", id, name);
+    err = wiegand_registry_update_name(id, name);
+    cJSON_Delete(payload);
+
+    if (err == ESP_ERR_NOT_FOUND) {
+        ESP_LOGW(API_TAG, "Wiegand user not found: %s", id);
+        return httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "User not found");
+    }
+    if (err != ESP_OK) {
+        ESP_LOGE(API_TAG, "Failed to rename Wiegand user %s (%s)", id, esp_err_to_name(err));
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to rename user");
+    }
+
+    return send_wiegand_state_response(req);
+}
+
 static esp_err_t handle_json_post(httpd_req_t *req, void (*handler)(cJSON *), cJSON *(*state_builder)(void)) {
     const size_t max_len = 2048;
     int total_len = req->content_len;
@@ -271,6 +382,34 @@ void register_api_routes(httpd_handle_t server) {
         .handler = api_state_get_handler,
     };
     httpd_register_uri_handler(server, &state);
+
+    httpd_uri_t wiegand_get = {
+        .uri = "/api/wiegand",
+        .method = HTTP_GET,
+        .handler = api_wiegand_get_handler,
+    };
+    httpd_register_uri_handler(server, &wiegand_get);
+
+    httpd_uri_t wiegand_register_post = {
+        .uri = "/api/wiegand/register",
+        .method = HTTP_POST,
+        .handler = api_wiegand_register_post_handler,
+    };
+    httpd_register_uri_handler(server, &wiegand_register_post);
+
+    httpd_uri_t wiegand_stop_post = {
+        .uri = "/api/wiegand/stop",
+        .method = HTTP_POST,
+        .handler = api_wiegand_stop_post_handler,
+    };
+    httpd_register_uri_handler(server, &wiegand_stop_post);
+
+    httpd_uri_t wiegand_rename_post = {
+        .uri = "/api/wiegand/rename",
+        .method = HTTP_POST,
+        .handler = api_wiegand_rename_post_handler,
+    };
+    httpd_register_uri_handler(server, &wiegand_rename_post);
 
     httpd_uri_t lock_post = {
         .uri = "/api/lock",

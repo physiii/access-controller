@@ -121,6 +121,7 @@ void check_motion (struct motionButton *mot)
 
 	if (mot->isPressed && !mot->prevPress) {
 		ESP_LOGI(TAG, "Motion detected on channel %d - disarming lock", mot->channel);
+        lock_set_action_source("motion");
 		arm_lock(mot->channel, false, mot->alert);
 		start_motion_timer(mot, true);
 	}
@@ -167,6 +168,7 @@ void motion_timer_func(struct motionButton *mot)
 {
 	if (mot->count >= mot->delay && !mot->expired) {
 		ESP_LOGI(TAG, "Re-arming lock from motion %d service.", mot->channel);
+        lock_set_action_source("motion_auto");
 		arm_lock(mot->channel, true, mot->alert);
 		mot->expired = true;
 	} else {

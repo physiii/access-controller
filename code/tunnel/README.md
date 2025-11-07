@@ -71,6 +71,33 @@ The protocol supports running >100 concurrent devices with independent sockets. 
 
    Replace `my-test-device` with the device ID shown in the mock-client logs. The response proves the HTTP tunnel is working end-to-end.
 
+## Run with Docker Compose
+
+1. Copy the example environment file and adjust it for your deployment:
+
+   ```bash
+   cp env.example .env
+   ```
+
+   Set `HTTP_BIND=0.0.0.0` so the proxy is reachable outside the container, and tweak the other ports/timeouts as needed.
+
+2. Build and start the tunnel:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+   The compose service maps container ports `9000` (HTTP proxy) and `9001` (device tunnel) directly to the host. The service uses `restart: unless-stopped`, so it comes back automatically on Docker daemon restarts or host reboots.
+
+3. View logs or stop the stack when required:
+
+   ```bash
+   docker compose logs -f
+   docker compose down
+   ```
+
+   After the first build you can omit `--build` unless the source changes.
+
 ## Deploy as a systemd Service (Ubuntu)
 
 > These steps target the local machine first (`192.168.1.43`). Once confirmed, repeat on the public host (`142.93.57.114`) and update DNS/firewall rules accordingly.

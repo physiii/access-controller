@@ -47,6 +47,7 @@ void keypad_timer_func(struct keypadButton *pad)
 {
 	if (pad->count >= pad->delay && !pad->expired) {
 		ESP_LOGI(TAG, "Re-arming lock from pad %d service. Alert %d", pad->channel, pad->alert);
+		lock_set_action_source("kp_auto");
 		arm_lock(pad->channel, true, pad->alert);
 		pad->expired = true;
 	} else {
@@ -182,6 +183,7 @@ void check_keypads (struct keypadButton *pad)
 
 	if (pad->isPressed && !pad->prevPress) {
 		ESP_LOGI(TAG, "Keypad %d pressed - disarming lock", pad->channel);
+		lock_set_action_source("kp_press");
 		arm_lock(pad->channel, false, pad->alert);
 		start_keypad_timer(pad, true);
 	}

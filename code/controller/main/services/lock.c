@@ -92,6 +92,16 @@ typedef struct {
 
 Lock locks[NUM_OF_LOCKS];
 
+static char s_last_action_source[12] = "sys";
+
+void lock_set_action_source(const char *source) {
+    const char *fallback = "sys";
+    if (!source || source[0] == '\0') {
+        source = fallback;
+    }
+    strlcpy(s_last_action_source, source, sizeof(s_last_action_source));
+}
+
 void start_lock_contact_timer(Lock *lck, bool val) {
     lck->expired = !val;
     if (!val) {
@@ -198,14 +208,50 @@ void enableLock(int ch, bool val) {
 
 void arm_lock(int channel, bool arm, bool alert) {
     int ch = channel - 1;
-    if (!locks[ch].enable) return;
+    if (ch < 0 || ch >= NUM_OF_LOCKS) {
+        return;
+    }
+    if (!locks[ch].enable) {
+        strlcpy(s_last_action_source, "sys", sizeof(s_last_action_source));
+        return;
+    }
+
     locks[ch].alert = alert;
-	locks[ch].shouldLock = arm;
 
-	if (locks[ch].polarity) arm = !arm;
+    bool requested_arm = arm;
+    locks[ch].shouldLock = requested_arm;
 
-    set_io(locks[ch].controlPin, arm);
+    bool output_level = requested_arm;
+    if (locks[ch].polarity) {
+        output_level = !output_level;
+    }
+
+    set_io(locks[ch].controlPin, output_level);
     start_lock_contact_timer(&locks[ch], true);
+
+    if (USE_MCP23017) {
+        locks[ch].isContact = get_mcp_io(locks[ch].contactPin);
+        locks[ch].isSignal = get_mcp_io(locks[ch].signalPin);
+    } else {
+        locks[ch].isContact = get_io(locks[ch].contactPin);
+        locks[ch].isSignal = get_io(locks[ch].signalPin);
+    }
+
+    char message[96];
+    char source[sizeof(s_last_action_source)];
+    strlcpy(source, s_last_action_source, sizeof(source));
+    snprintf(message, sizeof(message),
+             "Lock%d[%s] arm=%d out=%d en=%d contact=%d signal=%d alert=%d",
+             locks[ch].channel,
+             source,
+             requested_arm ? 1 : 0,
+             output_level ? 1 : 0,
+             locks[ch].enable ? 1 : 0,
+             locks[ch].isContact ? 1 : 0,
+             locks[ch].isSignal ? 1 : 0,
+             locks[ch].alert ? 1 : 0);
+    automation_record_log(message);
+    strlcpy(s_last_action_source, "sys", sizeof(s_last_action_source));
 
     if (locks[ch].alert) {
         beep_keypad(1, 50);
@@ -367,6 +413,7 @@ void handle_lock_message(cJSON * payload) {
         if (locks[ch].shouldLock != val) {
             locks[ch].shouldLock = val;
             last_change_time[ch] = current_time;
+            lock_set_action_source("api");
             if (val) {
                 arm_lock(ch + 1, true, true);
                 ESP_LOGI(TAG, "Arming lock %d", ch + 1);

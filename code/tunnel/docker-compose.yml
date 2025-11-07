@@ -1,0 +1,11 @@
+services:
+  tunnel:
+    build:
+      context: /home/andy/devices/access-controller/code/tunnel
+    restart: unless-stopped
+    env_file:
+      - /home/andy/devices/access-controller/code/tunnel/.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+

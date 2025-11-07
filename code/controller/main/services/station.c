@@ -25,6 +25,7 @@ static EventGroupHandle_t s_wifi_event_group;
 
 static int s_retry_num = 0;
 static bool s_sntp_started = false;
+static bool s_connected_once = false;
 
 static void time_sync_notification_cb(struct timeval *tv) {
     time_t now = 0;
@@ -38,18 +39,31 @@ static void event_handler(void* arg, esp_event_base_t event_base,
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+        wifi_event_sta_disconnected_t *disc = (wifi_event_sta_disconnected_t *)event_data;
+        int reason = disc ? disc->reason : -1;
+        ESP_LOGW(TAG, "Station disconnected (reason=%d)", reason);
+
+        char message[96];
+        snprintf(message, sizeof(message), "WiFi disconnected (reason=%d)", reason);
+        automation_record_log(message);
+
+        if (s_connected_once) {
+            esp_wifi_connect();
+            return;
+        }
+
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY) {
             esp_wifi_connect();
             s_retry_num++;
-            ESP_LOGI(TAG, "retry to connect to the AP");
+            ESP_LOGI(TAG, "Retry %d to connect to the AP", s_retry_num);
         } else {
             xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
         }
-        ESP_LOGI(TAG,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
+        s_connected_once = true;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         if (!s_sntp_started) {
             esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);

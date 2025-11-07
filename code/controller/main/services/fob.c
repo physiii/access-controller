@@ -42,6 +42,7 @@ void check_fob_timer (struct fob *fb)
 {
   if (fb->count >= fb->delay && !fb->expired) {
 		ESP_LOGI(TAG, "Re-arming lock from fob %d service.", fb->channel);
+        lock_set_action_source("fob_auto");
 		arm_lock(fb->channel, true, fb->alert);
 		fb->expired = true;
   } else fb->count++;
@@ -77,12 +78,14 @@ void check_fobs (struct fob *fb)
 	if (fb->latch && fb->isPressed != fb->prevPress) {
 		// Latch mode: FOB state directly controls lock state
 		ESP_LOGI(TAG, "Fob %d state changed to %s (latch mode)", fb->channel, fb->isPressed ? "activated" : "deactivated");
+        lock_set_action_source("fob_latch");
 		arm_lock(fb->channel, fb->isPressed, fb->alert);
 		enableExit(fb->channel, fb->isPressed);
 		enableKeypad(fb->channel, fb->isPressed);
 	} else if (!fb->latch && !fb->isPressed && fb->prevPress) {
 		// Momentary mode: FOB release triggers unlock and timer
 		ESP_LOGI(TAG, "Fob %d released (momentary mode) - disarming lock", fb->channel);
+        lock_set_action_source("fob_release");
 		arm_lock(fb->channel, false, fb->alert);
 		start_fob_timer(fb, true);
 	}

@@ -39,6 +39,7 @@ void exit_timer_func(struct exitButton *ext)
 {
 	if (ext->count >= ext->delay && !ext->expired) {
 		ESP_LOGI(TAG, "Re-arming lock from button %d service.", ext->channel);
+		lock_set_action_source("exit_auto");
 		arm_lock(ext->channel, true, ext->alert);
 		ext->expired = true;
 	} else {
@@ -160,6 +161,7 @@ void check_exit (struct exitButton *ext)
 
 	if (ext->isPressed && !ext->prevPress) {
 		ESP_LOGI(TAG, "Exit button %d pressed - disarming lock", ext->channel);
+		lock_set_action_source("exit_press");
 		arm_lock(ext->channel, false, ext->alert);
 		start_exit_timer(ext, true);
 	}

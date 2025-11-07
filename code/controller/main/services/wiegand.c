@@ -10,6 +10,7 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 
 #include "wiegand_registry.h"
 #include "wiegand.h"
@@ -18,12 +19,13 @@
 /* Forward declarations */
 struct wiegand;
 void start_wiegand_timer(struct wiegand *ctx, bool val);
-void handleKeyCode(struct wiegand *ctx);
+static bool handleKeyCode(struct wiegand *ctx);
 int is_pin_authorized(const char *incomingPin);
 void arm_lock(int channel, bool arm, bool alert);
 void beep_keypad(int beeps, int duration);
 
-#define WG_DELAY                80
+#define WIEGAND_FRAME_TIMEOUT_MS 80
+#define WIEGAND_MIN_FRAME_BITS   24
 #define NUM_OF_WIEGANDS         2
 #define NUM_OF_KEYS             12
 #define KEYCODE_LENGTH          6
@@ -57,6 +59,9 @@ struct wiegand {
 	int delay;
 	int keypressTimeout;
 	int channel;
+	char bit_buffer[WIEGAND_USER_CODE_MAX];
+	size_t bit_buffer_len;
+	int64_t last_bit_time_us;
 };
 
 typedef struct {
@@ -165,10 +170,26 @@ static size_t registration_pending_count(void) {
     return count;
 }
 
+static void wiegand_reset_bit_buffer(struct wiegand *ctx) {
+    if (!ctx) {
+        return;
+    }
+    ctx->bit_buffer_len = 0;
+    ctx->bit_buffer[0] = '\0';
+    ctx->last_bit_time_us = 0;
+}
+
 static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_string) {
     if (!wg_entry || !bit_string || bit_string[0] == '\0') {
         return;
     }
+
+    size_t bit_len = strlen(bit_string);
+    ESP_LOGI(LOG_TAG_WIEGAND,
+             "Processing Wiegand frame on channel %d (%u bits): %s",
+             wg_entry->channel,
+             (unsigned)bit_len,
+             bit_string);
 
     uint8_t configured_channel = 0;
     size_t pending = 0;
@@ -177,8 +198,24 @@ static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_strin
         wiegand_user_t new_user;
         esp_err_t err = wiegand_registry_add(bit_string, wg_entry->channel, &new_user);
         if (err == ESP_OK) {
+            if (new_user.status != WIEGAND_USER_STATUS_PENDING) {
+                esp_err_t status_err = wiegand_registry_update_status(new_user.id, WIEGAND_USER_STATUS_PENDING);
+                if (status_err == ESP_OK) {
+                    new_user.status = WIEGAND_USER_STATUS_PENDING;
+                } else {
+                    ESP_LOGW(LOG_TAG_WIEGAND,
+                             "Failed to mark Wiegand user %s as pending (%s)",
+                             new_user.id,
+                             esp_err_to_name(status_err));
+                }
+            }
             registration_track_new_user(&new_user);
-            ESP_LOGI(LOG_TAG_WIEGAND, "Captured Wiegand code %s on channel %d", bit_string, wg_entry->channel);
+            ESP_LOGI(LOG_TAG_WIEGAND,
+                     "Captured Wiegand code %s on channel %d (user_id=%s, pending=%u)",
+                     bit_string,
+                     wg_entry->channel,
+                     new_user.id,
+                     (unsigned)(pending + 1));
         } else if (err == ESP_ERR_INVALID_STATE) {
             registration_note_duplicate(bit_string);
             ESP_LOGW(LOG_TAG_WIEGAND, "Duplicate Wiegand code %s on channel %d", bit_string, wg_entry->channel);
@@ -186,6 +223,12 @@ static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_strin
             ESP_LOGE(LOG_TAG_WIEGAND, "Failed to record Wiegand code %s (%s)", bit_string, esp_err_to_name(err));
         }
         return;
+    }
+    if (active) {
+        ESP_LOGD(LOG_TAG_WIEGAND,
+                 "Registration active for channel %u but ignoring frame on channel %d",
+                 (unsigned)configured_channel,
+                 wg_entry->channel);
     }
 
     const wiegand_user_t *user = wiegand_registry_find_by_code(bit_string);
@@ -197,6 +240,7 @@ static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_strin
                  display_name, bit_string);
         // addServerMessageToQueue(log_msg); // This line is removed
         ESP_LOGI(LOG_TAG_WIEGAND, "Authorized Wiegand code %s (user=%s)", bit_string, display_name);
+        lock_set_action_source("wg_code");
         arm_lock(wg_entry->channel, false, wg_entry->alert);
         start_wiegand_timer(wg_entry, true);
     } else {
@@ -224,7 +268,7 @@ void start_keypress_timer(struct wiegand *ctx, bool val) {
 
 void check_keypress_timer(struct wiegand *ctx) {
     if (ctx->keypressCount >= ctx->keypressTimeout && !ctx->keypressExpired) {
-        printf("Keypress timer expired for wg %d\n", ctx->channel);
+        ESP_LOGW(LOG_TAG_WIEGAND, "Keypress timer expired for wg %d", ctx->channel);
         memset(ctx->code, 0, sizeof(ctx->code));
         memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
         ctx->incomingCodeCount = 0;
@@ -262,6 +306,7 @@ void check_wiegand_timer(struct wiegand *ctx) {
     }
     if (ctx->count >= ctx->delay && !ctx->expired) {
         ESP_LOGI(LOG_TAG_WIEGAND, "Re-arming lock from wg %d service. Alert %d", ctx->channel, ctx->alert);
+        lock_set_action_source("wg_auto");
         arm_lock(ctx->channel, true, ctx->alert);
         ctx->expired = true;
     } else {
@@ -278,12 +323,16 @@ static void wiegand_timer(void *pvParameter) {
   }
 }
 
-void handleKeyCode(struct wiegand *ctx) {
+static bool handleKeyCode(struct wiegand *ctx) {
     static const uint8_t key[NUM_OF_KEYS] = {
         0b00000000, 0b11000000, 0b00110000, 0b11110000,
         0b00001100, 0b11001100, 0b00111100, 0b11111100,
         0b00000011, 0b11000011, 0b00110011, 0b11110011
     };
+
+    if (!ctx) {
+        return false;
+    }
 
     uint8_t incomingByte = (uint8_t)strtol(ctx->incomingCode, NULL, 2);
     int keyIndex = -1;
@@ -297,23 +346,36 @@ void handleKeyCode(struct wiegand *ctx) {
     }
 
     if (keyIndex >= 0 && keyIndex <= 9) {
-        ctx->code[strlen(ctx->code)] = '0' + keyIndex;
+        size_t len = strlen(ctx->code);
+        if (len + 1 < sizeof(ctx->code)) {
+            ctx->code[len] = (char)('0' + keyIndex);
+            ctx->code[len + 1] = '\0';
+        }
+        ESP_LOGI(LOG_TAG_WIEGAND, "Keypad digit '%d' received on channel %d (PIN=%s)", keyIndex, ctx->channel, ctx->code);
     } else if (keyIndex == 10) {
-        ctx->code[strlen(ctx->code)] = '*';
+        size_t len = strlen(ctx->code);
+        if (len + 1 < sizeof(ctx->code)) {
+            ctx->code[len] = '*';
+            ctx->code[len + 1] = '\0';
+        }
+        ESP_LOGI(LOG_TAG_WIEGAND, "Keypad '*' received on channel %d", ctx->channel);
     } else if (keyIndex == 11) {
         if (is_pin_authorized(ctx->code)) {
+            lock_set_action_source("wg_pin");
             arm_lock(ctx->channel, false, ctx->alert);
             start_wiegand_timer(ctx, true);
+            ESP_LOGI(LOG_TAG_WIEGAND, "PIN accepted on channel %d (%s)", ctx->channel, ctx->code);
 		} else {
             beep_keypad(2, ctx->channel);
+            ESP_LOGW(LOG_TAG_WIEGAND, "PIN rejected on channel %d (%s)", ctx->channel, ctx->code);
 		}
         memset(ctx->code, 0, sizeof(ctx->code));
         start_keypress_timer(ctx, false);
-        return;
+        return true;
     }
 
     if (strlen(ctx->code) > KEYCODE_LENGTH) {
-        printf("Exceeded max keycode length (%d): %s\n", KEYCODE_LENGTH, ctx->code);
+        ESP_LOGW(LOG_TAG_WIEGAND, "Exceeded max keycode length (%d): %s", KEYCODE_LENGTH, ctx->code);
         memset(ctx->code, 0, sizeof(ctx->code));
         memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
         ctx->incomingCodeCount = 0;
@@ -321,22 +383,68 @@ void handleKeyCode(struct wiegand *ctx) {
         beep_keypad(2, ctx->channel);
 	}
 
+    if (keyIndex == -1) {
+        ESP_LOGD(LOG_TAG_WIEGAND, "No keypad match for pattern %s on channel %d", ctx->incomingCode, ctx->channel);
+    }
+
     memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
     ctx->incomingCodeCount = 0;
+    return keyIndex != -1;
 }
 
 static void wiegand_task(void *pvParameter) {
     gpio_event_t event;
+    const TickType_t wait_ticks = pdMS_TO_TICKS(WIEGAND_FRAME_TIMEOUT_MS);
+
     for (;;) {
-        if (xQueueReceive(gpio_evt_queue, &event, portMAX_DELAY)) {
+        bool received = xQueueReceive(gpio_evt_queue, &event, wait_ticks) == pdTRUE;
+        int64_t now_us = esp_timer_get_time();
+
+        if (received) {
             if (event.wg_index < 0 || event.wg_index >= NUM_OF_WIEGANDS) {
+                ESP_LOGW(LOG_TAG_WIEGAND, "Received GPIO event for unknown Wiegand index (%d)", event.wg_index);
                 continue;
             }
 
             struct wiegand *current_wg = &wg[event.wg_index];
             if (!current_wg->enable) {
+                ESP_LOGD(LOG_TAG_WIEGAND, "Ignoring GPIO %u event for disabled channel %d",
+                         (unsigned)event.gpio_num,
+                         current_wg->channel);
                 continue;
             }
+
+            if (event.gpio_val != 0) {
+                ESP_LOGD(LOG_TAG_WIEGAND, "Ignoring non-active edge on GPIO %u (channel %d)",
+                         (unsigned)event.gpio_num, current_wg->channel);
+                continue;
+            }
+
+            char bit = '\0';
+            if (event.gpio_num == current_wg->pin0) {
+                bit = '0';
+            } else if (event.gpio_num == current_wg->pin1) {
+                bit = '1';
+            } else {
+                ESP_LOGW(LOG_TAG_WIEGAND, "GPIO %u is not mapped to channel %d", (unsigned)event.gpio_num, current_wg->channel);
+                continue;
+            }
+
+            if (current_wg->bit_buffer_len == 0) {
+                ESP_LOGI(LOG_TAG_WIEGAND, "Starting new Wiegand frame on channel %d (first bit %c)", current_wg->channel, bit);
+            }
+
+            if (current_wg->bit_buffer_len + 1 >= sizeof(current_wg->bit_buffer)) {
+                ESP_LOGW(LOG_TAG_WIEGAND, "Wiegand frame overflow on channel %d; resetting buffer", current_wg->channel);
+                wiegand_reset_bit_buffer(current_wg);
+                current_wg->incomingCodeCount = 0;
+                memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
+                continue;
+            }
+
+            current_wg->bit_buffer[current_wg->bit_buffer_len++] = bit;
+            current_wg->bit_buffer[current_wg->bit_buffer_len] = '\0';
+            current_wg->last_bit_time_us = now_us;
 
             if (current_wg->incomingCodeCount == 0) {
                 memset(current_wg->incomingCode, '0', 8);
@@ -344,23 +452,62 @@ static void wiegand_task(void *pvParameter) {
 
             int bitPosition = 8 - current_wg->incomingCodeCount - 1;
             if (bitPosition >= 0 && bitPosition < 8) {
-                if (event.gpio_num == current_wg->pin0 && event.gpio_val == 0) {
-                current_wg->incomingCode[bitPosition] = '0';
-                } else if (event.gpio_num == current_wg->pin1 && event.gpio_val == 0) {
-                current_wg->incomingCode[bitPosition] = '1';
-                }
+                current_wg->incomingCode[bitPosition] = bit;
             }
 
             current_wg->incomingCodeCount++;
 
+            ESP_LOGI(LOG_TAG_WIEGAND,
+                     "Captured Wiegand bit %c on channel %d (GPIO=%u, keypad_bits=%u, frame_bits=%u)",
+                     bit,
+                     current_wg->channel,
+                     (unsigned)event.gpio_num,
+                     (unsigned)current_wg->incomingCodeCount,
+                     (unsigned)current_wg->bit_buffer_len);
+
             if (current_wg->incomingCodeCount >= 8) {
                 current_wg->incomingCode[8] = '\0';
-                char captured_code[WIEGAND_USER_CODE_MAX];
-                snprintf(captured_code, sizeof(captured_code), "%s", current_wg->incomingCode);
-                wiegand_process_code(current_wg, captured_code);
-                printf("Keypress detected on pin of wg %d. Current code: %s\n", current_wg->channel, current_wg->incomingCode);
-                handleKeyCode(current_wg);
+                bool recognized = handleKeyCode(current_wg);
                 current_wg->incomingCodeCount = 0;
+                memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
+                if (recognized) {
+                    ESP_LOGI(LOG_TAG_WIEGAND, "Keypad sequence consumed on channel %d; clearing current frame buffer", current_wg->channel);
+                    wiegand_reset_bit_buffer(current_wg);
+                }
+            }
+        }
+
+        for (int i = 0; i < NUM_OF_WIEGANDS; i++) {
+            struct wiegand *ctx = &wg[i];
+            if (!ctx->enable || ctx->bit_buffer_len == 0) {
+                continue;
+            }
+
+            if (ctx->last_bit_time_us == 0) {
+                ctx->last_bit_time_us = now_us;
+                continue;
+            }
+
+            if ((now_us - ctx->last_bit_time_us) > (int64_t)WIEGAND_FRAME_TIMEOUT_MS * 1000) {
+                if (ctx->bit_buffer_len < WIEGAND_MIN_FRAME_BITS) {
+                    ESP_LOGW(LOG_TAG_WIEGAND,
+                             "Discarding short Wiegand frame on channel %d (%u bits, minimum=%u)",
+                             ctx->channel,
+                             (unsigned)ctx->bit_buffer_len,
+                             WIEGAND_MIN_FRAME_BITS);
+                } else {
+                    char captured_code[WIEGAND_USER_CODE_MAX];
+                    snprintf(captured_code, sizeof(captured_code), "%s", ctx->bit_buffer);
+                    ESP_LOGI(LOG_TAG_WIEGAND,
+                             "Finalizing Wiegand frame on channel %d (%u bits) after %d ms gap",
+                             ctx->channel,
+                             (unsigned)ctx->bit_buffer_len,
+                             WIEGAND_FRAME_TIMEOUT_MS);
+                    wiegand_process_code(ctx, captured_code);
+                }
+                wiegand_reset_bit_buffer(ctx);
+                ctx->incomingCodeCount = 0;
+                memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
             }
         }
     }
@@ -384,7 +531,10 @@ void wiegand_main(void) {
 	wg[0].enable = true;
 	wg[0].alert = true;
 	wg[0].newKey = false;
-	wg[0].incomingCode[0] = 0;
+    memset(wg[0].incomingCode, 0, sizeof(wg[0].incomingCode));
+    memset(wg[0].code, 0, sizeof(wg[0].code));
+    wg[0].incomingCodeCount = 0;
+    wiegand_reset_bit_buffer(&wg[0]);
 	strcpy(wg[0].name, "Wiegand0");
 
 	wg[1].pin0 = WG1_DATA0_IO;
@@ -396,7 +546,10 @@ void wiegand_main(void) {
 	wg[1].enable = false;
 	wg[1].alert = true;
 	wg[1].newKey = false;
-	wg[1].incomingCode[0] = 0;
+    memset(wg[1].incomingCode, 0, sizeof(wg[1].incomingCode));
+    memset(wg[1].code, 0, sizeof(wg[1].code));
+    wg[1].incomingCodeCount = 0;
+    wiegand_reset_bit_buffer(&wg[1]);
 	strcpy(wg[1].name, "Wiegand1");
 
     gpio_evt_queue = xQueueCreate(10, sizeof(gpio_event_t));
