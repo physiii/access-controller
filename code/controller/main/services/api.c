@@ -13,6 +13,7 @@
 #include "wiegand_registry.h"
 #include "rf_registry.h"
 #include "store.h"
+#include "esp_system.h"
 
 static const char *API_TAG = "api_server";
 
@@ -97,6 +98,20 @@ static cJSON *build_state_snapshot(void) {
         logs = cJSON_CreateArray();
     }
     cJSON_AddItemToObject(root, "logs", logs);
+
+    /* Wi-Fi state */
+    cJSON *wifi = cJSON_CreateObject();
+    if (wifi) {
+        char ssid[32] = {0};
+        char pwd[64] = {0};
+        load_wifi_credentials_from_flash(ssid, pwd);
+        cJSON_AddStringToObject(wifi, "active_ssid", ssid);
+        cJSON *list = wifi_list_snapshot();
+        if (list) {
+            cJSON_AddItemToObject(wifi, "networks", list);
+        }
+        cJSON_AddItemToObject(root, "wifi", wifi);
+    }
 
     // Add keypad PIN users
     cJSON *keypad_users = keypad_users_snapshot();
@@ -393,6 +408,73 @@ static esp_err_t api_server_post_handler(httpd_req_t *req) {
     return handle_json_post(req, handle_authorize_message, build_state_snapshot);
 }
 
+static esp_err_t api_wifi_get_handler(httpd_req_t *req) {
+    return send_json_response(req, build_state_snapshot());
+}
+
+static esp_err_t api_wifi_add_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    const cJSON *ssid_item = cJSON_GetObjectItemCaseSensitive(payload, "ssid");
+    const cJSON *pass_item = cJSON_GetObjectItemCaseSensitive(payload, "password");
+    const char *ssid = cJSON_IsString(ssid_item) ? ssid_item->valuestring : NULL;
+    const char *pwd = cJSON_IsString(pass_item) ? pass_item->valuestring : "";
+    if (!ssid || ssid[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "ssid required");
+    }
+    err = wifi_list_add(ssid, pwd);
+    cJSON_Delete(payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to save WiFi");
+    }
+    httpd_resp_sendstr(req, "OK");
+    esp_restart();
+    return ESP_OK;
+}
+
+static esp_err_t api_wifi_delete_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    const cJSON *ssid_item = cJSON_GetObjectItemCaseSensitive(payload, "ssid");
+    const char *ssid = cJSON_IsString(ssid_item) ? ssid_item->valuestring : NULL;
+    if (!ssid || ssid[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "ssid required");
+    }
+    err = wifi_list_delete(ssid);
+    cJSON_Delete(payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to delete WiFi");
+    }
+    return send_json_response(req, build_state_snapshot());
+}
+
+static esp_err_t api_wifi_connect_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    const cJSON *ssid_item = cJSON_GetObjectItemCaseSensitive(payload, "ssid");
+    const char *ssid = cJSON_IsString(ssid_item) ? ssid_item->valuestring : NULL;
+    if (!ssid || ssid[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "ssid required");
+    }
+    err = wifi_list_set_active(ssid);
+    cJSON_Delete(payload);
+    if (err == ESP_ERR_NOT_FOUND) {
+        return httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "ssid not found");
+    }
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to activate WiFi");
+    }
+    httpd_resp_sendstr(req, "OK");
+    esp_restart();
+    return ESP_OK;
+}
+
 
 static esp_err_t api_favicon_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "image/x-icon");
@@ -624,6 +706,42 @@ static esp_err_t api_rf_delete_post_handler(httpd_req_t *req) {
     return send_rf_state_response(req);
 }
 
+static esp_err_t api_rf_config_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+    const cJSON *id_item = cJSON_GetObjectItemCaseSensitive(payload, "id");
+    const cJSON *mode_item = cJSON_GetObjectItemCaseSensitive(payload, "mode");
+    const cJSON *ch_item = cJSON_GetObjectItemCaseSensitive(payload, "channel_mask");
+    const cJSON *exit_item = cJSON_GetObjectItemCaseSensitive(payload, "exit_seconds");
+    const cJSON *alert_item = cJSON_GetObjectItemCaseSensitive(payload, "alert");
+    const char *id = cJSON_IsString(id_item) ? id_item->valuestring : NULL;
+    const char *mode = cJSON_IsString(mode_item) ? mode_item->valuestring : NULL;
+    int ch_mask = cJSON_IsNumber(ch_item) ? (int)ch_item->valuedouble : 0;
+    int exit_s = cJSON_IsNumber(exit_item) ? (int)exit_item->valuedouble : 0;
+    bool alert = alert_item ? cJSON_IsTrue(alert_item) : true;
+
+    if (!id || !mode || ch_mask <= 0) {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "id, mode, channel_mask required");
+    }
+
+    err = rf_registry_update_config(id, mode, ch_mask, exit_s, alert);
+    cJSON_Delete(payload);
+    if (err == ESP_ERR_NOT_FOUND) {
+        return httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "RF code not found");
+    }
+    if (err == ESP_ERR_INVALID_ARG) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid mode/channel");
+    }
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to update config");
+    }
+    return send_rf_state_response(req);
+}
+
 void register_api_routes(httpd_handle_t server) {
     httpd_uri_t state = {
         .uri = "/api/state",
@@ -702,6 +820,13 @@ void register_api_routes(httpd_handle_t server) {
     };
     httpd_register_uri_handler(server, &rf_delete_post);
 
+    httpd_uri_t rf_config_post = {
+        .uri = "/api/rf/config",
+        .method = HTTP_POST,
+        .handler = api_rf_config_post_handler,
+    };
+    httpd_register_uri_handler(server, &rf_config_post);
+
     httpd_uri_t keypad_user_post = {
         .uri = "/api/keypad/user",
         .method = HTTP_POST,
@@ -757,6 +882,34 @@ void register_api_routes(httpd_handle_t server) {
         .handler = api_wifi_post_handler,
     };
     httpd_register_uri_handler(server, &wifi_post);
+
+    httpd_uri_t wifi_get = {
+        .uri = "/api/wifi",
+        .method = HTTP_GET,
+        .handler = api_wifi_get_handler,
+    };
+    httpd_register_uri_handler(server, &wifi_get);
+
+    httpd_uri_t wifi_add = {
+        .uri = "/api/wifi/add",
+        .method = HTTP_POST,
+        .handler = api_wifi_add_post_handler,
+    };
+    httpd_register_uri_handler(server, &wifi_add);
+
+    httpd_uri_t wifi_delete = {
+        .uri = "/api/wifi/delete",
+        .method = HTTP_POST,
+        .handler = api_wifi_delete_post_handler,
+    };
+    httpd_register_uri_handler(server, &wifi_delete);
+
+    httpd_uri_t wifi_connect = {
+        .uri = "/api/wifi/connect",
+        .method = HTTP_POST,
+        .handler = api_wifi_connect_post_handler,
+    };
+    httpd_register_uri_handler(server, &wifi_connect);
 
     httpd_uri_t server_post = {
         .uri = "/api/server",

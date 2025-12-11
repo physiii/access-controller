@@ -269,10 +269,19 @@ const renderWiegand = (wiegand = {}) => {
       const existingValues = {};
       listEl.querySelectorAll('.user-row').forEach((row) => {
         const id = row.getAttribute('data-id');
-        const input = row.querySelector('.user-name-input');
-        if (id && input && document.activeElement === input) {
-          existingValues[id] = input.value;
-        }
+        if (!id) return;
+        const nameInput = row.querySelector('.user-name-input');
+        const modeSel = row.querySelector('.rf-mode-select');
+        const chSel = row.querySelector('.rf-channel-select');
+        const exitInput = row.querySelector('.rf-exit-seconds');
+        const alertCb = row.querySelector('.rf-alert-checkbox');
+        existingValues[id] = {
+          name: nameInput ? nameInput.value : undefined,
+          mode: modeSel ? modeSel.value : undefined,
+          channel_mask: chSel ? Number(chSel.value) : undefined,
+          exit_seconds: exitInput ? Number(exitInput.value) : undefined,
+          alert: alertCb ? alertCb.checked : undefined,
+        };
       });
 
       listEl.innerHTML = users
@@ -302,16 +311,52 @@ const renderWiegand = (wiegand = {}) => {
 
 // Remote FOBs (433 MHz)
 const buildRfUserRow = (user, existingValue) => {
-  const name = escapeHtml(existingValue !== undefined ? existingValue : (user.name || ''));
+  const name = escapeHtml(existingValue?.name !== undefined ? existingValue.name : (user.name || ''));
   const code = user.code ? `0x${escapeHtml(user.code)}` : '—';
+  const mode = existingValue?.mode || user.mode || 'toggle';
+  const channelMask = existingValue?.channel_mask || user.channel_mask || 1;
+  const exitSeconds = existingValue?.exit_seconds ?? user.exit_seconds ?? 4;
+  const alert = existingValue?.alert ?? (user.alert ?? true);
+
   return `
     <div class="user-row" data-id="${escapeHtml(user.id || '')}">
       <span class="user-code">${code}</span>
       <div class="user-info">
-        <input type="text" class="user-name-input" value="${name}" placeholder="Enter name...">
+        <label class="stacked">
+          <span>Name</span>
+          <input type="text" class="user-name-input" value="${name}" placeholder="Enter name...">
+        </label>
+        <div class="user-config">
+          <label class="stacked">
+            <span>Mode</span>
+            <select class="rf-mode-select">
+              <option value="toggle" ${mode === 'toggle' ? 'selected' : ''}>Toggle</option>
+              <option value="momentary" ${mode === 'momentary' ? 'selected' : ''}>Momentary (hold = off)</option>
+              <option value="exit" ${mode === 'exit' ? 'selected' : ''}>Exit (pulse)</option>
+              <option value="power_on" ${mode === 'power_on' ? 'selected' : ''}>Power ON</option>
+              <option value="power_off" ${mode === 'power_off' ? 'selected' : ''}>Power OFF</option>
+            </select>
+          </label>
+          <label class="stacked">
+            <span>Channel</span>
+            <select class="rf-channel-select">
+              <option value="1" ${channelMask === 1 ? 'selected' : ''}>Channel 1</option>
+              <option value="2" ${channelMask === 2 ? 'selected' : ''}>Channel 2</option>
+              <option value="3" ${channelMask === 3 ? 'selected' : ''}>Both</option>
+            </select>
+          </label>
+          <label class="stacked">
+            <span>Exit duration (s)</span>
+            <input type="number" class="rf-exit-seconds" min="1" step="1" value="${exitSeconds}">
+          </label>
+          <label class="form-switch">
+            <input type="checkbox" class="rf-alert-checkbox" ${alert ? 'checked' : ''}>
+            <span>Alert (beep)</span>
+          </label>
+        </div>
       </div>
       <div class="user-actions">
-        <button type="button" class="secondary" data-action="rename-rf" data-id="${escapeHtml(user.id || '')}">Save</button>
+        <button type="button" class="secondary" data-action="save-rf" data-id="${escapeHtml(user.id || '')}">Save</button>
         <button type="button" class="secondary danger" data-action="delete-rf" data-id="${escapeHtml(user.id || '')}">Delete</button>
       </div>
     </div>
@@ -349,33 +394,29 @@ const renderRf = (rf = {}) => {
   if (registerBtn) registerBtn.disabled = registrationActive;
   if (stopBtn) stopBtn.disabled = !registrationActive;
 
-  if (listEl) {
+  if (listEl && !listEl.contains(document.activeElement)) {
     if (!users || users.length === 0) {
       listEl.innerHTML = '<p class="empty-state muted">No remote FOBs learned yet. Click "Register" to learn codes.</p>';
     } else {
       const existingValues = {};
       listEl.querySelectorAll('.user-row').forEach((row) => {
         const id = row.getAttribute('data-id');
-        const input = row.querySelector('.user-name-input');
-        if (id && input && document.activeElement === input) {
-          existingValues[id] = input.value;
-        }
+        if (!id) return;
+        const nameInput = row.querySelector('.user-name-input');
+        const modeSel = row.querySelector('.rf-mode-select');
+        const chSel = row.querySelector('.rf-channel-select');
+        const exitInput = row.querySelector('.rf-exit-seconds');
+        existingValues[id] = {
+          name: nameInput ? nameInput.value : undefined,
+          mode: modeSel ? modeSel.value : undefined,
+          channel_mask: chSel ? Number(chSel.value) : undefined,
+          exit_seconds: exitInput ? Number(exitInput.value) : undefined,
+        };
       });
 
       listEl.innerHTML = users
         .map((u) => buildRfUserRow(u, existingValues[u.id]))
         .join('');
-
-      Object.keys(existingValues).forEach((id) => {
-        const row = listEl.querySelector(`.user-row[data-id="${id}"]`);
-        if (row) {
-          const input = row.querySelector('.user-name-input');
-          if (input) {
-            input.focus();
-            input.setSelectionRange(input.value.length, input.value.length);
-          }
-        }
-      });
     }
   }
 
@@ -399,6 +440,7 @@ const renderState = (state = {}) => {
   renderRf(state.rf || {});
   renderKeypadUsers(state.keypadUsers || []);
   renderLogs(state.logs || []);
+  renderWifi(state.wifi || {});
 };
 
 const loadState = async () => {
@@ -572,6 +614,7 @@ const setupKeypadHandlers = () => {
 const setupForms = () => {
   const wifiForm = document.getElementById('wifiForm');
   const serverForm = document.getElementById('serverForm');
+  const wifiList = document.getElementById('wifiNetworks');
 
   if (wifiForm) {
     wifiForm.addEventListener('submit', async (event) => {
@@ -580,13 +623,51 @@ const setupForms = () => {
       const wifiPassword = document.getElementById('wifiPassword')?.value || '';
 
       try {
-        await fetchJSON('api/wifi', {
+        await fetchJSON('api/wifi/add', {
           method: 'POST',
-          body: JSON.stringify({ wifiName, wifiPassword }),
+          body: JSON.stringify({ ssid: wifiName, password: wifiPassword }),
         });
-        showToast('Wi-Fi credentials updated. Device will reboot to apply changes.');
+        showToast('Wi‑Fi saved. Device will reboot to connect.');
       } catch (error) {
         handleError(error, 'Failed to update Wi-Fi credentials');
+      }
+    });
+  }
+
+  if (wifiList) {
+    wifiList.addEventListener('click', async (event) => {
+      const connectBtn = event.target.closest('button[data-action="wifi-connect"]');
+      const deleteBtn = event.target.closest('button[data-action="wifi-delete"]');
+      if (connectBtn) {
+        const ssid = connectBtn.getAttribute('data-ssid');
+        connectBtn.disabled = true;
+        try {
+          await fetchJSON('api/wifi/connect', {
+            method: 'POST',
+            body: JSON.stringify({ ssid }),
+          });
+          showToast('Connecting... device will reboot.');
+        } catch (error) {
+          handleError(error, 'Failed to connect');
+        } finally {
+          connectBtn.disabled = false;
+        }
+      }
+      if (deleteBtn) {
+        const ssid = deleteBtn.getAttribute('data-ssid');
+        deleteBtn.disabled = true;
+        try {
+          await fetchJSON('api/wifi/delete', {
+            method: 'POST',
+            body: JSON.stringify({ ssid }),
+          });
+          showToast('Wi‑Fi removed.');
+          loadState();
+        } catch (error) {
+          handleError(error, 'Failed to delete Wi‑Fi');
+        } finally {
+          deleteBtn.disabled = false;
+        }
       }
     });
   }
@@ -736,30 +817,47 @@ const setupRfHandlers = () => {
 
   if (listEl) {
     listEl.addEventListener('click', async (event) => {
-      const renameBtn = event.target.closest('button[data-action="rename-rf"]');
+      const saveBtn = event.target.closest('button[data-action="save-rf"]');
       const deleteBtn = event.target.closest('button[data-action="delete-rf"]');
 
-      if (renameBtn) {
-        const container = renameBtn.closest('.user-row');
-        const input = container?.querySelector('.user-name-input');
-        const id = renameBtn.getAttribute('data-id');
-        const name = input?.value.trim();
-        if (!id || !name) {
+      if (saveBtn) {
+        const container = saveBtn.closest('.user-row');
+        const nameInput = container?.querySelector('.user-name-input');
+        const modeSelect = container?.querySelector('.rf-mode-select');
+        const channelSelect = container?.querySelector('.rf-channel-select');
+        const exitInput = container?.querySelector('.rf-exit-seconds');
+        const alertCb = container?.querySelector('.rf-alert-checkbox');
+        const id = saveBtn.getAttribute('data-id');
+        const name = nameInput?.value.trim();
+        const mode = modeSelect?.value;
+        const channel_mask = channelSelect ? Number(channelSelect.value) : 0;
+        const exit_seconds = exitInput ? Number(exitInput.value || 0) : 0;
+        const alert = alertCb ? !!alertCb.checked : true;
+
+        if (!id) {
+          showToast('Missing id');
+          return;
+        }
+        if (!name) {
           showToast('Please provide a name before saving.');
           return;
         }
-        renameBtn.disabled = true;
+        saveBtn.disabled = true;
         try {
-          const rf = await fetchJSON('api/rf/rename', {
+          await fetchJSON('api/rf/rename', {
             method: 'POST',
             body: JSON.stringify({ id, name }),
           });
+          const rf = await fetchJSON('api/rf/config', {
+            method: 'POST',
+            body: JSON.stringify({ id, mode, channel_mask, exit_seconds, alert }),
+          });
           renderRf(rf);
-          showToast('Remote name updated.');
+          showToast('Remote updated.');
         } catch (error) {
-          handleError(error, error.message || 'Failed to rename remote');
+          handleError(error, error.message || 'Failed to update remote');
         } finally {
-          renameBtn.disabled = false;
+          saveBtn.disabled = false;
         }
       }
 
@@ -875,6 +973,37 @@ const renderKeypadUsers = (users = []) => {
       }
     });
   }
+};
+
+const renderWifi = (wifi = {}) => {
+  const list = document.getElementById('wifiNetworks');
+  const activeEl = document.getElementById('wifiActive');
+  if (!list) return;
+  const networks = wifi.networks || [];
+  const active = wifi.active_ssid || '';
+  if (activeEl) {
+    activeEl.textContent = active || '—';
+  }
+  if (!networks.length) {
+    list.innerHTML = '<p class="empty-state muted">No saved Wi‑Fi networks.</p>';
+    return;
+  }
+  list.innerHTML = networks
+    .map(
+      (n) => `
+      <div class="user-row" data-ssid="${escapeHtml(n.ssid || '')}">
+        <div class="user-info">
+          <strong>${escapeHtml(n.ssid || '')}</strong>
+          <div class="meta muted">${n.last_used_ms ? `Last used: ${Math.round(n.last_used_ms / 1000)}s since boot` : ''}</div>
+        </div>
+        <div class="user-actions">
+          <button type="button" class="secondary" data-action="wifi-connect" data-ssid="${escapeHtml(n.ssid || '')}" ${active === n.ssid ? 'disabled' : ''}>Connect</button>
+          <button type="button" class="secondary danger" data-action="wifi-delete" data-ssid="${escapeHtml(n.ssid || '')}">Delete</button>
+        </div>
+      </div>
+    `
+    )
+    .join('');
 };
 
 const setupKeypadPinHandlers = () => {
@@ -1020,6 +1149,8 @@ document.addEventListener('DOMContentLoaded', () => {
     keypadSaveNewBtn: document.getElementById('keypadSaveNewBtn'),
     logItems: document.getElementById('logItems'),
     logEmptyState: document.getElementById('logEmptyState'),
+    wifiNetworks: document.getElementById('wifiNetworks'),
+    wifiActive: document.getElementById('wifiActive'),
   };
 
   bindNavigation();

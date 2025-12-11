@@ -253,6 +253,7 @@ void app_main(void) {
         tunnel_start();
     } else {
         ESP_LOGI(TAG, "Starting Access Point...");
+        automation_record_log("WiFi STA failed after retries; starting AP mode");
         
         char ap_ssid[32];
         generate_ssid_from_device_id(device_id, ap_ssid, sizeof(ap_ssid));

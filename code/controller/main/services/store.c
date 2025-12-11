@@ -11,6 +11,7 @@
 #include "nvs.h"
 #include "esp_spiffs.h"
 #include "cJSON.h"
+#include "esp_timer.h"
 #include "automation.h"
 #include "log_store.h"
 #include "store.h"
@@ -388,6 +389,113 @@ void load_server_info_from_flash(char *server_ip, char *server_port) {
     free(port_str);
 }
 
+/* ---------- WiFi list management ---------- */
+static uint64_t now_ms_store(void) { return esp_timer_get_time() / 1000ULL; }
+static esp_err_t wifi_list_save_array(cJSON *arr); // forward
+
+static cJSON *wifi_list_load_array(void) {
+    char *json = get_char("wifi_list");
+    cJSON *arr = NULL;
+    if (json && json[0] != '\0') {
+        arr = cJSON_Parse(json);
+    }
+    if (!cJSON_IsArray(arr)) {
+        if (arr) cJSON_Delete(arr);
+        arr = cJSON_CreateArray();
+        /* Persist an empty list to avoid repeated NVS-not-found logs */
+        if (arr) {
+            wifi_list_save_array(arr);
+        }
+    }
+    free(json);
+    return arr;
+}
+
+static esp_err_t wifi_list_save_array(cJSON *arr) {
+    if (!arr) return ESP_ERR_INVALID_ARG;
+    char *json = cJSON_PrintUnformatted(arr);
+    if (!json) return ESP_ERR_NO_MEM;
+    esp_err_t err = store_char("wifi_list", json);
+    free(json);
+    return err;
+}
+
+static void wifi_list_remove_ssid(cJSON *arr, const char *ssid) {
+    if (!arr || !ssid) return;
+    int count = cJSON_GetArraySize(arr);
+    for (int i = count - 1; i >= 0; i--) {
+        cJSON *item = cJSON_GetArrayItem(arr, i);
+        const cJSON *s = cJSON_GetObjectItemCaseSensitive(item, "ssid");
+        if (cJSON_IsString(s) && s->valuestring && strcmp(s->valuestring, ssid) == 0) {
+            cJSON_DeleteItemFromArray(arr, i);
+        }
+    }
+}
+
+esp_err_t wifi_list_add(const char *ssid, const char *password) {
+    if (!ssid || ssid[0] == '\0') return ESP_ERR_INVALID_ARG;
+    cJSON *arr = wifi_list_load_array();
+    if (!arr) return ESP_ERR_NO_MEM;
+    wifi_list_remove_ssid(arr, ssid);
+    cJSON *obj = cJSON_CreateObject();
+    cJSON_AddStringToObject(obj, "ssid", ssid);
+    cJSON_AddStringToObject(obj, "password", password ? password : "");
+    cJSON_AddNumberToObject(obj, "last_used_ms", (double)now_ms_store());
+    cJSON_AddItemToArray(arr, obj);
+    esp_err_t err = wifi_list_save_array(arr);
+    cJSON_Delete(arr);
+    // also set active creds
+    if (err == ESP_OK) {
+        store_wifi_credentials_to_flash(ssid, password ? password : "");
+    }
+    return err;
+}
+
+esp_err_t wifi_list_delete(const char *ssid) {
+    if (!ssid) return ESP_ERR_INVALID_ARG;
+    cJSON *arr = wifi_list_load_array();
+    if (!arr) return ESP_ERR_NO_MEM;
+    wifi_list_remove_ssid(arr, ssid);
+    esp_err_t err = wifi_list_save_array(arr);
+    cJSON_Delete(arr);
+    return err;
+}
+
+esp_err_t wifi_list_set_active(const char *ssid) {
+    if (!ssid) return ESP_ERR_INVALID_ARG;
+    cJSON *arr = wifi_list_load_array();
+    if (!arr) return ESP_ERR_NO_MEM;
+    bool found = false;
+    int count = cJSON_GetArraySize(arr);
+    for (int i = 0; i < count; i++) {
+        cJSON *item = cJSON_GetArrayItem(arr, i);
+        const cJSON *s = cJSON_GetObjectItemCaseSensitive(item, "ssid");
+        const cJSON *p = cJSON_GetObjectItemCaseSensitive(item, "password");
+        if (cJSON_IsString(s) && s->valuestring && strcmp(s->valuestring, ssid) == 0) {
+            const char *pwd = (cJSON_IsString(p) && p->valuestring) ? p->valuestring : "";
+            store_wifi_credentials_to_flash(ssid, pwd);
+            cJSON_ReplaceItemInObject(item, "last_used_ms", cJSON_CreateNumber((double)now_ms_store()));
+            found = true;
+            break;
+        }
+    }
+    esp_err_t err = found ? wifi_list_save_array(arr) : ESP_ERR_NOT_FOUND;
+    cJSON_Delete(arr);
+    return err;
+}
+
+cJSON *wifi_list_snapshot(void) {
+    cJSON *arr = wifi_list_load_array();
+    if (!arr) return NULL;
+    // Strip passwords for snapshot
+    int count = cJSON_GetArraySize(arr);
+    for (int i = 0; i < count; i++) {
+        cJSON *item = cJSON_GetArrayItem(arr, i);
+        cJSON_DeleteItemFromObject(item, "password");
+    }
+    return arr;
+}
+
 void get_md5_from_flash(char *md5_hash, size_t size) {
     char *stored_md5 = get_char("firmware_md5");
     if (stored_md5 && strlen(stored_md5) > 0) {
@@ -582,6 +690,14 @@ void delete_user_from_flash(const char *uuid_to_delete) {
 esp_err_t store_server_info_to_flash(const char *server_ip, const char *server_port) {
     esp_err_t err_ip = store_char("server_ip", server_ip);
     esp_err_t err_port = store_char("server_port", server_port);
+
+    /* Keep tunnel host/port in sync with server settings */
+    if (err_ip == ESP_OK) {
+        store_char("tunnel_host", server_ip);
+    }
+    if (err_port == ESP_OK) {
+        store_char("tunnel_port", server_port);
+    }
 
     if (err_ip == ESP_OK && err_port == ESP_OK) {
         char log_msg[LOG_STORE_MESSAGE_MAX];

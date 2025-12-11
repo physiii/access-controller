@@ -228,36 +228,6 @@
         <div id="wiegandUserList" class="user-list"></div>
       </div>
 
-      <div class="card" id="rf-card">
-        <div class="card-header">
-          <div>
-            <h2>Remote FOBs</h2>
-            <p class="subtitle">Learn 433MHz remotes and manage their names.</p>
-          </div>
-          <div class="card-actions">
-            <button id="rfRegisterBtn" type="button">
-              <span class="btn-icon">+</span> Register
-            </button>
-            <button id="rfStopBtn" type="button" class="secondary">Stop</button>
-          </div>
-        </div>
-        <div class="status-bar" id="rfStatusBar">
-          <div class="status-indicator" id="rfStatusIndicator">
-            <span class="status-dot"></span>
-            <span id="rfStatus">Idle</span>
-          </div>
-          <div class="status-meta">
-            <span class="label">Pending:</span>
-            <span id="rfPending" class="value">0</span>
-          </div>
-          <div class="status-meta" id="rfDuplicateWrap">
-            <span class="label">Duplicate:</span>
-            <span id="rfDuplicate" class="value muted">—</span>
-          </div>
-        </div>
-        <div id="rfUserList" class="user-list"></div>
-      </div>
-
       <div class="card" id="keypad-card">
         <div class="card-header">
           <div>
@@ -289,6 +259,36 @@
             <button id="keypadSaveNewBtn" type="button">Save PIN</button>
           </div>
         </div>
+      </div>
+
+      <div class="card" id="rf-card">
+        <div class="card-header">
+          <div>
+            <h2>Remote FOBs</h2>
+            <p class="subtitle">Learn 433MHz remotes and manage their names.</p>
+          </div>
+          <div class="card-actions">
+            <button id="rfRegisterBtn" type="button">
+              <span class="btn-icon">+</span> Register
+            </button>
+            <button id="rfStopBtn" type="button" class="secondary">Stop</button>
+          </div>
+        </div>
+        <div class="status-bar" id="rfStatusBar">
+          <div class="status-indicator" id="rfStatusIndicator">
+            <span class="status-dot"></span>
+            <span id="rfStatus">Idle</span>
+          </div>
+          <div class="status-meta">
+            <span class="label">Pending:</span>
+            <span id="rfPending" class="value">0</span>
+          </div>
+          <div class="status-meta" id="rfDuplicateWrap">
+            <span class="label">Duplicate:</span>
+            <span id="rfDuplicate" class="value muted">—</span>
+          </div>
+        </div>
+        <div id="rfUserList" class="user-list"></div>
       </div>
     </section>
 
@@ -343,6 +343,13 @@
             <button type="submit">Save Wi-Fi</button>
           </div>
         </form>
+        <div class="info-list" id="wifiSaved">
+          <div class="info-row">
+            <span class="label">Saved networks</span>
+            <span class="value muted" id="wifiActive">—</span>
+          </div>
+          <div id="wifiNetworks" class="user-list"></div>
+        </div>
       </div>
 
       <div class="card">

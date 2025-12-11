@@ -18,5 +18,7 @@ void rf_registry_on_code(uint32_t code, size_t pulse_count);
 esp_err_t rf_registry_update_name(const char *id, const char *name);
 esp_err_t rf_registry_remove(const char *id);
 cJSON *rf_state_snapshot(void);
+bool rf_registry_handle_code(uint32_t code);
+esp_err_t rf_registry_update_config(const char *id, const char *mode, int channel_mask, int exit_seconds, bool alert);
 
 #endif /* RF_REGISTRY_H */

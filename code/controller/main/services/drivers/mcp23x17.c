@@ -17,6 +17,9 @@ esp_err_t i2c_master_write_slave(uint8_t addr, i2c_port_t i2c_num, uint8_t *data
 #define A6	6
 #define A7	7
 
+#ifdef B0
+#undef B0
+#endif
 #define B0	8
 #define B1	9
 #define B2	10

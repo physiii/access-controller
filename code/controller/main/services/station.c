@@ -26,6 +26,7 @@ static EventGroupHandle_t s_wifi_event_group;
 static int s_retry_num = 0;
 static bool s_sntp_started = false;
 static bool s_connected_once = false;
+static int s_disconnect_retry = 0;
 
 static void time_sync_notification_cb(struct timeval *tv) {
     time_t now = 0;
@@ -48,7 +49,13 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         automation_record_log(message);
 
         if (s_connected_once) {
-            esp_wifi_connect();
+            if (s_disconnect_retry < EXAMPLE_ESP_MAXIMUM_RETRY) {
+                s_disconnect_retry++;
+                esp_wifi_connect();
+                ESP_LOGI(TAG, "Reconnect attempt %d after disconnect", s_disconnect_retry);
+            } else {
+                xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
+            }
             return;
         }
 
@@ -64,6 +71,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         s_connected_once = true;
+        s_disconnect_retry = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         if (!s_sntp_started) {
             esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);

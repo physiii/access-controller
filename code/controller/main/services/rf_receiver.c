@@ -274,8 +274,12 @@ static void rf_process_task(void *pvParameter)
                             rf_last_code = code;
                             rf_last_code_time_us = now_us;
                             
-                            /* TODO: Check against authorized codes and trigger action */
-                            rf_registry_on_code(code, count);
+                            /* Registration path vs live action */
+                            if (rf_registry_is_active()) {
+                                rf_registry_on_code(code, count);
+                            } else {
+                                rf_registry_handle_code(code);
+                            }
                         }
                     } else {
                         ESP_LOGD(RF_TAG, "Decode failed (count=%d, sync=%d)", (int)count, had_sync);

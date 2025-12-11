@@ -94,28 +94,30 @@ static void load_tunnel_config(tunnel_config_t *cfg) {
     }
 
     char *stored_host = get_char("tunnel_host");
-    if (stored_host && strlen(stored_host) > 0) {
-        snprintf(cfg->host, sizeof(cfg->host), "%s", stored_host);
-    } else {
-        snprintf(cfg->host, sizeof(cfg->host), "%s", TUNNEL_DEFAULT_HOST);
-    }
-    if (stored_host) {
-        free(stored_host);
-    }
-
     char *stored_port = get_char("tunnel_port");
-    if (stored_port && strlen(stored_port) > 0) {
-        cfg->port = atoi(stored_port);
+    char *server_host = get_char("server_ip");
+    char *server_port = get_char("server_port");
+
+    const char *host_pick = (stored_host && stored_host[0]) ? stored_host :
+                            (server_host && server_host[0]) ? server_host : TUNNEL_DEFAULT_HOST;
+    const char *port_pick_str = (stored_port && stored_port[0]) ? stored_port :
+                                (server_port && server_port[0]) ? server_port : NULL;
+
+    snprintf(cfg->host, sizeof(cfg->host), "%s", host_pick);
+    if (port_pick_str) {
+        cfg->port = atoi(port_pick_str);
     } else {
         cfg->port = TUNNEL_DEFAULT_PORT;
-    }
-    if (stored_port) {
-        free(stored_port);
     }
 
     if (cfg->port <= 0) {
         cfg->port = TUNNEL_DEFAULT_PORT;
     }
+
+    if (stored_host) free(stored_host);
+    if (stored_port) free(stored_port);
+    if (server_host) free(server_host);
+    if (server_port) free(server_port);
 }
 
 static esp_http_client_method_t http_method_from_string(const char *method) {
