@@ -120,37 +120,35 @@ void check_lock_contact_timer(Lock *lck) {
         && lck->enable
         && !lck->expired)
     {
-        if (!lck->isSignal) {
-            if (!lck->sentSignalAlert) {
-                snprintf(log_msg, sizeof(log_msg), 
-                    "{\"event_type\":\"log\",\"payload\":"
-                    "{\"service_id\":\"ac_1\", "
-                    "\"type\":\"access-control\", "
-                    "\"description\":\"No armed status coming from lock.\", "
-                    "\"event\":\"authentication\", "
-                    "\"value\":\"true\"}"
-                    "}");
-                addServerMessageToQueue(log_msg);
-                lck->sentSignalAlert = true;
-            }
-            ESP_LOGI(TAG, "No signal from lock %d, sounding alert.", lck->channel);
+        if (!lck->isSignal && !lck->sentSignalAlert) {
+            snprintf(log_msg, sizeof(log_msg), 
+                "{\"event_type\":\"log\",\"payload\":"
+                "{\"service_id\":\"ac_1\", "
+                "\"type\":\"access-control\", "
+                "\"description\":\"No armed status coming from lock.\", "
+                "\"event\":\"authentication\", "
+                "\"value\":\"true\"}"
+                "}");
+            addServerMessageToQueue(log_msg);
+            lck->sentSignalAlert = true;
         }
-        if (!lck->isContact) {
-            if (!lck->sentContactAlert) {
-                snprintf(log_msg, sizeof(log_msg), 
-                    "{\"event_type\":\"log\",\"payload\":"
-                    "{\"service_id\":\"ac_1\", "
-                    "\"type\":\"access-control\", "
-                    "\"description\":\"Door is still open when armed.\", "
-                    "\"event\":\"authentication\", "
-                    "\"value\":\"true\"}"
-                    "}");
-                addServerMessageToQueue(log_msg);
-                lck->sentContactAlert = true;
-            }
-            ESP_LOGI(TAG, "No contact from lock %d, sounding alert.", lck->channel);
+        if (!lck->isContact && !lck->sentContactAlert) {
+            snprintf(log_msg, sizeof(log_msg), 
+                "{\"event_type\":\"log\",\"payload\":"
+                "{\"service_id\":\"ac_1\", "
+                "\"type\":\"access-control\", "
+                "\"description\":\"Door is still open when armed.\", "
+                "\"event\":\"authentication\", "
+                "\"value\":\"true\"}"
+                "}");
+            addServerMessageToQueue(log_msg);
+            lck->sentContactAlert = true;
         }
-        beep_keypad(1, 50);
+        beep_keypad(1, lck->channel);
+        ESP_LOGI(TAG, "Contact alert beep lock %d (contact=%d signal=%d)",
+                 lck->channel,
+                 lck->isContact ? 1 : 0,
+                 lck->isSignal ? 1 : 0);
     } else {
         lck->sentSignalAlert = false;
         lck->sentContactAlert = false;
@@ -211,7 +209,7 @@ void arm_lock(int channel, bool arm, bool alert) {
     if (ch < 0 || ch >= NUM_OF_LOCKS) {
         return;
     }
-    if (!locks[ch].enable) {
+	if (!locks[ch].enable) {
         strlcpy(s_last_action_source, "sys", sizeof(s_last_action_source));
         return;
     }
@@ -254,7 +252,6 @@ void arm_lock(int channel, bool arm, bool alert) {
     strlcpy(s_last_action_source, "sys", sizeof(s_last_action_source));
 
     if (locks[ch].alert) {
-        beep_keypad(1, 50);
         beep_keypad(1, locks[ch].channel);
     }
 }
@@ -444,7 +441,7 @@ void lock_init()
 	locks[0].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_1 : CONTACT_IO_1;
 	locks[0].signalPin = USE_MCP23017 ? LOCK_SIGNAL_PIN_1 : SIGNAL_IO_1;
 	locks[0].enable = true;
-	locks[0].delay = 4;
+	locks[0].delay = 1;
 	locks[0].alert = true;
 	locks[0].enableContactAlert = false;
 	locks[0].polarity = 0;
@@ -458,7 +455,7 @@ void lock_init()
 	locks[1].contactPin = USE_MCP23017 ? LOCK_CONTACT_PIN_2 : CONTACT_IO_2;
 	locks[1].signalPin = USE_MCP23017 ? LOCK_SIGNAL_PIN_2 : SIGNAL_IO_2;
 	locks[1].enable = true;
-	locks[1].delay = 4;
+	locks[1].delay = 1;
 	locks[1].alert = true;
 	locks[1].enableContactAlert = false;
 	locks[0].polarity = 0;
@@ -496,7 +493,7 @@ static void lock_service(void *pvParameter) {
                     
                     if (!hasContact) {
                         ESP_LOGI(TAG, "No contact from lock %d, sounding alert.", i + 1);
-                        beep_keypad(1, 200);
+                        beep_keypad(1, i + 1);  // channel is i + 1
                     }
                 }
             }

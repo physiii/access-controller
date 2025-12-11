@@ -38,7 +38,9 @@ char * get_char(const char * key)
           //printf("%s current value: %s\n", tag, previous_value);
           break;
         case ESP_ERR_NVS_NOT_FOUND:
-          ESP_LOGE(tag, "%s value not initialized, key: %s\n",tag, key);
+          // Key not found - return empty string (expected for uninitialized keys)
+          nvs_close(my_handle);
+          free(value_str);
           return "";
         default :
           ESP_LOGE(tag, "%s Error (%d) reading %s\n", tag, err, key);
@@ -145,10 +147,10 @@ uint32_t get_u32(const char * key, uint32_t value) {
                 // ESP_LOGI(tag, "%s %s:%lu\n", tag, key, value);
                 break;
             case ESP_ERR_NVS_NOT_FOUND:
-                ESP_LOGE(tag, "Error (%d) reading!\n", err);
+                // Key not found - use default value (this is expected for uninitialized keys)
                 break;
             default :
-                ESP_LOGE(tag, "Error (%d) reading!\n", err);
+                ESP_LOGE(tag, "Error (%d) reading key %s!\n", err, key);
         }
         nvs_close(my_handle);
     }

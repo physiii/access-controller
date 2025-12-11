@@ -196,8 +196,8 @@
       <div class="card" id="wiegand-card">
         <div class="card-header">
           <div>
-            <h2>Wiegand</h2>
-            <p class="subtitle">Register RFID taps and keypad identifiers.</p>
+            <h2>RFID Cards</h2>
+            <p class="subtitle">Manage registered RFID tags and fobs.</p>
           </div>
           <div class="card-actions">
             <select id="wiegandChannelSelect" aria-label="Wiegand channel">
@@ -205,36 +205,89 @@
               <option value="1">Channel 1</option>
               <option value="2">Channel 2</option>
             </select>
-            <button id="wiegandRegisterBtn" type="button">Register</button>
+            <button id="wiegandRegisterBtn" type="button">
+              <span class="btn-icon">+</span> Register
+            </button>
             <button id="wiegandStopBtn" type="button" class="secondary">Stop</button>
           </div>
         </div>
-        <div class="status-grid">
-          <div>
-            <span class="label">Status</span>
-            <span id="wiegandStatus" class="value">Inactive</span>
+        <div class="status-bar" id="wiegandStatusBar">
+          <div class="status-indicator" id="wiegandStatusIndicator">
+            <span class="status-dot"></span>
+            <span id="wiegandStatus">Idle</span>
           </div>
-          <div>
-            <span class="label">Pending</span>
+          <div class="status-meta">
+            <span class="label">Pending:</span>
             <span id="wiegandPending" class="value">0</span>
           </div>
-          <div>
-            <span class="label">Last duplicate</span>
-            <span id="wiegandDuplicate" class="value muted">None</span>
+          <div class="status-meta" id="wiegandDuplicateWrap">
+            <span class="label">Duplicate:</span>
+            <span id="wiegandDuplicate" class="value muted">—</span>
           </div>
         </div>
-        <div id="wiegandUserList" class="wiegand-user-list"></div>
+        <div id="wiegandUserList" class="user-list"></div>
+      </div>
+
+      <div class="card" id="rf-card">
+        <div class="card-header">
+          <div>
+            <h2>Remote FOBs</h2>
+            <p class="subtitle">Learn 433MHz remotes and manage their names.</p>
+          </div>
+          <div class="card-actions">
+            <button id="rfRegisterBtn" type="button">
+              <span class="btn-icon">+</span> Register
+            </button>
+            <button id="rfStopBtn" type="button" class="secondary">Stop</button>
+          </div>
+        </div>
+        <div class="status-bar" id="rfStatusBar">
+          <div class="status-indicator" id="rfStatusIndicator">
+            <span class="status-dot"></span>
+            <span id="rfStatus">Idle</span>
+          </div>
+          <div class="status-meta">
+            <span class="label">Pending:</span>
+            <span id="rfPending" class="value">0</span>
+          </div>
+          <div class="status-meta" id="rfDuplicateWrap">
+            <span class="label">Duplicate:</span>
+            <span id="rfDuplicate" class="value muted">—</span>
+          </div>
+        </div>
+        <div id="rfUserList" class="user-list"></div>
       </div>
 
       <div class="card" id="keypad-card">
         <div class="card-header">
           <div>
-            <h2>Keypad Codes</h2>
-            <p class="subtitle">Manage keypad timers and alerts.</p>
+            <h2>Keypad PIN Codes</h2>
+            <p class="subtitle">Manage PIN codes for keypad access.</p>
+          </div>
+          <div class="card-actions">
+            <button id="keypadAddBtn" type="button">
+              <span class="btn-icon">+</span> Add PIN
+            </button>
           </div>
         </div>
-        <div id="keypadContent" class="keypad-content">
-          <p class="muted">Keypad configuration coming soon.</p>
+        <div id="keypadUserList" class="user-list">
+          <p class="empty-state muted">No PIN codes configured yet.</p>
+        </div>
+        <div id="keypadAddForm" class="add-form" hidden>
+          <div class="form-row">
+            <label class="form-field">
+              <span>Name</span>
+              <input type="text" id="keypadNewName" placeholder="e.g. John Smith">
+            </label>
+            <label class="form-field">
+              <span>PIN Code</span>
+              <input type="text" id="keypadNewPin" placeholder="e.g. 1234" maxlength="6" pattern="[0-9]*" inputmode="numeric">
+            </label>
+          </div>
+          <div class="form-actions">
+            <button id="keypadCancelBtn" type="button" class="secondary">Cancel</button>
+            <button id="keypadSaveNewBtn" type="button">Save PIN</button>
+          </div>
         </div>
       </div>
     </section>

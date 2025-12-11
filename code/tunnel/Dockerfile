@@ -18,3 +18,4 @@ EXPOSE 9000 9001
 
 CMD ["node", "src/server.js"]
 
+

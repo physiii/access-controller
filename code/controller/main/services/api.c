@@ -4,12 +4,15 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "esp_random.h"
 #include "cJSON.h"
 #include "freertos/semphr.h"
 
 #include "automation.h"
 #include "wiegand.h"
 #include "wiegand_registry.h"
+#include "rf_registry.h"
+#include "store.h"
 
 static const char *API_TAG = "api_server";
 
@@ -32,6 +35,14 @@ extern void handle_keypad_message(cJSON *payload);
 extern void handle_authorize_message(cJSON *payload);
 
 extern char device_id[100];
+extern uint32_t get_u32(const char *key, uint32_t default_value);
+extern cJSON *load_user_from_flash(uint32_t user_id);
+extern void store_user_to_flash(char *uuid, char *name, char *pin);
+extern void delete_user_from_flash(const char *uuid);
+extern void modify_user_from_flash(const char *uuid, const char *newName, const char *newPin);
+
+// Forward declaration
+static cJSON *keypad_users_snapshot(void);
 
 static cJSON *build_state_snapshot(void) {
     cJSON *root = cJSON_CreateObject();
@@ -75,11 +86,24 @@ static cJSON *build_state_snapshot(void) {
     }
     cJSON_AddItemToObject(root, "wiegand", wiegand);
 
+    cJSON *rf = rf_state_snapshot();
+    if (!rf) {
+        rf = cJSON_CreateObject();
+    }
+    cJSON_AddItemToObject(root, "rf", rf);
+
     cJSON *logs = system_logs_snapshot();
     if (!logs) {
         logs = cJSON_CreateArray();
     }
     cJSON_AddItemToObject(root, "logs", logs);
+
+    // Add keypad PIN users
+    cJSON *keypad_users = keypad_users_snapshot();
+    if (!keypad_users) {
+        keypad_users = cJSON_CreateArray();
+    }
+    cJSON_AddItemToObject(root, "keypadUsers", keypad_users);
 
     return root;
 }
@@ -375,6 +399,231 @@ static esp_err_t api_favicon_handler(httpd_req_t *req) {
     return httpd_resp_send(req, NULL, 0);
 }
 
+// Build JSON array of keypad PIN users
+static cJSON *keypad_users_snapshot(void) {
+    cJSON *array = cJSON_CreateArray();
+    if (!array) return NULL;
+
+    uint32_t user_count = get_u32("auth_user_count", 0);
+    for (uint32_t i = 0; i < user_count; i++) {
+        cJSON *user = load_user_from_flash(i + 1);
+        if (user) {
+            cJSON_AddItemToArray(array, user);
+        }
+    }
+    return array;
+}
+
+// Generate a random UUID
+static void generate_uuid(char *buf, size_t len) {
+    const char *hex = "0123456789abcdef";
+    for (size_t i = 0; i + 1 < len; i++) {
+        buf[i] = hex[esp_random() % 16];
+    }
+    buf[len - 1] = '\0';
+}
+
+// POST /api/keypad/user - Add new PIN user
+static esp_err_t api_keypad_user_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+
+    const cJSON *name_item = cJSON_GetObjectItemCaseSensitive(payload, "name");
+    const cJSON *pin_item = cJSON_GetObjectItemCaseSensitive(payload, "pin");
+
+    const char *name = cJSON_IsString(name_item) ? name_item->valuestring : NULL;
+    const char *pin = cJSON_IsString(pin_item) ? pin_item->valuestring : NULL;
+
+    if (!name || !pin || strlen(pin) < 4 || strlen(pin) > 6) {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Name and PIN (4-6 digits) required");
+    }
+
+    char uuid[33];
+    generate_uuid(uuid, sizeof(uuid));
+
+    ESP_LOGI(API_TAG, "Adding keypad user: name=%s, pin=****", name);
+    store_user_to_flash(uuid, (char *)name, (char *)pin);
+    cJSON_Delete(payload);
+
+    cJSON *users = keypad_users_snapshot();
+    return send_json_response(req, users);
+}
+
+// DELETE /api/keypad/user - Delete PIN user by UUID
+static esp_err_t api_keypad_user_delete_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+
+    const cJSON *uuid_item = cJSON_GetObjectItemCaseSensitive(payload, "uuid");
+    const char *uuid = cJSON_IsString(uuid_item) ? uuid_item->valuestring : NULL;
+
+    if (!uuid || uuid[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "UUID required");
+    }
+
+    ESP_LOGI(API_TAG, "Deleting keypad user: uuid=%s", uuid);
+    delete_user_from_flash(uuid);
+    cJSON_Delete(payload);
+
+    cJSON *users = keypad_users_snapshot();
+    return send_json_response(req, users);
+}
+
+// PUT /api/keypad/user - Update PIN user name
+static esp_err_t api_keypad_user_put_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+
+    const cJSON *uuid_item = cJSON_GetObjectItemCaseSensitive(payload, "uuid");
+    const cJSON *name_item = cJSON_GetObjectItemCaseSensitive(payload, "name");
+
+    const char *uuid = cJSON_IsString(uuid_item) ? uuid_item->valuestring : NULL;
+    const char *name = cJSON_IsString(name_item) ? name_item->valuestring : NULL;
+
+    if (!uuid || !name) {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "UUID and name required");
+    }
+
+    ESP_LOGI(API_TAG, "Updating keypad user: uuid=%s, name=%s", uuid, name);
+    modify_user_from_flash(uuid, name, NULL);
+    cJSON_Delete(payload);
+
+    cJSON *users = keypad_users_snapshot();
+    return send_json_response(req, users);
+}
+
+// DELETE /api/wiegand/delete - Remove Wiegand user
+static esp_err_t api_wiegand_delete_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+
+    const cJSON *id_item = cJSON_GetObjectItemCaseSensitive(payload, "id");
+    const char *id = cJSON_IsString(id_item) ? id_item->valuestring : NULL;
+
+    if (!id || id[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "User ID required");
+    }
+
+    ESP_LOGI(API_TAG, "Deleting Wiegand user: id=%s", id);
+    err = wiegand_registry_remove(id);
+    cJSON_Delete(payload);
+
+    if (err == ESP_ERR_NOT_FOUND) {
+        return httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "User not found");
+    }
+
+    return send_wiegand_state_response(req);
+}
+
+/* RF remote fobs */
+static esp_err_t send_rf_state_response(httpd_req_t *req) {
+    return send_json_response(req, rf_state_snapshot());
+}
+
+static esp_err_t api_rf_get_handler(httpd_req_t *req) {
+    ESP_LOGI(API_TAG, "RF state requested");
+    return send_rf_state_response(req);
+}
+
+static esp_err_t api_rf_register_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    cJSON_Delete(payload);
+
+    err = rf_registration_start();
+    if (err == ESP_ERR_INVALID_STATE) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Registration already active");
+    }
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to start registration");
+    }
+    return send_rf_state_response(req);
+}
+
+static esp_err_t api_rf_stop_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    cJSON_Delete(payload);
+
+    err = rf_registration_stop();
+    if (err == ESP_ERR_INVALID_STATE) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Registration is not active");
+    }
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to stop registration");
+    }
+    return send_rf_state_response(req);
+}
+
+static esp_err_t api_rf_rename_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+
+    const cJSON *id_item = cJSON_GetObjectItemCaseSensitive(payload, "id");
+    const cJSON *name_item = cJSON_GetObjectItemCaseSensitive(payload, "name");
+    const char *id = cJSON_IsString(id_item) ? id_item->valuestring : NULL;
+    const char *name = cJSON_IsString(name_item) ? name_item->valuestring : NULL;
+
+    if (!id || !name || name[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "id and name required");
+    }
+
+    err = rf_registry_update_name(id, name);
+    cJSON_Delete(payload);
+    if (err == ESP_ERR_NOT_FOUND) {
+        return httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "RF code not found");
+    }
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to update name");
+    }
+    return send_rf_state_response(req);
+}
+
+static esp_err_t api_rf_delete_post_handler(httpd_req_t *req) {
+    cJSON *payload = NULL;
+    esp_err_t err = read_json_body(req, &payload);
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    }
+
+    const cJSON *id_item = cJSON_GetObjectItemCaseSensitive(payload, "id");
+    const char *id = cJSON_IsString(id_item) ? id_item->valuestring : NULL;
+    if (!id || id[0] == '\0') {
+        cJSON_Delete(payload);
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "id required");
+    }
+
+    err = rf_registry_remove(id);
+    cJSON_Delete(payload);
+    if (err == ESP_ERR_NOT_FOUND) {
+        return httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "RF code not found");
+    }
+    if (err != ESP_OK) {
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to delete RF code");
+    }
+    return send_rf_state_response(req);
+}
+
 void register_api_routes(httpd_handle_t server) {
     httpd_uri_t state = {
         .uri = "/api/state",
@@ -410,6 +659,69 @@ void register_api_routes(httpd_handle_t server) {
         .handler = api_wiegand_rename_post_handler,
     };
     httpd_register_uri_handler(server, &wiegand_rename_post);
+
+    httpd_uri_t wiegand_delete_post = {
+        .uri = "/api/wiegand/delete",
+        .method = HTTP_POST,
+        .handler = api_wiegand_delete_post_handler,
+    };
+    httpd_register_uri_handler(server, &wiegand_delete_post);
+
+    httpd_uri_t rf_get = {
+        .uri = "/api/rf",
+        .method = HTTP_GET,
+        .handler = api_rf_get_handler,
+    };
+    httpd_register_uri_handler(server, &rf_get);
+
+    httpd_uri_t rf_register_post = {
+        .uri = "/api/rf/register",
+        .method = HTTP_POST,
+        .handler = api_rf_register_post_handler,
+    };
+    httpd_register_uri_handler(server, &rf_register_post);
+
+    httpd_uri_t rf_stop_post = {
+        .uri = "/api/rf/stop",
+        .method = HTTP_POST,
+        .handler = api_rf_stop_post_handler,
+    };
+    httpd_register_uri_handler(server, &rf_stop_post);
+
+    httpd_uri_t rf_rename_post = {
+        .uri = "/api/rf/rename",
+        .method = HTTP_POST,
+        .handler = api_rf_rename_post_handler,
+    };
+    httpd_register_uri_handler(server, &rf_rename_post);
+
+    httpd_uri_t rf_delete_post = {
+        .uri = "/api/rf/delete",
+        .method = HTTP_POST,
+        .handler = api_rf_delete_post_handler,
+    };
+    httpd_register_uri_handler(server, &rf_delete_post);
+
+    httpd_uri_t keypad_user_post = {
+        .uri = "/api/keypad/user",
+        .method = HTTP_POST,
+        .handler = api_keypad_user_post_handler,
+    };
+    httpd_register_uri_handler(server, &keypad_user_post);
+
+    httpd_uri_t keypad_user_delete = {
+        .uri = "/api/keypad/user",
+        .method = HTTP_DELETE,
+        .handler = api_keypad_user_delete_handler,
+    };
+    httpd_register_uri_handler(server, &keypad_user_delete);
+
+    httpd_uri_t keypad_user_put = {
+        .uri = "/api/keypad/user",
+        .method = HTTP_PUT,
+        .handler = api_keypad_user_put_handler,
+    };
+    httpd_register_uri_handler(server, &keypad_user_put);
 
     httpd_uri_t lock_post = {
         .uri = "/api/lock",

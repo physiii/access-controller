@@ -22,7 +22,7 @@ void start_wiegand_timer(struct wiegand *ctx, bool val);
 static bool handleKeyCode(struct wiegand *ctx);
 int is_pin_authorized(const char *incomingPin);
 void arm_lock(int channel, bool arm, bool alert);
-void beep_keypad(int beeps, int duration);
+void beep_keypad(int beeps, int channel);
 
 #define WIEGAND_FRAME_TIMEOUT_MS 80
 #define WIEGAND_MIN_FRAME_BITS   24
@@ -78,7 +78,46 @@ static QueueHandle_t gpio_evt_queue = NULL;
 static portMUX_TYPE registrationMutex = portMUX_INITIALIZER_UNLOCKED;
 static wiegand_registration_session_t registration_session = {0};
 
-static int wiegand_index_for_gpio(uint32_t gpio_num) {
+static void wiegand_bits_to_hex(const char *bit_string, size_t bit_len, char *hex_buf, size_t hex_buf_size) {
+    static const char HEX[] = "0123456789ABCDEF";
+    size_t out = 0;
+    uint8_t acc = 0;
+    int acc_bits = 0;
+
+    if (!bit_string || bit_len == 0 || !hex_buf || hex_buf_size < 2) {
+        if (hex_buf && hex_buf_size > 0) hex_buf[0] = '\0';
+        return;
+    }
+
+    for (size_t i = 0; i < bit_len && out < hex_buf_size - 1; i++) {
+        acc = (acc << 1) | (bit_string[i] == '1');
+        acc_bits++;
+        if (acc_bits == 4) {
+            hex_buf[out++] = HEX[acc & 0x0F];
+            acc = 0;
+            acc_bits = 0;
+        }
+    }
+    if (acc_bits > 0 && out < hex_buf_size - 1) {
+        acc <<= (4 - acc_bits);
+        hex_buf[out++] = HEX[acc & 0x0F];
+    }
+    hex_buf[out] = '\0';
+}
+
+static void wiegand_log_frame_hex(const char *bit_string, size_t bit_len, int channel, bool short_frame) {
+    if (!bit_string || bit_len == 0) {
+        return;
+    }
+    (void)short_frame;  // No longer used for logging
+
+    char hex_buf[WIEGAND_USER_CODE_MAX / 4 + 4];
+    wiegand_bits_to_hex(bit_string, bit_len, hex_buf, sizeof(hex_buf));
+
+    ESP_LOGI(LOG_TAG_WIEGAND, "Ch%d: 0x%s (%u bits)", channel, hex_buf, (unsigned)bit_len);
+}
+
+static int IRAM_ATTR wiegand_index_for_gpio(uint32_t gpio_num) {
     for (int i = 0; i < NUM_OF_WIEGANDS; i++) {
         if (wg[i].pin0 == gpio_num || wg[i].pin1 == gpio_num) {
             return i;
@@ -185,11 +224,7 @@ static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_strin
     }
 
     size_t bit_len = strlen(bit_string);
-    ESP_LOGI(LOG_TAG_WIEGAND,
-             "Processing Wiegand frame on channel %d (%u bits): %s",
-             wg_entry->channel,
-             (unsigned)bit_len,
-             bit_string);
+    (void)bit_len;  // Used below in registration
 
     uint8_t configured_channel = 0;
     size_t pending = 0;
@@ -254,6 +289,8 @@ static void IRAM_ATTR wiegand_isr_handler(void *arg) {
     event.gpio_num = (uint32_t)arg;
 	event.gpio_val = gpio_get_level(event.gpio_num);
     event.wg_index = wiegand_index_for_gpio(event.gpio_num);
+	
+	// Log all ISR events (note: ESP_LOG* cannot be used in ISR, so we rely on task logging)
 	xQueueSendFromISR(gpio_evt_queue, &event, NULL);
 }
 
@@ -401,23 +438,26 @@ static void wiegand_task(void *pvParameter) {
         int64_t now_us = esp_timer_get_time();
 
         if (received) {
+            ESP_LOGD(LOG_TAG_WIEGAND, 
+                     "RAW GPIO event: GPIO=%u, level=%d, wg_index=%d",
+                     (unsigned)event.gpio_num, event.gpio_val, event.wg_index);
+            
             if (event.wg_index < 0 || event.wg_index >= NUM_OF_WIEGANDS) {
-                ESP_LOGW(LOG_TAG_WIEGAND, "Received GPIO event for unknown Wiegand index (%d)", event.wg_index);
+                ESP_LOGD(LOG_TAG_WIEGAND, "Unknown Wiegand index (%d) on GPIO %u", 
+                         event.wg_index, (unsigned)event.gpio_num);
                 continue;
             }
 
             struct wiegand *current_wg = &wg[event.wg_index];
+            
             if (!current_wg->enable) {
                 ESP_LOGD(LOG_TAG_WIEGAND, "Ignoring GPIO %u event for disabled channel %d",
-                         (unsigned)event.gpio_num,
-                         current_wg->channel);
+                         (unsigned)event.gpio_num, current_wg->channel);
                 continue;
             }
 
             if (event.gpio_val != 0) {
-                ESP_LOGD(LOG_TAG_WIEGAND, "Ignoring non-active edge on GPIO %u (channel %d)",
-                         (unsigned)event.gpio_num, current_wg->channel);
-                continue;
+                continue;  // Ignore rising edge
             }
 
             char bit = '\0';
@@ -426,16 +466,11 @@ static void wiegand_task(void *pvParameter) {
             } else if (event.gpio_num == current_wg->pin1) {
                 bit = '1';
             } else {
-                ESP_LOGW(LOG_TAG_WIEGAND, "GPIO %u is not mapped to channel %d", (unsigned)event.gpio_num, current_wg->channel);
                 continue;
             }
 
-            if (current_wg->bit_buffer_len == 0) {
-                ESP_LOGI(LOG_TAG_WIEGAND, "Starting new Wiegand frame on channel %d (first bit %c)", current_wg->channel, bit);
-            }
-
             if (current_wg->bit_buffer_len + 1 >= sizeof(current_wg->bit_buffer)) {
-                ESP_LOGW(LOG_TAG_WIEGAND, "Wiegand frame overflow on channel %d; resetting buffer", current_wg->channel);
+                ESP_LOGW(LOG_TAG_WIEGAND, "Frame overflow on channel %d", current_wg->channel);
                 wiegand_reset_bit_buffer(current_wg);
                 current_wg->incomingCodeCount = 0;
                 memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
@@ -457,21 +492,12 @@ static void wiegand_task(void *pvParameter) {
 
             current_wg->incomingCodeCount++;
 
-            ESP_LOGI(LOG_TAG_WIEGAND,
-                     "Captured Wiegand bit %c on channel %d (GPIO=%u, keypad_bits=%u, frame_bits=%u)",
-                     bit,
-                     current_wg->channel,
-                     (unsigned)event.gpio_num,
-                     (unsigned)current_wg->incomingCodeCount,
-                     (unsigned)current_wg->bit_buffer_len);
-
             if (current_wg->incomingCodeCount >= 8) {
                 current_wg->incomingCode[8] = '\0';
                 bool recognized = handleKeyCode(current_wg);
                 current_wg->incomingCodeCount = 0;
                 memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
                 if (recognized) {
-                    ESP_LOGI(LOG_TAG_WIEGAND, "Keypad sequence consumed on channel %d; clearing current frame buffer", current_wg->channel);
                     wiegand_reset_bit_buffer(current_wg);
                 }
             }
@@ -490,19 +516,12 @@ static void wiegand_task(void *pvParameter) {
 
             if ((now_us - ctx->last_bit_time_us) > (int64_t)WIEGAND_FRAME_TIMEOUT_MS * 1000) {
                 if (ctx->bit_buffer_len < WIEGAND_MIN_FRAME_BITS) {
-                    ESP_LOGW(LOG_TAG_WIEGAND,
-                             "Discarding short Wiegand frame on channel %d (%u bits, minimum=%u)",
-                             ctx->channel,
-                             (unsigned)ctx->bit_buffer_len,
-                             WIEGAND_MIN_FRAME_BITS);
+                    // Short frames are keypad presses - don't log as errors
+                    ESP_LOGD(LOG_TAG_WIEGAND, "Ch%d: keypad frame %u bits", ctx->channel, (unsigned)ctx->bit_buffer_len);
                 } else {
                     char captured_code[WIEGAND_USER_CODE_MAX];
                     snprintf(captured_code, sizeof(captured_code), "%s", ctx->bit_buffer);
-                    ESP_LOGI(LOG_TAG_WIEGAND,
-                             "Finalizing Wiegand frame on channel %d (%u bits) after %d ms gap",
-                             ctx->channel,
-                             (unsigned)ctx->bit_buffer_len,
-                             WIEGAND_FRAME_TIMEOUT_MS);
+                    wiegand_log_frame_hex(captured_code, ctx->bit_buffer_len, ctx->channel, false);
                     wiegand_process_code(ctx, captured_code);
                 }
                 wiegand_reset_bit_buffer(ctx);
@@ -520,6 +539,7 @@ void enableWiegand(int ch, bool val) {
         }
     }
 }
+
 
 void wiegand_main(void) {
 	wg[0].pin0 = WG0_DATA0_IO;
@@ -543,7 +563,7 @@ void wiegand_main(void) {
 	wg[1].delay = 4;
 	wg[1].keypressTimeout = 4;
 	wg[1].channel = 2;
-	wg[1].enable = false;
+	wg[1].enable = true;
 	wg[1].alert = true;
 	wg[1].newKey = false;
     memset(wg[1].incomingCode, 0, sizeof(wg[1].incomingCode));
@@ -552,13 +572,20 @@ void wiegand_main(void) {
     wiegand_reset_bit_buffer(&wg[1]);
 	strcpy(wg[1].name, "Wiegand1");
 
-    gpio_evt_queue = xQueueCreate(10, sizeof(gpio_event_t));
+    ESP_LOGI(LOG_TAG_WIEGAND, "Initializing Wiegand: WG0 (channel 1) GPIO%d/DATA0, GPIO%d/DATA1, enabled=%d",
+             wg[0].pin0, wg[0].pin1, wg[0].enable);
+    ESP_LOGI(LOG_TAG_WIEGAND, "Initializing Wiegand: WG1 (channel 2) GPIO%d/DATA0, GPIO%d/DATA1, enabled=%d",
+             wg[1].pin0, wg[1].pin1, wg[1].enable);
+
+    gpio_evt_queue = xQueueCreate(128, sizeof(gpio_event_t));  // Must hold 2x bits for ANYEDGE
 
 	xTaskCreate(wiegand_timer, "wigand_timer", 3072, NULL, 10, NULL);
 	xTaskCreate(keypress_timer, "keypress_timer", 3072, NULL, 10, NULL);
     xTaskCreate(wiegand_task, "wiegand_task", 4096, NULL, 10, NULL);
 
     for (int i = 0; i < NUM_OF_WIEGANDS; i++) {
+        ESP_LOGI(LOG_TAG_WIEGAND, "Registering ISR handlers for WG%d: GPIO%d and GPIO%d",
+                 i, wg[i].pin0, wg[i].pin1);
         gpio_isr_handler_add(wg[i].pin0, wiegand_isr_handler, (void *)(uintptr_t)wg[i].pin0);
         gpio_isr_handler_add(wg[i].pin1, wiegand_isr_handler, (void *)(uintptr_t)wg[i].pin1);
 	}

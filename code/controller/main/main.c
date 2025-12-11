@@ -18,6 +18,8 @@
 #include "services/motion.c"
 #include "services/keypad.c"
 #include "services/fob.c"
+#include "services/rf_registry.c"
+#include "services/rf_receiver.c"
 #include "services/server.c"
 #include "services/tunnel.c"
 #include "services/ap.c"
@@ -269,6 +271,8 @@ void app_main(void) {
     motion_main();
     keypad_main();
     fob_main();
+    rf_registry_init();
+    rf_receiver_init();
     lock_main();
     server_main();
 

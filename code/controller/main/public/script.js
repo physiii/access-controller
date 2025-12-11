@@ -2,6 +2,7 @@ const App = {
   data: null,
   stateTimer: null,
   wiegandPollTimer: null,
+  rfPollTimer: null,
   toastTimer: null,
   elements: {},
 };
@@ -10,6 +11,20 @@ const WIEGAND_STATUS_META = {
   0: { label: 'Pending', className: 'pending' },
   1: { label: 'Active', className: 'active' },
   2: { label: 'Disabled', className: '' },
+};
+
+// Convert binary string to hex
+const binaryToHex = (binaryStr) => {
+  if (!binaryStr || !/^[01]+$/.test(binaryStr)) {
+    return binaryStr || '—';
+  }
+  // Pad to multiple of 4
+  const padded = binaryStr.padStart(Math.ceil(binaryStr.length / 4) * 4, '0');
+  let hex = '';
+  for (let i = 0; i < padded.length; i += 4) {
+    hex += parseInt(padded.substr(i, 4), 2).toString(16).toUpperCase();
+  }
+  return '0x' + hex;
 };
 
 const fetchJSON = async (path, options = {}) => {
@@ -142,22 +157,26 @@ const applyKeypadState = (keypads = []) => {
   });
 };
 
-const buildWiegandUserRow = (user) => {
+const buildWiegandUserRow = (user, existingValue) => {
   const meta = WIEGAND_STATUS_META[user.status] || WIEGAND_STATUS_META[2];
   const statusClass = meta.className ? `status-chip ${meta.className}` : 'status-chip';
-  const code = escapeHtml(user.code || '');
-  const name = escapeHtml(user.name || '');
+  const rawCode = user.code || '';
+  const hexCode = binaryToHex(rawCode);
+  // Use existing input value if user was editing, otherwise use stored name
+  const name = escapeHtml(existingValue !== undefined ? existingValue : (user.name || ''));
+  const channelNum = user.channel || 0;
 
   return `
-    <div class="wiegand-user" data-id="${escapeHtml(user.id)}">
-      <div class="user-meta">
-        <span class="code-pill">${code || '—'}</span>
-        <span class="${statusClass}">${meta.label}</span>
-        <span class="muted">${formatChannelLabel(user.channel)}</span>
+    <div class="user-row" data-id="${escapeHtml(user.id)}">
+      <span class="user-code">${escapeHtml(hexCode)}</span>
+      <div class="user-info">
+        <input type="text" class="user-name-input" value="${name}" placeholder="Enter name...">
+        <span class="user-channel">Channel ${channelNum}</span>
       </div>
-      <div class="wiegand-actions">
-        <input type="text" class="wiegand-name-input" value="${name}" placeholder="User name">
+      <div class="user-actions">
+        <span class="${statusClass}">${meta.label}</span>
         <button type="button" class="secondary" data-action="rename" data-id="${escapeHtml(user.id)}">Save</button>
+        <button type="button" class="secondary danger" data-action="delete-wiegand" data-id="${escapeHtml(user.id)}">Delete</button>
       </div>
     </div>
   `;
@@ -206,10 +225,15 @@ const renderWiegand = (wiegand = {}) => {
   const registerBtn = App.elements.wiegandRegisterBtn;
   const stopBtn = App.elements.wiegandStopBtn;
   const channelSelect = App.elements.wiegandChannelSelect;
+  const statusBar = App.elements.wiegandStatusBar;
+
+  if (statusBar) {
+    statusBar.classList.toggle('registering', registrationActive);
+  }
 
   if (statusEl) {
     statusEl.textContent = registrationActive
-      ? `Registering (${formatChannelLabel(registrationChannel)})`
+      ? `Registering ${formatChannelLabel(registrationChannel)}`
       : 'Idle';
   }
 
@@ -219,10 +243,10 @@ const renderWiegand = (wiegand = {}) => {
 
   if (duplicateEl) {
     if (lastDuplicateCode) {
-      duplicateEl.textContent = lastDuplicateCode;
+      duplicateEl.textContent = binaryToHex(lastDuplicateCode);
       duplicateEl.classList.remove('muted');
     } else {
-      duplicateEl.textContent = 'None';
+      duplicateEl.textContent = '—';
       duplicateEl.classList.add('muted');
     }
   }
@@ -239,11 +263,33 @@ const renderWiegand = (wiegand = {}) => {
 
   if (listEl) {
     if (!users || users.length === 0) {
-      listEl.innerHTML = '<p class="muted">No Wiegand users stored yet.</p>';
+      listEl.innerHTML = '<p class="empty-state muted">No RFID cards registered yet. Click "Register" to add cards.</p>';
     } else {
+      // Preserve input values that user may be editing
+      const existingValues = {};
+      listEl.querySelectorAll('.user-row').forEach((row) => {
+        const id = row.getAttribute('data-id');
+        const input = row.querySelector('.user-name-input');
+        if (id && input && document.activeElement === input) {
+          existingValues[id] = input.value;
+        }
+      });
+
       listEl.innerHTML = users
-        .map((user) => buildWiegandUserRow(user))
+        .map((user) => buildWiegandUserRow(user, existingValues[user.id]))
         .join('');
+
+      // Restore focus if user was editing
+      Object.keys(existingValues).forEach((id) => {
+        const row = listEl.querySelector(`.user-row[data-id="${id}"]`);
+        if (row) {
+          const input = row.querySelector('.user-name-input');
+          if (input) {
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+          }
+        }
+      });
     }
   }
 
@@ -254,6 +300,95 @@ const renderWiegand = (wiegand = {}) => {
   }
 };
 
+// Remote FOBs (433 MHz)
+const buildRfUserRow = (user, existingValue) => {
+  const name = escapeHtml(existingValue !== undefined ? existingValue : (user.name || ''));
+  const code = user.code ? `0x${escapeHtml(user.code)}` : '—';
+  return `
+    <div class="user-row" data-id="${escapeHtml(user.id || '')}">
+      <span class="user-code">${code}</span>
+      <div class="user-info">
+        <input type="text" class="user-name-input" value="${name}" placeholder="Enter name...">
+      </div>
+      <div class="user-actions">
+        <button type="button" class="secondary" data-action="rename-rf" data-id="${escapeHtml(user.id || '')}">Save</button>
+        <button type="button" class="secondary danger" data-action="delete-rf" data-id="${escapeHtml(user.id || '')}">Delete</button>
+      </div>
+    </div>
+  `;
+};
+
+const renderRf = (rf = {}) => {
+  const {
+    registrationActive = false,
+    registrationPending = 0,
+    lastDuplicateCode = '',
+    users = [],
+  } = rf;
+
+  const statusEl = App.elements.rfStatus;
+  const pendingEl = App.elements.rfPending;
+  const duplicateEl = App.elements.rfDuplicate;
+  const listEl = App.elements.rfUserList;
+  const registerBtn = App.elements.rfRegisterBtn;
+  const stopBtn = App.elements.rfStopBtn;
+  const statusBar = App.elements.rfStatusBar;
+
+  if (statusBar) statusBar.classList.toggle('registering', registrationActive);
+  if (statusEl) statusEl.textContent = registrationActive ? 'Registering remotes' : 'Idle';
+  if (pendingEl) pendingEl.textContent = registrationPending;
+  if (duplicateEl) {
+    if (lastDuplicateCode) {
+      duplicateEl.textContent = `0x${lastDuplicateCode}`;
+      duplicateEl.classList.remove('muted');
+    } else {
+      duplicateEl.textContent = '—';
+      duplicateEl.classList.add('muted');
+    }
+  }
+  if (registerBtn) registerBtn.disabled = registrationActive;
+  if (stopBtn) stopBtn.disabled = !registrationActive;
+
+  if (listEl) {
+    if (!users || users.length === 0) {
+      listEl.innerHTML = '<p class="empty-state muted">No remote FOBs learned yet. Click "Register" to learn codes.</p>';
+    } else {
+      const existingValues = {};
+      listEl.querySelectorAll('.user-row').forEach((row) => {
+        const id = row.getAttribute('data-id');
+        const input = row.querySelector('.user-name-input');
+        if (id && input && document.activeElement === input) {
+          existingValues[id] = input.value;
+        }
+      });
+
+      listEl.innerHTML = users
+        .map((u) => buildRfUserRow(u, existingValues[u.id]))
+        .join('');
+
+      Object.keys(existingValues).forEach((id) => {
+        const row = listEl.querySelector(`.user-row[data-id="${id}"]`);
+        if (row) {
+          const input = row.querySelector('.user-name-input');
+          if (input) {
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+          }
+        }
+      });
+    }
+  }
+
+  if (registrationActive) {
+    if (!App.rfPollTimer) {
+      App.rfPollTimer = setInterval(loadState, 2000);
+    }
+  } else if (App.rfPollTimer) {
+    clearInterval(App.rfPollTimer);
+    App.rfPollTimer = null;
+  }
+};
+
 const renderState = (state = {}) => {
   applyDeviceInfo(state.device || {});
   applyLockState(state.locks || []);
@@ -261,6 +396,8 @@ const renderState = (state = {}) => {
   applyFobState(state.fobs || []);
   applyKeypadState(state.keypads || []);
   renderWiegand(state.wiegand || {});
+  renderRf(state.rf || {});
+  renderKeypadUsers(state.keypadUsers || []);
   renderLogs(state.logs || []);
 };
 
@@ -512,34 +649,137 @@ const setupWiegandHandlers = () => {
 
   if (listEl) {
     listEl.addEventListener('click', async (event) => {
-      const button = event.target.closest('button[data-action="rename"]');
-      if (!button) return;
+      const renameBtn = event.target.closest('button[data-action="rename"]');
+      const deleteBtn = event.target.closest('button[data-action="delete-wiegand"]');
 
-      const container = button.closest('.wiegand-user');
-      if (!container) return;
+      if (renameBtn) {
+        const container = renameBtn.closest('.user-row');
+        if (!container) return;
 
-      const input = container.querySelector('.wiegand-name-input');
-      if (!input) return;
+        const input = container.querySelector('.user-name-input');
+        if (!input) return;
 
-      const id = container.getAttribute('data-id');
-      const name = input.value.trim();
-      if (!id || !name) {
-        showToast('Please provide a name before saving.');
-        return;
+        const id = container.getAttribute('data-id');
+        const name = input.value.trim();
+        if (!id || !name) {
+          showToast('Please provide a name before saving.');
+          return;
+        }
+
+        renameBtn.disabled = true;
+        try {
+          const wiegand = await fetchJSON('api/wiegand/rename', {
+            method: 'POST',
+            body: JSON.stringify({ id, name }),
+          });
+          renderWiegand(wiegand);
+          showToast('User name updated.');
+        } catch (error) {
+          handleError(error, error.message || 'Failed to rename user');
+        } finally {
+          renameBtn.disabled = false;
+        }
       }
 
-      button.disabled = true;
+      if (deleteBtn) {
+        const id = deleteBtn.getAttribute('data-id');
+        if (!id) return;
+
+        if (!confirm('Delete this RFID card?')) return;
+
+        deleteBtn.disabled = true;
+        try {
+          const wiegand = await fetchJSON('api/wiegand/delete', {
+            method: 'POST',
+            body: JSON.stringify({ id }),
+          });
+          renderWiegand(wiegand);
+          showToast('RFID card deleted.');
+        } catch (error) {
+          handleError(error, error.message || 'Failed to delete card');
+        } finally {
+          deleteBtn.disabled = false;
+        }
+      }
+    });
+  }
+};
+
+const setupRfHandlers = () => {
+  const registerBtn = App.elements.rfRegisterBtn;
+  const stopBtn = App.elements.rfStopBtn;
+  const listEl = App.elements.rfUserList;
+
+  if (registerBtn) {
+    registerBtn.addEventListener('click', async () => {
       try {
-        const wiegand = await fetchJSON('api/wiegand/rename', {
-          method: 'POST',
-          body: JSON.stringify({ id, name }),
-        });
-        renderWiegand(wiegand);
-        showToast('User name updated.');
+        const rf = await fetchJSON('api/rf/register', { method: 'POST', body: JSON.stringify({}) });
+        renderRf(rf);
+        showToast('RF registration started. Press remote buttons to learn.');
       } catch (error) {
-        handleError(error, error.message || 'Failed to rename user');
-      } finally {
-        button.disabled = false;
+        handleError(error, error.message || 'Failed to start RF registration');
+      }
+    });
+  }
+
+  if (stopBtn) {
+    stopBtn.addEventListener('click', async () => {
+      try {
+        const rf = await fetchJSON('api/rf/stop', { method: 'POST', body: JSON.stringify({}) });
+        renderRf(rf);
+        showToast('RF registration stopped.');
+      } catch (error) {
+        handleError(error, error.message || 'Failed to stop RF registration');
+      }
+    });
+  }
+
+  if (listEl) {
+    listEl.addEventListener('click', async (event) => {
+      const renameBtn = event.target.closest('button[data-action="rename-rf"]');
+      const deleteBtn = event.target.closest('button[data-action="delete-rf"]');
+
+      if (renameBtn) {
+        const container = renameBtn.closest('.user-row');
+        const input = container?.querySelector('.user-name-input');
+        const id = renameBtn.getAttribute('data-id');
+        const name = input?.value.trim();
+        if (!id || !name) {
+          showToast('Please provide a name before saving.');
+          return;
+        }
+        renameBtn.disabled = true;
+        try {
+          const rf = await fetchJSON('api/rf/rename', {
+            method: 'POST',
+            body: JSON.stringify({ id, name }),
+          });
+          renderRf(rf);
+          showToast('Remote name updated.');
+        } catch (error) {
+          handleError(error, error.message || 'Failed to rename remote');
+        } finally {
+          renameBtn.disabled = false;
+        }
+      }
+
+      if (deleteBtn) {
+        const id = deleteBtn.getAttribute('data-id');
+        if (!id) return;
+        if (!confirm('Delete this remote FOB?')) return;
+        deleteBtn.disabled = true;
+        try {
+          const rf = await fetchJSON('api/rf/delete', {
+            method: 'POST',
+            body: JSON.stringify({ id }),
+          });
+          renderRf(rf);
+          showToast('Remote deleted.');
+        } catch (error) {
+          handleError(error, error.message || 'Failed to delete remote');
+        } finally {
+          deleteBtn.disabled = false;
+        }
       }
     });
   }
@@ -582,18 +822,202 @@ const renderLogs = (logs = []) => {
   list.innerHTML = entries.join('');
 };
 
+// Keypad PIN Management
+const buildKeypadUserRow = (user, index, existingValue) => {
+  // Use existing input value if user was editing, otherwise use stored name
+  const name = escapeHtml(existingValue !== undefined ? existingValue : (user.name || `User ${index + 1}`));
+  const pin = escapeHtml(user.pin || '****');
+  
+  return `
+    <div class="user-row" data-uuid="${escapeHtml(user.uuid || '')}">
+      <span class="user-code">${pin}</span>
+      <div class="user-info">
+        <input type="text" class="user-name-input" value="${name}" placeholder="Enter name...">
+      </div>
+      <div class="user-actions">
+        <button type="button" class="secondary" data-action="save-pin" data-uuid="${escapeHtml(user.uuid || '')}">Save</button>
+        <button type="button" class="secondary danger" data-action="delete-pin" data-uuid="${escapeHtml(user.uuid || '')}">Delete</button>
+      </div>
+    </div>
+  `;
+};
+
+const renderKeypadUsers = (users = []) => {
+  const listEl = App.elements.keypadUserList;
+  if (!listEl) return;
+
+  if (!users || users.length === 0) {
+    listEl.innerHTML = '<p class="empty-state muted">No PIN codes configured yet.</p>';
+  } else {
+    // Preserve input values that user may be editing
+    const existingValues = {};
+    listEl.querySelectorAll('.user-row').forEach((row) => {
+      const uuid = row.getAttribute('data-uuid');
+      const input = row.querySelector('.user-name-input');
+      if (uuid && input && document.activeElement === input) {
+        existingValues[uuid] = input.value;
+      }
+    });
+
+    listEl.innerHTML = users
+      .map((user, idx) => buildKeypadUserRow(user, idx, existingValues[user.uuid]))
+      .join('');
+
+    // Restore focus if user was editing
+    Object.keys(existingValues).forEach((uuid) => {
+      const row = listEl.querySelector(`.user-row[data-uuid="${uuid}"]`);
+      if (row) {
+        const input = row.querySelector('.user-name-input');
+        if (input) {
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        }
+      }
+    });
+  }
+};
+
+const setupKeypadPinHandlers = () => {
+  const addBtn = App.elements.keypadAddBtn;
+  const addForm = App.elements.keypadAddForm;
+  const cancelBtn = App.elements.keypadCancelBtn;
+  const saveNewBtn = App.elements.keypadSaveNewBtn;
+  const listEl = App.elements.keypadUserList;
+
+  if (addBtn && addForm) {
+    addBtn.addEventListener('click', () => {
+      addForm.hidden = false;
+      addBtn.disabled = true;
+      const nameInput = document.getElementById('keypadNewName');
+      if (nameInput) nameInput.focus();
+    });
+  }
+
+  if (cancelBtn && addForm && addBtn) {
+    cancelBtn.addEventListener('click', () => {
+      addForm.hidden = true;
+      addBtn.disabled = false;
+      document.getElementById('keypadNewName').value = '';
+      document.getElementById('keypadNewPin').value = '';
+    });
+  }
+
+  if (saveNewBtn) {
+    saveNewBtn.addEventListener('click', async () => {
+      const nameInput = document.getElementById('keypadNewName');
+      const pinInput = document.getElementById('keypadNewPin');
+      const name = nameInput?.value.trim() || '';
+      const pin = pinInput?.value.trim() || '';
+
+      if (!name || !pin) {
+        showToast('Please enter both name and PIN code.');
+        return;
+      }
+
+      if (!/^\d{4,6}$/.test(pin)) {
+        showToast('PIN must be 4-6 digits.');
+        return;
+      }
+
+      saveNewBtn.disabled = true;
+      try {
+        await fetchJSON('api/keypad/user', {
+          method: 'POST',
+          body: JSON.stringify({ name, pin }),
+        });
+        showToast('PIN code added successfully.');
+        addForm.hidden = true;
+        addBtn.disabled = false;
+        nameInput.value = '';
+        pinInput.value = '';
+        loadState();
+      } catch (error) {
+        handleError(error, 'Failed to add PIN code');
+      } finally {
+        saveNewBtn.disabled = false;
+      }
+    });
+  }
+
+  if (listEl) {
+    listEl.addEventListener('click', async (event) => {
+      const saveBtn = event.target.closest('button[data-action="save-pin"]');
+      const deleteBtn = event.target.closest('button[data-action="delete-pin"]');
+
+      if (saveBtn) {
+        const container = saveBtn.closest('.user-row');
+        const input = container?.querySelector('.user-name-input');
+        const uuid = saveBtn.getAttribute('data-uuid');
+        const name = input?.value.trim();
+
+        if (!uuid || !name) {
+          showToast('Please provide a name.');
+          return;
+        }
+
+        saveBtn.disabled = true;
+        try {
+          await fetchJSON('api/keypad/user', {
+            method: 'PUT',
+            body: JSON.stringify({ uuid, name }),
+          });
+          showToast('PIN user updated.');
+        } catch (error) {
+          handleError(error, 'Failed to update user');
+        } finally {
+          saveBtn.disabled = false;
+        }
+      }
+
+      if (deleteBtn) {
+        const uuid = deleteBtn.getAttribute('data-uuid');
+        if (!uuid) return;
+
+        if (!confirm('Delete this PIN code?')) return;
+
+        deleteBtn.disabled = true;
+        try {
+          await fetchJSON('api/keypad/user', {
+            method: 'DELETE',
+            body: JSON.stringify({ uuid }),
+          });
+          showToast('PIN code deleted.');
+          loadState();
+        } catch (error) {
+          handleError(error, 'Failed to delete PIN code');
+        } finally {
+          deleteBtn.disabled = false;
+        }
+      }
+    });
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   App.elements = {
     navItems: Array.from(document.querySelectorAll('.nav-item')),
     pages: Array.from(document.querySelectorAll('.page')),
     toast: document.getElementById('toast'),
     wiegandStatus: document.getElementById('wiegandStatus'),
+    wiegandStatusBar: document.getElementById('wiegandStatusBar'),
     wiegandPending: document.getElementById('wiegandPending'),
     wiegandDuplicate: document.getElementById('wiegandDuplicate'),
     wiegandUserList: document.getElementById('wiegandUserList'),
     wiegandRegisterBtn: document.getElementById('wiegandRegisterBtn'),
     wiegandStopBtn: document.getElementById('wiegandStopBtn'),
     wiegandChannelSelect: document.getElementById('wiegandChannelSelect'),
+    rfStatus: document.getElementById('rfStatus'),
+    rfStatusBar: document.getElementById('rfStatusBar'),
+    rfPending: document.getElementById('rfPending'),
+    rfDuplicate: document.getElementById('rfDuplicate'),
+    rfUserList: document.getElementById('rfUserList'),
+    rfRegisterBtn: document.getElementById('rfRegisterBtn'),
+    rfStopBtn: document.getElementById('rfStopBtn'),
+    keypadUserList: document.getElementById('keypadUserList'),
+    keypadAddBtn: document.getElementById('keypadAddBtn'),
+    keypadAddForm: document.getElementById('keypadAddForm'),
+    keypadCancelBtn: document.getElementById('keypadCancelBtn'),
+    keypadSaveNewBtn: document.getElementById('keypadSaveNewBtn'),
     logItems: document.getElementById('logItems'),
     logEmptyState: document.getElementById('logEmptyState'),
   };
@@ -605,6 +1029,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupKeypadHandlers();
   setupForms();
   setupWiegandHandlers();
+  setupRfHandlers();
+  setupKeypadPinHandlers();
 
   loadState();
   App.stateTimer = setInterval(loadState, 7000);
