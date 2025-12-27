@@ -337,31 +337,17 @@ esp_err_t initialize_spiffs(void) {
 }
 
 void load_wifi_credentials_from_flash(char *ssid, char *password) {
-    ESP_LOGI(STORE_TAG, "Loading WiFi credentials from flash");
     char *ssid_str = get_char("wifi_ssid");
     char *password_str = get_char("wifi_password");
 
-    char log_msg[LOG_STORE_MESSAGE_MAX];
-
     if (strcmp(ssid_str, "")==0 || strcmp(password_str, "")==0) {
-        ESP_LOGI(STORE_TAG, "No WiFi credentials found in flash");
         strcpy(ssid, "");
         strcpy(password, "");
-        snprintf(log_msg, sizeof(log_msg), "WiFi credentials not found in NVS");
     } else {
-        ESP_LOGI(STORE_TAG, "WiFi credentials found in flash: %s, %s.", ssid_str, password_str);
         strcpy(ssid, ssid_str);
         strcpy(password, password_str);
-
-        size_t pass_len = strlen(password_str);
-        size_t mask_len = pass_len < 32 ? pass_len : 32;
-        char mask[33];
-        memset(mask, '*', mask_len);
-        mask[mask_len] = '\0';
-        snprintf(log_msg, sizeof(log_msg), "WiFi credentials loaded (SSID=%s, password=%s)", ssid_str, pass_len > 0 ? mask : "empty");
     }
 
-    automation_record_log(log_msg);
     free(ssid_str);
     free(password_str);
 }

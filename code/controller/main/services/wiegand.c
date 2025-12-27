@@ -397,15 +397,20 @@ static bool handleKeyCode(struct wiegand *ctx) {
         }
         ESP_LOGI(LOG_TAG_WIEGAND, "Keypad '*' received on channel %d", ctx->channel);
     } else if (keyIndex == 11) {
-        if (is_pin_authorized(ctx->code)) {
-            lock_set_action_source("wg_pin");
-            arm_lock(ctx->channel, false, ctx->alert);
-            start_wiegand_timer(ctx, true);
-            ESP_LOGI(LOG_TAG_WIEGAND, "PIN accepted on channel %d (%s)", ctx->channel, ctx->code);
-		} else {
-            beep_keypad(2, ctx->channel);
-            ESP_LOGW(LOG_TAG_WIEGAND, "PIN rejected on channel %d (%s)", ctx->channel, ctx->code);
-		}
+        // Only attempt authorization if PIN is not empty
+        if (strlen(ctx->code) > 0) {
+            if (is_pin_authorized(ctx->code)) {
+                lock_set_action_source("wg_pin");
+                arm_lock(ctx->channel, false, ctx->alert);
+                start_wiegand_timer(ctx, true);
+                ESP_LOGI(LOG_TAG_WIEGAND, "PIN accepted on channel %d (%s)", ctx->channel, ctx->code);
+            } else {
+                beep_keypad(2, ctx->channel);
+                ESP_LOGW(LOG_TAG_WIEGAND, "PIN rejected on channel %d (%s)", ctx->channel, ctx->code);
+            }
+        } else {
+            ESP_LOGD(LOG_TAG_WIEGAND, "Ignoring # key with empty PIN on channel %d", ctx->channel);
+        }
         memset(ctx->code, 0, sizeof(ctx->code));
         start_keypress_timer(ctx, false);
         return true;
@@ -481,26 +486,16 @@ static void wiegand_task(void *pvParameter) {
             current_wg->bit_buffer[current_wg->bit_buffer_len] = '\0';
             current_wg->last_bit_time_us = now_us;
 
-            if (current_wg->incomingCodeCount == 0) {
-                memset(current_wg->incomingCode, '0', 8);
-            }
-
-            int bitPosition = 8 - current_wg->incomingCodeCount - 1;
-            if (bitPosition >= 0 && bitPosition < 8) {
-                current_wg->incomingCode[bitPosition] = bit;
+            // Log first bit to indicate frame start
+            if (current_wg->bit_buffer_len == 1) {
+                ESP_LOGI(LOG_TAG_WIEGAND, "Ch%d: Frame started (bit=%c)", 
+                         current_wg->channel, bit);
             }
 
             current_wg->incomingCodeCount++;
-
-            if (current_wg->incomingCodeCount >= 8) {
-                current_wg->incomingCode[8] = '\0';
-                bool recognized = handleKeyCode(current_wg);
-                current_wg->incomingCodeCount = 0;
-                memset(current_wg->incomingCode, 0, sizeof(current_wg->incomingCode));
-                if (recognized) {
-                    wiegand_reset_bit_buffer(current_wg);
-                }
-            }
+            // Note: We no longer call handleKeyCode mid-frame. 
+            // All frame processing happens after timeout to prevent
+            // card data being discarded when first 8 bits match keypad patterns.
         }
 
         for (int i = 0; i < NUM_OF_WIEGANDS; i++) {
@@ -515,10 +510,30 @@ static void wiegand_task(void *pvParameter) {
             }
 
             if ((now_us - ctx->last_bit_time_us) > (int64_t)WIEGAND_FRAME_TIMEOUT_MS * 1000) {
+                ESP_LOGI(LOG_TAG_WIEGAND, "Ch%d: Frame complete - %u bits received", 
+                         ctx->channel, (unsigned)ctx->bit_buffer_len);
+                
                 if (ctx->bit_buffer_len < WIEGAND_MIN_FRAME_BITS) {
-                    // Short frames are keypad presses - don't log as errors
-                    ESP_LOGD(LOG_TAG_WIEGAND, "Ch%d: keypad frame %u bits", ctx->channel, (unsigned)ctx->bit_buffer_len);
+                    // Short frames (< 24 bits) are keypad presses
+                    // Process 8-bit keypad codes
+                    if (ctx->bit_buffer_len >= 4 && ctx->bit_buffer_len <= 8) {
+                        // Prepare 8-bit pattern from the bit buffer
+                        char keypad_bits[9] = {'0','0','0','0','0','0','0','0','\0'};
+                        size_t start = (ctx->bit_buffer_len <= 8) ? (8 - ctx->bit_buffer_len) : 0;
+                        for (size_t j = 0; j < ctx->bit_buffer_len && j < 8; j++) {
+                            keypad_bits[start + j] = ctx->bit_buffer[j];
+                        }
+                        memcpy(ctx->incomingCode, keypad_bits, 9);
+                        ctx->incomingCodeCount = 8;
+                        handleKeyCode(ctx);
+                        ctx->incomingCodeCount = 0;
+                        memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
+                    } else {
+                        ESP_LOGD(LOG_TAG_WIEGAND, "Ch%d: Ignoring %u-bit short frame (not keypad)", 
+                                 ctx->channel, (unsigned)ctx->bit_buffer_len);
+                    }
                 } else {
+                    // Long frames (>= 24 bits) are RFID cards
                     char captured_code[WIEGAND_USER_CODE_MAX];
                     snprintf(captured_code, sizeof(captured_code), "%s", ctx->bit_buffer);
                     wiegand_log_frame_hex(captured_code, ctx->bit_buffer_len, ctx->channel, false);
@@ -551,6 +566,10 @@ void wiegand_main(void) {
 	wg[0].enable = true;
 	wg[0].alert = true;
 	wg[0].newKey = false;
+	wg[0].keypressExpired = true;  // Start as expired to prevent false timeout at boot
+	wg[0].keypressCount = 0;
+	wg[0].expired = true;
+	wg[0].count = 0;
     memset(wg[0].incomingCode, 0, sizeof(wg[0].incomingCode));
     memset(wg[0].code, 0, sizeof(wg[0].code));
     wg[0].incomingCodeCount = 0;
@@ -566,6 +585,10 @@ void wiegand_main(void) {
 	wg[1].enable = true;
 	wg[1].alert = true;
 	wg[1].newKey = false;
+	wg[1].keypressExpired = true;  // Start as expired to prevent false timeout at boot
+	wg[1].keypressCount = 0;
+	wg[1].expired = true;
+	wg[1].count = 0;
     memset(wg[1].incomingCode, 0, sizeof(wg[1].incomingCode));
     memset(wg[1].code, 0, sizeof(wg[1].code));
     wg[1].incomingCodeCount = 0;
