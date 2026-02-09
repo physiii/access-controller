@@ -77,6 +77,7 @@ static esp_err_t script_get_handler(httpd_req_t *req)
     extern const unsigned char script_js_end[]   asm("_binary_script_js_end");
     const size_t script_js_size = (script_js_end - script_js_start);
     httpd_resp_set_type(req, "application/javascript");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
     httpd_resp_send(req, (const char *)script_js_start, script_js_size);
     return ESP_OK;
 }
@@ -87,6 +88,7 @@ static esp_err_t style_get_handler(httpd_req_t *req)
     extern const unsigned char style_css_end[]   asm("_binary_style_css_end");
     const size_t style_css_size = (style_css_end - style_css_start);
     httpd_resp_set_type(req, "text/css");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
     httpd_resp_send(req, (const char *)style_css_start, style_css_size);
     return ESP_OK;
 }
@@ -97,6 +99,7 @@ static esp_err_t index_get_handler(httpd_req_t *req)
     extern const unsigned char index_html_end[]   asm("_binary_index_html_end");
     const size_t index_html_size = (index_html_end - index_html_start);
     httpd_resp_set_type(req, "text/html");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
     httpd_resp_send(req, (const char *)index_html_start, index_html_size);
     return ESP_OK;
 }

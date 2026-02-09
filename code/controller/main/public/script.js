@@ -48,12 +48,17 @@ const fetchJSON = async (path, options = {}) => {
   return response.json();
 };
 
-const escapeHtml = (value = '') => value
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
+const escapeHtml = (value) => {
+  // Handle null, undefined, or any non-string value
+  if (value == null) return '';
+  const str = String(value);
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
 
 const showToast = (message) => {
   const toast = App.elements.toast;
@@ -158,6 +163,7 @@ const applyKeypadState = (keypads = []) => {
 };
 
 const buildWiegandUserRow = (user, existingValue) => {
+  if (!user) return '';
   const meta = WIEGAND_STATUS_META[user.status] || WIEGAND_STATUS_META[2];
   const statusClass = meta.className ? `status-chip ${meta.className}` : 'status-chip';
   const rawCode = user.code || '';
@@ -165,9 +171,10 @@ const buildWiegandUserRow = (user, existingValue) => {
   // Use existing input value if user was editing, otherwise use stored name
   const name = escapeHtml(existingValue !== undefined ? existingValue : (user.name || ''));
   const channelNum = user.channel || 0;
+  const userId = escapeHtml(user.id || '');
 
   return `
-    <div class="user-row" data-id="${escapeHtml(user.id)}">
+    <div class="user-row" data-id="${userId}">
       <span class="user-code">${escapeHtml(hexCode)}</span>
       <div class="user-info">
         <input type="text" class="user-name-input" value="${name}" placeholder="Enter name...">
@@ -175,8 +182,8 @@ const buildWiegandUserRow = (user, existingValue) => {
       </div>
       <div class="user-actions">
         <span class="${statusClass}">${meta.label}</span>
-        <button type="button" class="secondary" data-action="rename" data-id="${escapeHtml(user.id)}">Save</button>
-        <button type="button" class="secondary danger" data-action="delete-wiegand" data-id="${escapeHtml(user.id)}">Delete</button>
+        <button type="button" class="secondary" data-action="rename" data-id="${userId}">Save</button>
+        <button type="button" class="secondary danger" data-action="delete-wiegand" data-id="${userId}">Delete</button>
       </div>
     </div>
   `;
@@ -265,27 +272,19 @@ const renderWiegand = (wiegand = {}) => {
     if (!users || users.length === 0) {
       listEl.innerHTML = '<p class="empty-state muted">No RFID cards registered yet. Click "Register" to add cards.</p>';
     } else {
-      // Preserve input values that user may be editing
-      const existingValues = {};
+      // Preserve name input values that user may be editing
+      const existingNames = {};
       listEl.querySelectorAll('.user-row').forEach((row) => {
         const id = row.getAttribute('data-id');
         if (!id) return;
         const nameInput = row.querySelector('.user-name-input');
-        const modeSel = row.querySelector('.rf-mode-select');
-        const chSel = row.querySelector('.rf-channel-select');
-        const exitInput = row.querySelector('.rf-exit-seconds');
-        const alertCb = row.querySelector('.rf-alert-checkbox');
-        existingValues[id] = {
-          name: nameInput ? nameInput.value : undefined,
-          mode: modeSel ? modeSel.value : undefined,
-          channel_mask: chSel ? Number(chSel.value) : undefined,
-          exit_seconds: exitInput ? Number(exitInput.value) : undefined,
-          alert: alertCb ? alertCb.checked : undefined,
-        };
+        if (nameInput) {
+          existingNames[id] = nameInput.value;
+        }
       });
 
       listEl.innerHTML = users
-        .map((user) => buildWiegandUserRow(user, existingValues[user.id]))
+        .map((user) => buildWiegandUserRow(user, existingNames[user.id]))
         .join('');
 
       // Restore focus if user was editing
@@ -311,6 +310,7 @@ const renderWiegand = (wiegand = {}) => {
 
 // Remote FOBs (433 MHz)
 const buildRfUserRow = (user, existingValue) => {
+  if (!user) return '';
   const name = escapeHtml(existingValue?.name !== undefined ? existingValue.name : (user.name || ''));
   const code = user.code ? `0x${escapeHtml(user.code)}` : '—';
   const mode = existingValue?.mode || user.mode || 'toggle';

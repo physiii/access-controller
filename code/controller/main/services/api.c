@@ -289,23 +289,29 @@ static esp_err_t api_wiegand_rename_post_handler(httpd_req_t *req) {
 
     const cJSON *id_item = cJSON_GetObjectItemCaseSensitive(payload, "id");
     const cJSON *name_item = cJSON_GetObjectItemCaseSensitive(payload, "name");
-    const char *id = (cJSON_IsString(id_item) && id_item->valuestring) ? id_item->valuestring : NULL;
-    const char *name = (cJSON_IsString(name_item) && name_item->valuestring) ? name_item->valuestring : NULL;
+    const char *id_raw = (cJSON_IsString(id_item) && id_item->valuestring) ? id_item->valuestring : NULL;
+    const char *name_raw = (cJSON_IsString(name_item) && name_item->valuestring) ? name_item->valuestring : NULL;
 
-    if (!id || id[0] == '\0' || !name || name[0] == '\0') {
+    if (!id_raw || id_raw[0] == '\0' || !name_raw || name_raw[0] == '\0') {
         cJSON_Delete(payload);
         ESP_LOGW(API_TAG, "Wiegand rename missing id or name");
         return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Both id and name are required");
     }
-    if (strlen(name) >= WIEGAND_USER_NAME_MAX) {
+    if (strlen(name_raw) >= WIEGAND_USER_NAME_MAX) {
         cJSON_Delete(payload);
-        ESP_LOGW(API_TAG, "Wiegand rename name too long (%u >= %d)", (unsigned)strlen(name), WIEGAND_USER_NAME_MAX);
+        ESP_LOGW(API_TAG, "Wiegand rename name too long (%u >= %d)", (unsigned)strlen(name_raw), WIEGAND_USER_NAME_MAX);
         return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Name exceeds maximum length");
     }
 
+    // Copy id and name to local buffers BEFORE freeing payload to avoid use-after-free
+    char id[WIEGAND_USER_ID_MAX];
+    char name[WIEGAND_USER_NAME_MAX];
+    strlcpy(id, id_raw, sizeof(id));
+    strlcpy(name, name_raw, sizeof(name));
+    cJSON_Delete(payload);
+
     ESP_LOGI(API_TAG, "Renaming Wiegand user %s to '%s'", id, name);
     err = wiegand_registry_update_name(id, name);
-    cJSON_Delete(payload);
 
     if (err == ESP_ERR_NOT_FOUND) {
         ESP_LOGW(API_TAG, "Wiegand user not found: %s", id);
@@ -314,6 +320,19 @@ static esp_err_t api_wiegand_rename_post_handler(httpd_req_t *req) {
     if (err != ESP_OK) {
         ESP_LOGE(API_TAG, "Failed to rename Wiegand user %s (%s)", id, esp_err_to_name(err));
         return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to rename user");
+    }
+
+    // UX: if the user was just enrolled via registration, they start as PENDING.
+    // Promote to ACTIVE when the operator saves a name so the tag works immediately.
+    esp_err_t promote_err = wiegand_registry_update_status(id, WIEGAND_USER_STATUS_ACTIVE);
+    if (promote_err == ESP_OK) {
+        const wiegand_user_t *user = wiegand_registry_find_by_id(id);
+        ESP_LOGI(API_TAG,
+                 "Wiegand user %s promoted to ACTIVE (status=%d)",
+                 id,
+                 user ? (int)user->status : -1);
+    } else {
+        ESP_LOGW(API_TAG, "Wiegand user %s promote to ACTIVE failed (%s)", id, esp_err_to_name(promote_err));
     }
 
     return send_wiegand_state_response(req);

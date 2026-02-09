@@ -229,6 +229,21 @@ static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_strin
     uint8_t configured_channel = 0;
     size_t pending = 0;
     bool active = registration_snapshot(&configured_channel, &pending);
+    // If registration mode is active, still allow ACTIVE users to unlock.
+    // This prevents the system from feeling "broken" while enrolling new tags.
+    const wiegand_user_t *existing = wiegand_registry_find_by_code(bit_string);
+    if (active && existing && existing->status == WIEGAND_USER_STATUS_ACTIVE) {
+        const char *display_name = (existing->name[0] != '\0') ? existing->name : "Wiegand User";
+        ESP_LOGI(LOG_TAG_WIEGAND,
+                 "Authorized Wiegand code %s (user=%s) while registering",
+                 bit_string,
+                 display_name);
+        lock_set_action_source("wg_code");
+        arm_lock(wg_entry->channel, false, wg_entry->alert);
+        start_wiegand_timer(wg_entry, true);
+        return;
+    }
+
     if (active && registration_channel_matches(configured_channel, wg_entry->channel)) {
         wiegand_user_t new_user;
         esp_err_t err = wiegand_registry_add(bit_string, wg_entry->channel, &new_user);
@@ -266,7 +281,7 @@ static void wiegand_process_code(struct wiegand *wg_entry, const char *bit_strin
                  wg_entry->channel);
     }
 
-    const wiegand_user_t *user = wiegand_registry_find_by_code(bit_string);
+    const wiegand_user_t *user = existing ? existing : wiegand_registry_find_by_code(bit_string);
     if (user && user->status == WIEGAND_USER_STATUS_ACTIVE) {
         const char *display_name = (user->name[0] != '\0') ? user->name : "Wiegand User";
         char log_msg[256];
@@ -371,15 +386,42 @@ static bool handleKeyCode(struct wiegand *ctx) {
         return false;
     }
 
-    uint8_t incomingByte = (uint8_t)strtol(ctx->incomingCode, NULL, 2);
+    const size_t bit_len = strlen(ctx->incomingCode);
     int keyIndex = -1;
     start_keypress_timer(ctx, true);
 
-    for (int i = 0; i < NUM_OF_KEYS; i++) {
-        if (incomingByte == key[i]) {
-            keyIndex = i;
-            break;
+    if (bit_len == 8) {
+        uint8_t incomingByte = (uint8_t)strtol(ctx->incomingCode, NULL, 2);
+        for (int i = 0; i < NUM_OF_KEYS; i++) {
+            if (incomingByte == key[i]) {
+                keyIndex = i;
+                break;
+            }
         }
+    } else if (bit_len == 4) {
+        // Some keypads output 4-bit codes (no parity). Common mapping is:
+        // There are multiple variants in the wild. We'll accept the common ones and
+        // log the raw nibble to make it easy to adjust per keypad.
+        uint8_t nibble = (uint8_t)strtol(ctx->incomingCode, NULL, 2) & 0x0F;
+        if (nibble >= 1 && nibble <= 9) {
+            keyIndex = (int)nibble;  // 1..9
+        } else if (nibble == 0x0 || nibble == 0xA) {
+            keyIndex = 0;            // '0' (common variants)
+        } else if (nibble == 0xB || nibble == 0xC || nibble == 0xF) {
+            keyIndex = 11;           // '#' (0xB observed on at least one keypad)
+        } else if (nibble == 0xD || nibble == 0xE) {
+            keyIndex = 10;           // '*'
+        }
+
+        ESP_LOGI(LOG_TAG_WIEGAND,
+                 "Keypad 4-bit frame on channel %d: bits=%s nibble=0x%X mapped=%d",
+                 ctx->channel,
+                 ctx->incomingCode,
+                 (unsigned)nibble,
+                 keyIndex);
+    } else {
+        ESP_LOGD(LOG_TAG_WIEGAND, "Unexpected keypad frame length %u bits (%s) on channel %d",
+                 (unsigned)bit_len, ctx->incomingCode, ctx->channel);
     }
 
     if (keyIndex >= 0 && keyIndex <= 9) {
@@ -426,7 +468,11 @@ static bool handleKeyCode(struct wiegand *ctx) {
 	}
 
     if (keyIndex == -1) {
-        ESP_LOGD(LOG_TAG_WIEGAND, "No keypad match for pattern %s on channel %d", ctx->incomingCode, ctx->channel);
+        ESP_LOGW(LOG_TAG_WIEGAND,
+                 "Unknown keypad code bits=%s (len=%u) on channel %d",
+                 ctx->incomingCode,
+                 (unsigned)strlen(ctx->incomingCode),
+                 ctx->channel);
     }
 
     memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
@@ -515,16 +561,12 @@ static void wiegand_task(void *pvParameter) {
                 
                 if (ctx->bit_buffer_len < WIEGAND_MIN_FRAME_BITS) {
                     // Short frames (< 24 bits) are keypad presses
-                    // Process 8-bit keypad codes
                     if (ctx->bit_buffer_len >= 4 && ctx->bit_buffer_len <= 8) {
-                        // Prepare 8-bit pattern from the bit buffer
-                        char keypad_bits[9] = {'0','0','0','0','0','0','0','0','\0'};
-                        size_t start = (ctx->bit_buffer_len <= 8) ? (8 - ctx->bit_buffer_len) : 0;
-                        for (size_t j = 0; j < ctx->bit_buffer_len && j < 8; j++) {
-                            keypad_bits[start + j] = ctx->bit_buffer[j];
-                        }
-                        memcpy(ctx->incomingCode, keypad_bits, 9);
-                        ctx->incomingCodeCount = 8;
+                        // Copy the raw bits (4 or 8) and let handleKeyCode() decode.
+                        memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
+                        memcpy(ctx->incomingCode, ctx->bit_buffer, ctx->bit_buffer_len);
+                        ctx->incomingCode[ctx->bit_buffer_len] = '\0';
+                        ctx->incomingCodeCount = (int)ctx->bit_buffer_len;
                         handleKeyCode(ctx);
                         ctx->incomingCodeCount = 0;
                         memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
@@ -656,6 +698,16 @@ esp_err_t wiegand_registration_stop(bool promote_pending) {
             if (err != ESP_OK) {
                 ESP_LOGW(LOG_TAG_WIEGAND, "Failed to activate Wiegand user %s (%s)", ids[i], esp_err_to_name(err));
             }
+        }
+
+        // Also promote any previously-enrolled pending users. This fixes the common case where
+        // a tag was captured earlier (or scanned as a duplicate during registration) and stayed pending.
+        size_t promoted = 0;
+        esp_err_t promote_err = wiegand_registry_promote_all_pending(&promoted);
+        if (promote_err != ESP_OK) {
+            ESP_LOGW(LOG_TAG_WIEGAND, "Failed to promote pending users (%s)", esp_err_to_name(promote_err));
+        } else if (promoted > 0) {
+            ESP_LOGI(LOG_TAG_WIEGAND, "Promoted %u pending Wiegand users to ACTIVE", (unsigned)promoted);
         }
     }
 

@@ -510,3 +510,30 @@ cJSON *wiegand_registry_snapshot(void) {
     return array;
 }
 
+esp_err_t wiegand_registry_promote_all_pending(size_t *out_promoted) {
+    ensure_mutex();
+    if (!s_mutex) return ESP_ERR_NO_MEM;
+    if (xSemaphoreTake(s_mutex, pdMS_TO_TICKS(200)) != pdTRUE) {
+        return ESP_ERR_TIMEOUT;
+    }
+
+    size_t promoted = 0;
+    for (size_t i = 0; i < s_user_count; i++) {
+        if (s_users[i].status == WIEGAND_USER_STATUS_PENDING) {
+            s_users[i].status = WIEGAND_USER_STATUS_ACTIVE;
+            assign_defaults(&s_users[i]);
+            s_users[i].updated_at_ms = current_time_ms();
+            promoted++;
+        }
+    }
+    if (promoted > 0) {
+        persist_locked();
+    }
+
+    xSemaphoreGive(s_mutex);
+    if (out_promoted) {
+        *out_promoted = promoted;
+    }
+    return ESP_OK;
+}
+

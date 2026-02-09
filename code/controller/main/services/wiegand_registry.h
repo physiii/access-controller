@@ -42,5 +42,8 @@ esp_err_t wiegand_registry_reload(void);
 esp_err_t wiegand_registry_save(void);
 cJSON *wiegand_registry_snapshot(void);
 
+// Promote all pending users to active. Returns number promoted via out_promoted (optional).
+esp_err_t wiegand_registry_promote_all_pending(size_t *out_promoted);
+
 #endif // WIEGAND_REGISTRY_H
 

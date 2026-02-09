@@ -116,7 +116,8 @@ char* get_char(const char* key) {
     size_t required_size = 0;
     err = nvs_get_str(my_handle, key, NULL, &required_size);
     if (err == ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGE(STORE_TAG, "[%s] value not initialized, key: %s", STORE_TAG, key);
+        // Many keys are optional; missing should not spam the logs at error level.
+        ESP_LOGD(STORE_TAG, "[%s] value not initialized, key: %s", STORE_TAG, key);
         nvs_close(my_handle);
         return strdup("");
     } else if (err != ESP_OK) {
@@ -306,7 +307,8 @@ uint32_t get_u32(const char* key, uint32_t default_value) {
     uint32_t value = default_value;
     err = nvs_get_u32(my_handle, key, &value);
     if (err == ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGE(STORE_TAG, "[get_u32]: Error (%s) reading!", esp_err_to_name(err));
+        // Missing u32 keys are common on first boot; don't spam error logs.
+        ESP_LOGD(STORE_TAG, "[get_u32]: value not initialized, key: %s", key);
         nvs_close(my_handle);
         return default_value;
     } else if (err != ESP_OK) {
