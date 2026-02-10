@@ -536,4 +536,3 @@ esp_err_t wiegand_registry_promote_all_pending(size_t *out_promoted) {
     }
     return ESP_OK;
 }
-
