@@ -44,14 +44,12 @@ void longBeep(int cnt);
 #define LOCK_MCP_IO_2       MCP_B0
 #define NUM_OF_LOCKS        2
 
-const uint8_t LOCK_CONTACT_PIN_1 = A1;
-const uint8_t LOCK_CONTACT_PIN_2 = B2;
+/* Channel 1 = LOCK0: GPA1=SENSE, GPA2=CLOSE_IO. Channel 2 = LOCK1: GPB1=SENSE, GPB2=CLOSE_IO */
+const uint8_t LOCK_CONTACT_PIN_1 = A2;  /* LOCK0_CLOSE_IO (GPA2) */
+const uint8_t LOCK_CONTACT_PIN_2 = B2;  /* LOCK1_CLOSE_IO (GPB2) */
 
-const uint8_t LOCK_SIGNAL_PIN_1 = B1;
-const uint8_t LOCK_SIGNAL_PIN_2 = A2;
-
-// const uint8_t LOCK_CONTACT_PIN_1 = B1;
-// const uint8_t LOCK_CONTACT_PIN_2 = B1;
+const uint8_t LOCK_SIGNAL_PIN_1 = A1;   /* LOCK0_SENSE (GPA1) */
+const uint8_t LOCK_SIGNAL_PIN_2 = B1;   /* LOCK1_SENSE (GPB1) */
 
 bool ARM = false;
 bool ALERT = true;
@@ -321,6 +319,15 @@ cJSON *lock_state_snapshot(void) {
     }
 
     for (int i = 0; i < NUM_OF_LOCKS; i++) {
+        /* Refresh sense/contact from hardware so API reflects current I/O state */
+        if (USE_MCP23017) {
+            locks[i].isContact = get_mcp_io(locks[i].contactPin);
+            locks[i].isSignal = get_mcp_io(locks[i].signalPin);
+        } else {
+            locks[i].isContact = get_io(locks[i].contactPin);
+            locks[i].isSignal = get_io(locks[i].signalPin);
+        }
+
         cJSON *entry = cJSON_CreateObject();
         if (!entry) {
             continue;
@@ -330,6 +337,17 @@ cJSON *lock_state_snapshot(void) {
         cJSON_AddBoolToObject(entry, "arm", locks[i].shouldLock);
         cJSON_AddBoolToObject(entry, "enableContactAlert", locks[i].enableContactAlert);
         cJSON_AddBoolToObject(entry, "polarity", locks[i].polarity);
+        /* Invert: pull-up means disconnected=high; we want true=closed/active (green) */
+        bool sense_ok = !locks[i].isSignal;
+        bool contact_ok = !locks[i].isContact;
+        /* Channel 1: display contact as signal and signal as contact (UI swap) */
+        if (i == 0) {
+            cJSON_AddBoolToObject(entry, "sense", contact_ok);
+            cJSON_AddBoolToObject(entry, "contact", sense_ok);
+        } else {
+            cJSON_AddBoolToObject(entry, "sense", sense_ok);
+            cJSON_AddBoolToObject(entry, "contact", contact_ok);
+        }
         cJSON_AddItemToArray(array, entry);
     }
 

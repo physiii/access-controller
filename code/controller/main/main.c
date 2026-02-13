@@ -314,6 +314,6 @@ void app_main(void) {
         ESP_LOGI(TAG, "Loop Count: %d", cnt++);
         ESP_LOGI(TAG, "----------------------------");
 
-        vTaskDelay(10 * 1000 / portTICK_PERIOD_MS);
+        vTaskDelay(60 * 1000 / portTICK_PERIOD_MS);
     }
 }

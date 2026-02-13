@@ -115,11 +115,38 @@ const applyLockState = (locks = []) => {
     const armEl = document.getElementById(`arm_${ch}`);
     const contactEl = document.getElementById(`enableContactAlert_${ch}`);
     const polarityEl = document.getElementById(`polarity_${ch}`);
+    const contactStatusEl = document.getElementById(`lockContact_${ch}`);
+    const senseStatusEl = document.getElementById(`lockSense_${ch}`);
 
     if (enableEl) enableEl.checked = !!lock.enable;
     if (armEl) armEl.checked = !!lock.arm;
     if (contactEl) contactEl.checked = !!lock.enableContactAlert;
     if (polarityEl) polarityEl.checked = !!lock.polarity;
+
+    /* Ch1: contact state is in API "sense". Ch2: contact state is in API "contact". */
+    const contactState = ch === 1 ? lock.sense : lock.contact;
+    const signalState = ch === 1 ? lock.contact : lock.sense;
+
+    if (contactStatusEl) {
+      if (typeof contactState === 'boolean') {
+        contactStatusEl.classList.remove('status-ok', 'status-alert');
+        contactStatusEl.classList.add(contactState ? 'status-ok' : 'status-alert');
+        contactStatusEl.title = contactState ? 'Contact closed' : 'Contact open';
+      } else {
+        contactStatusEl.classList.remove('status-ok', 'status-alert');
+        contactStatusEl.title = 'Contact state unknown';
+      }
+    }
+    if (senseStatusEl) {
+      if (typeof signalState === 'boolean') {
+        senseStatusEl.classList.remove('status-ok', 'status-alert');
+        senseStatusEl.classList.add(signalState ? 'status-ok' : 'status-alert');
+        senseStatusEl.title = signalState ? 'Signal active' : 'Signal inactive';
+      } else {
+        senseStatusEl.classList.remove('status-ok', 'status-alert');
+        senseStatusEl.title = 'Signal state unknown';
+      }
+    }
   });
 };
 
@@ -443,13 +470,24 @@ const renderState = (state = {}) => {
   renderWifi(state.wifi || {});
 };
 
+const DEVICE_STATE_ERROR_THROTTLE_MS = 15000;
+let lastDeviceStateErrorToast = 0;
+
 const loadState = async () => {
   try {
     const data = await fetchJSON('api/state');
     App.data = data;
     renderState(data);
+    if (App.elements.toast && !App.elements.toast.hidden) {
+      App.elements.toast.hidden = true;
+      App.elements.toast.classList.remove('show');
+    }
   } catch (error) {
-    handleError(error, 'Unable to load device state');
+    const now = Date.now();
+    if (now - lastDeviceStateErrorToast >= DEVICE_STATE_ERROR_THROTTLE_MS) {
+      lastDeviceStateErrorToast = now;
+      handleError(error, 'Unable to load device state');
+    }
   }
 };
 
