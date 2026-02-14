@@ -1,6 +1,8 @@
 import http from 'http';
 import net from 'net';
 import { randomUUID } from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { config as loadEnv } from 'dotenv';
 import { FrameParser, writeFrame } from './protocol.js';
 
@@ -33,6 +35,58 @@ function log(level, message, meta = {}) {
   const output = { level, time: new Date().toISOString(), message, ...meta };
   // eslint-disable-next-line no-console
   console.log(JSON.stringify(output));
+}
+
+const STATIC_UI_DIR = process.env.STATIC_UI_DIR ?? '/app/device-ui';
+const STATIC_UI = {
+  index: {
+    filename: 'index.html',
+    contentType: 'text/html; charset=utf-8',
+    cacheControl: 'no-store',
+  },
+  script: {
+    filename: 'script.js',
+    contentType: 'application/javascript; charset=utf-8',
+    cacheControl: 'public, max-age=31536000, immutable',
+  },
+  style: {
+    filename: 'style.css',
+    contentType: 'text/css; charset=utf-8',
+    cacheControl: 'public, max-age=31536000, immutable',
+  },
+};
+
+function readStaticAsset(kind) {
+  const meta = STATIC_UI[kind];
+  if (!meta) return null;
+  try {
+    const filePath = path.join(STATIC_UI_DIR, meta.filename);
+    const body = fs.readFileSync(filePath);
+    return { ...meta, body };
+  } catch (err) {
+    log('warn', 'Static UI asset not available', {
+      kind,
+      dir: STATIC_UI_DIR,
+      error: err.message,
+    });
+    return null;
+  }
+}
+
+function sendStaticAsset(req, res, kind) {
+  const asset = readStaticAsset(kind);
+  if (!asset) return false;
+
+  res.setHeader('content-type', asset.contentType);
+  res.setHeader('cache-control', asset.cacheControl);
+  if (req.method === 'HEAD') {
+    res.statusCode = 200;
+    res.end();
+    return true;
+  }
+  res.statusCode = 200;
+  res.end(asset.body);
+  return true;
 }
 
 class PayloadTooLargeError extends Error {
@@ -142,6 +196,14 @@ class DeviceConnection {
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
+        log('warn', 'Tunnel request timed out waiting for device response', {
+          deviceId: this.deviceId,
+          requestId,
+          method: pending.method,
+          requestTarget: pending.requestTarget,
+          remoteAddress: this.remoteAddress,
+          pendingRequests: this.pendingRequests.size,
+        });
         this.pendingRequests.delete(requestId);
         if (!res.headersSent) {
           res.writeHead(504, 'Gateway Timeout');
@@ -598,7 +660,10 @@ class TunnelManager {
     }
 
     this.heartbeatTimer = setInterval(() => {
-      const cutoff = Date.now() - this.config.heartbeatIntervalMs * 2;
+      // Allow for slow / single-threaded firmware that may block while handling
+      // a burst of requests. Log staleness, but avoid force-closing: hard closes
+      // cause flapping and hide the underlying firmware issue.
+      const cutoff = Date.now() - this.config.heartbeatIntervalMs * 10;
       for (const device of this.devices.values()) {
         try {
           writeFrame(device.socket, { type: 'ping' });
@@ -609,10 +674,10 @@ class TunnelManager {
           });
         }
         if (device.lastSeen < cutoff) {
-          log('warn', 'Device appears unresponsive, closing connection', {
+          log('warn', 'Device appears unresponsive (heartbeat overdue)', {
             deviceId: device.deviceId,
           });
-          device.close('Heartbeat missed');
+          // Intentionally do not close the socket here.
         }
       }
     }, this.config.heartbeatIntervalMs).unref();
@@ -685,6 +750,23 @@ class TunnelManager {
       }
 
       const deviceId = segments[1];
+
+      // Serve UI assets locally (fast) instead of pulling them via the ESP32 tunnel.
+      // This makes first paint immediate and reduces load on the controller.
+      const isGetLike = req.method === 'GET' || req.method === 'HEAD';
+      const uiTail = segments.slice(2).join('/');
+      if (isGetLike) {
+        if (segments.length === 2) {
+          if (sendStaticAsset(req, res, 'index')) return;
+        } else if (uiTail === 'index.html') {
+          if (sendStaticAsset(req, res, 'index')) return;
+        } else if (uiTail === 'style.css') {
+          if (sendStaticAsset(req, res, 'style')) return;
+        } else if (uiTail === 'script.js') {
+          if (sendStaticAsset(req, res, 'script')) return;
+        }
+      }
+
       const device = this.getDevice(deviceId);
       if (!device || device.socket.destroyed) {
         res.writeHead(404, 'Device Not Connected');

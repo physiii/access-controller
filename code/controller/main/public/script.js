@@ -1,10 +1,16 @@
 const App = {
   data: null,
   stateTimer: null,
+  logsTimer: null,
   wiegandPollTimer: null,
   rfPollTimer: null,
   toastTimer: null,
   elements: {},
+  pageBoot: {
+    device: false,
+    system: false,
+    settings: false,
+  },
 };
 
 const WIEGAND_STATUS_META = {
@@ -33,6 +39,7 @@ const fetchJSON = async (path, options = {}) => {
   const url = new URL(path, baseHref);
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
     ...options,
   });
 
@@ -97,8 +104,41 @@ const bindNavigation = () => {
     button.addEventListener('click', () => {
       const target = button.dataset.target;
       setActivePage(target);
+      onPageActivated(target);
     });
   });
+};
+
+const onPageActivated = (targetId) => {
+  if (!targetId) return;
+
+  if (targetId === 'device') {
+    if (!App.pageBoot.device) {
+      App.pageBoot.device = true;
+      // Loaded on-demand to avoid spiking the ESP32 heap when opening via tunnel.
+      loadKeypadUsers();
+    }
+  }
+
+  if (targetId === 'system') {
+    if (!App.pageBoot.system) {
+      App.pageBoot.system = true;
+      loadLogs();
+    }
+    if (!App.logsTimer) {
+      App.logsTimer = setInterval(loadLogs, 30000);
+    }
+  } else if (App.logsTimer) {
+    clearInterval(App.logsTimer);
+    App.logsTimer = null;
+  }
+
+  if (targetId === 'settings') {
+    if (!App.pageBoot.settings) {
+      App.pageBoot.settings = true;
+      loadWifiList();
+    }
+  }
 };
 
 const applyDeviceInfo = (device = {}) => {
@@ -301,12 +341,16 @@ const renderWiegand = (wiegand = {}) => {
     } else {
       // Preserve name input values that user may be editing
       const existingNames = {};
+      let focusedId = null;
       listEl.querySelectorAll('.user-row').forEach((row) => {
         const id = row.getAttribute('data-id');
         if (!id) return;
         const nameInput = row.querySelector('.user-name-input');
         if (nameInput) {
           existingNames[id] = nameInput.value;
+          if (document.activeElement === nameInput) {
+            focusedId = id;
+          }
         }
       });
 
@@ -315,16 +359,14 @@ const renderWiegand = (wiegand = {}) => {
         .join('');
 
       // Restore focus if user was editing
-      Object.keys(existingValues).forEach((id) => {
-        const row = listEl.querySelector(`.user-row[data-id="${id}"]`);
-        if (row) {
-          const input = row.querySelector('.user-name-input');
-          if (input) {
-            input.focus();
-            input.setSelectionRange(input.value.length, input.value.length);
-          }
+      if (focusedId) {
+        const row = listEl.querySelector(`.user-row[data-id="${focusedId}"]`);
+        const input = row?.querySelector('.user-name-input');
+        if (input) {
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
         }
-      });
+      }
     }
   }
 
@@ -465,30 +507,116 @@ const renderState = (state = {}) => {
   applyKeypadState(state.keypads || []);
   renderWiegand(state.wiegand || {});
   renderRf(state.rf || {});
-  renderKeypadUsers(state.keypadUsers || []);
-  renderLogs(state.logs || []);
+  // Keypad users and logs are heavy; loaded via dedicated endpoints so state polling
+  // can't fragment heap on the ESP32 or wipe UI lists when omitted from /api/state.
+  if (Array.isArray(state.keypadUsers)) {
+    renderKeypadUsers(state.keypadUsers);
+  }
+  if (Array.isArray(state.logs)) {
+    renderLogs(state.logs);
+  }
   renderWifi(state.wifi || {});
 };
 
 const DEVICE_STATE_ERROR_THROTTLE_MS = 15000;
 let lastDeviceStateErrorToast = 0;
+let stateInFlight = null;
+let consecutiveStateFailures = 0;
+let nextStateToastAt = 0;
+const DEVICE_STATE_TOAST_BACKOFF_MS = 120000;
+let wifiNetworksCache = null;
 
 const loadState = async () => {
+  if (stateInFlight) return stateInFlight;
+
+  stateInFlight = (async () => {
   try {
-    const data = await fetchJSON('api/state');
+    const data = await fetchJSON(`api/state?t=${Date.now()}`);
     App.data = data;
+    consecutiveStateFailures = 0;
+    nextStateToastAt = 0;
+    if (wifiNetworksCache) {
+      App.data.wifi = App.data.wifi || {};
+      App.data.wifi.networks = wifiNetworksCache;
+    }
     renderState(data);
     if (App.elements.toast && !App.elements.toast.hidden) {
       App.elements.toast.hidden = true;
       App.elements.toast.classList.remove('show');
     }
   } catch (error) {
+    consecutiveStateFailures++;
     const now = Date.now();
-    if (now - lastDeviceStateErrorToast >= DEVICE_STATE_ERROR_THROTTLE_MS) {
+    const shouldToast =
+      consecutiveStateFailures === 1 || (nextStateToastAt > 0 && now >= nextStateToastAt);
+    if (shouldToast && now - lastDeviceStateErrorToast >= DEVICE_STATE_ERROR_THROTTLE_MS) {
       lastDeviceStateErrorToast = now;
+      nextStateToastAt = now + DEVICE_STATE_TOAST_BACKOFF_MS;
       handleError(error, 'Unable to load device state');
     }
   }
+  })().finally(() => {
+    stateInFlight = null;
+  });
+
+  return stateInFlight;
+};
+
+let wifiListInFlight = null;
+const loadWifiList = async () => {
+  if (wifiListInFlight) return wifiListInFlight;
+  wifiListInFlight = (async () => {
+    try {
+      const networks = await fetchJSON(`api/wifi/list?t=${Date.now()}`);
+      wifiNetworksCache = Array.isArray(networks) ? networks : [];
+      const wifi = (App.data && App.data.wifi) ? App.data.wifi : {};
+      renderWifi({ ...wifi, networks: wifiNetworksCache });
+      if (App.data) {
+        App.data.wifi = App.data.wifi || {};
+        App.data.wifi.networks = wifiNetworksCache;
+      }
+    } catch (error) {
+      console.warn('Failed to load Wi-Fi list', error);
+    }
+  })().finally(() => {
+    wifiListInFlight = null;
+  });
+  return wifiListInFlight;
+};
+
+let keypadUsersInFlight = null;
+const loadKeypadUsers = async () => {
+  if (keypadUsersInFlight) return keypadUsersInFlight;
+  keypadUsersInFlight = (async () => {
+    try {
+      const users = await fetchJSON(`api/keypad/users?t=${Date.now()}`);
+      renderKeypadUsers(Array.isArray(users) ? users : []);
+      if (App.data) App.data.keypadUsers = Array.isArray(users) ? users : [];
+    } catch (error) {
+      // Don't toast spam; state load already covers connectivity issues.
+      console.warn('Failed to load keypad users', error);
+    }
+  })().finally(() => {
+    keypadUsersInFlight = null;
+  });
+  return keypadUsersInFlight;
+};
+
+let logsInFlight = null;
+const loadLogs = async () => {
+  if (logsInFlight) return logsInFlight;
+  logsInFlight = (async () => {
+    try {
+      const logs = await fetchJSON(`api/logs?t=${Date.now()}`);
+      renderLogs(Array.isArray(logs) ? logs : []);
+      if (App.data) App.data.logs = Array.isArray(logs) ? logs : [];
+    } catch (error) {
+      console.warn('Failed to load logs', error);
+    }
+  })().finally(() => {
+    logsInFlight = null;
+  });
+  return logsInFlight;
 };
 
 const updateLock = async (channel, updates) => {
@@ -1081,23 +1209,26 @@ const setupKeypadPinHandlers = () => {
         return;
       }
 
-      if (!/^\d{4,6}$/.test(pin)) {
-        showToast('PIN must be 4-6 digits.');
+      if (!/^\d{4,8}$/.test(pin)) {
+        showToast('PIN must be 4-8 digits.');
         return;
       }
 
       saveNewBtn.disabled = true;
       try {
-        await fetchJSON('api/keypad/user', {
+        const users = await fetchJSON('api/keypad/user', {
           method: 'POST',
           body: JSON.stringify({ name, pin }),
         });
+        renderKeypadUsers(Array.isArray(users) ? users : []);
         showToast('PIN code added successfully.');
         addForm.hidden = true;
         addBtn.disabled = false;
         nameInput.value = '';
         pinInput.value = '';
-        loadState();
+        if (App.data) App.data.keypadUsers = Array.isArray(users) ? users : [];
+        // Refresh list from flash to match persisted state
+        loadKeypadUsers();
       } catch (error) {
         handleError(error, 'Failed to add PIN code');
       } finally {
@@ -1124,11 +1255,13 @@ const setupKeypadPinHandlers = () => {
 
         saveBtn.disabled = true;
         try {
-          await fetchJSON('api/keypad/user', {
+          const users = await fetchJSON('api/keypad/user', {
             method: 'PUT',
             body: JSON.stringify({ uuid, name }),
           });
+          renderKeypadUsers(Array.isArray(users) ? users : []);
           showToast('PIN user updated.');
+          if (App.data) App.data.keypadUsers = Array.isArray(users) ? users : [];
         } catch (error) {
           handleError(error, 'Failed to update user');
         } finally {
@@ -1144,12 +1277,14 @@ const setupKeypadPinHandlers = () => {
 
         deleteBtn.disabled = true;
         try {
-          await fetchJSON('api/keypad/user', {
+          const users = await fetchJSON('api/keypad/user', {
             method: 'DELETE',
             body: JSON.stringify({ uuid }),
           });
+          renderKeypadUsers(Array.isArray(users) ? users : []);
           showToast('PIN code deleted.');
-          loadState();
+          if (App.data) App.data.keypadUsers = Array.isArray(users) ? users : [];
+          loadKeypadUsers();
         } catch (error) {
           handleError(error, 'Failed to delete PIN code');
         } finally {
@@ -1202,5 +1337,28 @@ document.addEventListener('DOMContentLoaded', () => {
   setupKeypadPinHandlers();
 
   loadState();
-  App.stateTimer = setInterval(loadState, 7000);
+  // Defer heavy endpoints until their tabs are opened; tunneling adds overhead
+  // and these requests can clobber the ESP32 heap when fired all at once.
+  onPageActivated('device');
+  const startStatePolling = () => {
+    if (App.stateTimer) return;
+    App.stateTimer = setInterval(loadState, 20000);
+  };
+  const stopStatePolling = () => {
+    if (App.stateTimer) {
+      clearInterval(App.stateTimer);
+      App.stateTimer = null;
+    }
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopStatePolling();
+    } else {
+      loadState();
+      startStatePolling();
+    }
+  });
+
+  startStatePolling();
 });

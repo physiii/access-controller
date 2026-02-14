@@ -1,12 +1,19 @@
 services:
   tunnel:
     build:
-      context: /home/andy/devices/access-controller/code/tunnel
+      context: .
     restart: unless-stopped
     env_file:
-      - /home/andy/devices/access-controller/code/tunnel/.env
+      - ./.env
+    volumes:
+      # Optional: serve the UI assets locally (recommended for reliability).
+      # Put `index.html`, `style.css`, `script.js` into `./device-ui/` on the host.
+      - ./device-ui:/app/device-ui:ro
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      # Cursor is already listening on 127.0.0.1:9000/9001 on this host.
+      # Binding Docker to the LAN IP avoids the localhost port conflict while
+      # still allowing ESP32 devices on the 192.168.1.0/24 network to connect.
+      - "192.168.1.43:9000:9000"
+      - "192.168.1.43:9001:9001"
 
 

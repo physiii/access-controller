@@ -28,7 +28,7 @@ void beep_keypad(int beeps, int channel);
 #define WIEGAND_MIN_FRAME_BITS   24
 #define NUM_OF_WIEGANDS         2
 #define NUM_OF_KEYS             12
-#define KEYCODE_LENGTH          6
+#define KEYCODE_LENGTH          8
 #define WIEGAND_SESSION_MAX     64
 
 typedef struct {
@@ -77,6 +77,18 @@ static struct wiegand wg[NUM_OF_WIEGANDS];
 static QueueHandle_t gpio_evt_queue = NULL;
 static portMUX_TYPE registrationMutex = portMUX_INITIALIZER_UNLOCKED;
 static wiegand_registration_session_t registration_session = {0};
+
+// True while user is actively typing a PIN (digits/*) and before # is pressed or timeout clears it.
+bool wiegand_pin_entry_active(int channel) {
+    if (channel < 1 || channel > NUM_OF_WIEGANDS) {
+        return false;
+    }
+    struct wiegand *ctx = &wg[channel - 1];
+    if (!ctx->enable) {
+        return false;
+    }
+    return !ctx->keypressExpired && ctx->code[0] != '\0';
+}
 
 static void wiegand_bits_to_hex(const char *bit_string, size_t bit_len, char *hex_buf, size_t hex_buf_size) {
     static const char HEX[] = "0123456789ABCDEF";
@@ -320,13 +332,13 @@ void start_keypress_timer(struct wiegand *ctx, bool val) {
 
 void check_keypress_timer(struct wiegand *ctx) {
     if (ctx->keypressCount >= ctx->keypressTimeout && !ctx->keypressExpired) {
-        ESP_LOGW(LOG_TAG_WIEGAND, "Keypress timer expired for wg %d", ctx->channel);
+        ESP_LOGW(LOG_TAG_WIEGAND, "Keypress timer expired for wg %d (clearing buffer, wait for # to submit)", ctx->channel);
         memset(ctx->code, 0, sizeof(ctx->code));
         memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
         ctx->incomingCodeCount = 0;
         ctx->keypressExpired = true;
         ctx->keypressCount = 0;
-        beep_keypad(2, ctx->channel);
+        /* Do not error-beep on timeout; only reject when user presses # with wrong PIN */
     } else {
         ctx->keypressCount++;
     }
@@ -399,18 +411,21 @@ static bool handleKeyCode(struct wiegand *ctx) {
             }
         }
     } else if (bit_len == 4) {
-        // Some keypads output 4-bit codes (no parity). Common mapping is:
-        // There are multiple variants in the wild. We'll accept the common ones and
-        // log the raw nibble to make it easy to adjust per keypad.
+        // This keypad uses inverted 4-bit encoding: nibble = 0xF - digit
+        // Confirmed mapping from pressing 1,2,3,4,5,6,7,8,9,0,*,# in order:
+        //   1→0xE  2→0xD  3→0xC  4→0xB  5→0xA
+        //   6→0x9  7→0x8  8→0x7  9→0x6  0→0xF
+        //   *→0x5  #→0x4
         uint8_t nibble = (uint8_t)strtol(ctx->incomingCode, NULL, 2) & 0x0F;
-        if (nibble >= 1 && nibble <= 9) {
-            keyIndex = (int)nibble;  // 1..9
-        } else if (nibble == 0x0 || nibble == 0xA) {
-            keyIndex = 0;            // '0' (common variants)
-        } else if (nibble == 0xB || nibble == 0xC || nibble == 0xF) {
-            keyIndex = 11;           // '#' (0xB observed on at least one keypad)
-        } else if (nibble == 0xD || nibble == 0xE) {
-            keyIndex = 10;           // '*'
+        uint8_t decoded = 0xF - nibble;  // inverted encoding
+        if (decoded <= 9) {
+            keyIndex = (int)decoded;       // digits 0-9
+        } else if (decoded == 10) {
+            keyIndex = 10;                 // '*'
+        } else if (decoded == 11) {
+            keyIndex = 11;                 // '#' (submit)
+        } else {
+            keyIndex = -1;                 // invalid (nibbles 0x0-0x3)
         }
 
         ESP_LOGI(LOG_TAG_WIEGAND,
@@ -426,18 +441,30 @@ static bool handleKeyCode(struct wiegand *ctx) {
 
     if (keyIndex >= 0 && keyIndex <= 9) {
         size_t len = strlen(ctx->code);
-        if (len + 1 < sizeof(ctx->code)) {
+        if (len >= KEYCODE_LENGTH) {
+            // Do not error-beep or reset; just ignore extra digits until # is pressed.
+            ESP_LOGI(LOG_TAG_WIEGAND,
+                     "Ignoring extra keypad digit '%d' on channel %d (PIN already %u chars)",
+                     keyIndex,
+                     ctx->channel,
+                     (unsigned)KEYCODE_LENGTH);
+        } else if (len + 1 < sizeof(ctx->code)) {
             ctx->code[len] = (char)('0' + keyIndex);
             ctx->code[len + 1] = '\0';
+            ESP_LOGI(LOG_TAG_WIEGAND, "Keypad digit '%d' received on channel %d (PIN=%s)", keyIndex, ctx->channel, ctx->code);
         }
-        ESP_LOGI(LOG_TAG_WIEGAND, "Keypad digit '%d' received on channel %d (PIN=%s)", keyIndex, ctx->channel, ctx->code);
     } else if (keyIndex == 10) {
         size_t len = strlen(ctx->code);
-        if (len + 1 < sizeof(ctx->code)) {
+        if (len >= KEYCODE_LENGTH) {
+            ESP_LOGI(LOG_TAG_WIEGAND,
+                     "Ignoring extra keypad '*' on channel %d (PIN already %u chars)",
+                     ctx->channel,
+                     (unsigned)KEYCODE_LENGTH);
+        } else if (len + 1 < sizeof(ctx->code)) {
             ctx->code[len] = '*';
             ctx->code[len + 1] = '\0';
+            ESP_LOGI(LOG_TAG_WIEGAND, "Keypad '*' received on channel %d", ctx->channel);
         }
-        ESP_LOGI(LOG_TAG_WIEGAND, "Keypad '*' received on channel %d", ctx->channel);
     } else if (keyIndex == 11) {
         // Only attempt authorization if PIN is not empty
         if (strlen(ctx->code) > 0) {
@@ -457,15 +484,6 @@ static bool handleKeyCode(struct wiegand *ctx) {
         start_keypress_timer(ctx, false);
         return true;
     }
-
-    if (strlen(ctx->code) > KEYCODE_LENGTH) {
-        ESP_LOGW(LOG_TAG_WIEGAND, "Exceeded max keycode length (%d): %s", KEYCODE_LENGTH, ctx->code);
-        memset(ctx->code, 0, sizeof(ctx->code));
-        memset(ctx->incomingCode, 0, sizeof(ctx->incomingCode));
-        ctx->incomingCodeCount = 0;
-        start_keypress_timer(ctx, false);
-        beep_keypad(2, ctx->channel);
-	}
 
     if (keyIndex == -1) {
         ESP_LOGW(LOG_TAG_WIEGAND,
@@ -603,7 +621,7 @@ void wiegand_main(void) {
 	wg[0].pin1 = WG0_DATA1_IO;
 	wg[0].pin_push = OPEN_IO_1;
 	wg[0].delay = 4;
-	wg[0].keypressTimeout = 4;
+	wg[0].keypressTimeout = 10;  /* seconds before buffer clear; PIN only evaluated on # key */
 	wg[0].channel = 1;
 	wg[0].enable = true;
 	wg[0].alert = true;
@@ -622,7 +640,7 @@ void wiegand_main(void) {
 	wg[1].pin1 = WG1_DATA1_IO;
 	wg[1].pin_push = OPEN_IO_1;
 	wg[1].delay = 4;
-	wg[1].keypressTimeout = 4;
+	wg[1].keypressTimeout = 10;  /* seconds before buffer clear; PIN only evaluated on # key */
 	wg[1].channel = 2;
 	wg[1].enable = true;
 	wg[1].alert = true;

@@ -48,8 +48,23 @@ void addUser(char *uuid, char *name, char *pin) {
     store_user_to_flash(uuid, name, pin);
 }
 
+/* Copy PIN with '*' removed so keypads that send * between digits still match. */
+static void pin_strip_star(const char *in, char *out, size_t out_size) {
+    size_t j = 0;
+    for (; *in != '\0' && j < out_size - 1; in++) {
+        if (*in != '*') out[j++] = *in;
+    }
+    out[j] = '\0';
+}
+
 int is_pin_authorized(const char *incomingPin) {
     char* name = find_pin_in_flash(incomingPin);
+    if (!name && incomingPin) {
+        char stripped[MAX_PIN_SIZE];
+        pin_strip_star(incomingPin, stripped, sizeof(stripped));
+        if (stripped[0] != '\0')
+            name = find_pin_in_flash(stripped);
+    }
     char log_msg[1000];
 
     if (name) {

@@ -53,6 +53,8 @@ extern void register_api_routes(httpd_handle_t server);
 static esp_err_t index_html_get_handler(httpd_req_t *req)
 {
     httpd_resp_set_status(req, "307 Temporary Redirect");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store, no-cache, must-revalidate");
+    httpd_resp_set_hdr(req, "Pragma", "no-cache");
     httpd_resp_set_hdr(req, "Location", "/");
     httpd_resp_send(req, NULL, 0);  // Response body can be empty
     return ESP_OK;
@@ -114,6 +116,7 @@ static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
 	extern const unsigned char index_html_end[]   asm("_binary_index_html_end");
 	const size_t index_html_size = (index_html_end - index_html_start);
 	httpd_resp_set_type(req, "text/html");
+	httpd_resp_set_hdr(req, "Cache-Control", "no-store");
 	httpd_resp_send(req, (const char *)index_html_start, index_html_size);
 	return ESP_OK;
 }
@@ -218,6 +221,10 @@ static esp_err_t download_get_handler(httpd_req_t *req)
 
     ESP_LOGI(FILE_TAG, "Sending file : %s (%ld bytes)...", filename, file_stat.st_size);
     set_content_type_from_file(req, filename);
+
+    /* Prevent browser from caching HTML/JS/CSS so updated files are always loaded */
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store, no-cache, must-revalidate");
+    httpd_resp_set_hdr(req, "Pragma", "no-cache");
 
     /* Retrieve the pointer to scratch buffer for temporary storage */
     char *chunk = ((struct file_server_data *)req->user_ctx)->scratch;

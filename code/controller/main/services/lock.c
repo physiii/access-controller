@@ -17,6 +17,7 @@ void set_bool(const char *key, bool value);
 bool get_bool(const char *key, bool default_value);
 void beep(int cnt);
 void longBeep(int cnt);
+bool wiegand_pin_entry_active(int channel);
 
 // MCP definitions
 #define MCP_OUTPUT 0
@@ -142,11 +143,13 @@ void check_lock_contact_timer(Lock *lck) {
             addServerMessageToQueue(log_msg);
             lck->sentContactAlert = true;
         }
-        beep_keypad(1, lck->channel);
-        ESP_LOGI(TAG, "Contact alert beep lock %d (contact=%d signal=%d)",
-                 lck->channel,
-                 lck->isContact ? 1 : 0,
-                 lck->isSignal ? 1 : 0);
+        if (!wiegand_pin_entry_active(lck->channel)) {
+            beep_keypad(1, lck->channel);
+            ESP_LOGI(TAG, "Contact alert beep lock %d (contact=%d signal=%d)",
+                     lck->channel,
+                     lck->isContact ? 1 : 0,
+                     lck->isSignal ? 1 : 0);
+        }
     } else {
         lck->sentSignalAlert = false;
         lck->sentContactAlert = false;
@@ -250,7 +253,12 @@ void arm_lock(int channel, bool arm, bool alert) {
     strlcpy(s_last_action_source, "sys", sizeof(s_last_action_source));
 
     if (locks[ch].alert) {
-        beep_keypad(1, locks[ch].channel);
+        // While typing a PIN, suppress unrelated beeps (e.g. pad auto-rearm/contact alerts)
+        // but still allow the feedback beep for the successful PIN submit path.
+        bool suppress = wiegand_pin_entry_active(locks[ch].channel) && strcmp(source, "wg_pin") != 0;
+        if (!suppress) {
+            beep_keypad(1, locks[ch].channel);
+        }
     }
 }
 
@@ -511,7 +519,9 @@ static void lock_service(void *pvParameter) {
                     
                     if (!hasContact) {
                         ESP_LOGI(TAG, "No contact from lock %d, sounding alert.", i + 1);
-                        beep_keypad(1, i + 1);  // channel is i + 1
+                        if (!wiegand_pin_entry_active(i + 1)) {
+                            beep_keypad(1, i + 1);  // channel is i + 1
+                        }
                     }
                 }
             }

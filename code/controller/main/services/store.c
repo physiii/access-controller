@@ -390,10 +390,6 @@ static cJSON *wifi_list_load_array(void) {
     if (!cJSON_IsArray(arr)) {
         if (arr) cJSON_Delete(arr);
         arr = cJSON_CreateArray();
-        /* Persist an empty list to avoid repeated NVS-not-found logs */
-        if (arr) {
-            wifi_list_save_array(arr);
-        }
     }
     free(json);
     return arr;

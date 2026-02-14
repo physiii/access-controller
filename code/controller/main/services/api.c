@@ -93,12 +93,6 @@ static cJSON *build_state_snapshot(void) {
     }
     cJSON_AddItemToObject(root, "rf", rf);
 
-    cJSON *logs = system_logs_snapshot();
-    if (!logs) {
-        logs = cJSON_CreateArray();
-    }
-    cJSON_AddItemToObject(root, "logs", logs);
-
     /* Wi-Fi state */
     cJSON *wifi = cJSON_CreateObject();
     if (wifi) {
@@ -112,13 +106,6 @@ static cJSON *build_state_snapshot(void) {
         }
         cJSON_AddItemToObject(root, "wifi", wifi);
     }
-
-    // Add keypad PIN users
-    cJSON *keypad_users = keypad_users_snapshot();
-    if (!keypad_users) {
-        keypad_users = cJSON_CreateArray();
-    }
-    cJSON_AddItemToObject(root, "keypadUsers", keypad_users);
 
     return root;
 }
@@ -159,6 +146,8 @@ static esp_err_t send_json_response(httpd_req_t *req, cJSON *json) {
     ESP_LOGI(API_TAG, "state response size=%zu (prealloc=%s)", resp_len, used_preallocated ? "yes" : "no");
 
     httpd_resp_set_type(req, "application/json");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store, no-cache, must-revalidate");
+    httpd_resp_set_hdr(req, "Pragma", "no-cache");
     esp_err_t result = httpd_resp_send(req, resp_str, resp_len);
     cJSON_Delete(json);
     if (!used_preallocated) {
@@ -208,7 +197,17 @@ static esp_err_t read_json_body(httpd_req_t *req, cJSON **out_payload) {
 }
 
 static esp_err_t api_state_get_handler(httpd_req_t *req) {
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store, no-cache, must-revalidate");
+    httpd_resp_set_hdr(req, "Pragma", "no-cache");
     return send_json_response(req, build_state_snapshot());
+}
+
+static esp_err_t api_keypad_users_get_handler(httpd_req_t *req) {
+    return send_json_response(req, keypad_users_snapshot());
+}
+
+static esp_err_t api_logs_get_handler(httpd_req_t *req) {
+    return send_json_response(req, system_logs_snapshot());
 }
 
 static esp_err_t send_wiegand_state_response(httpd_req_t *req) {
@@ -431,6 +430,10 @@ static esp_err_t api_wifi_get_handler(httpd_req_t *req) {
     return send_json_response(req, build_state_snapshot());
 }
 
+static esp_err_t api_wifi_list_get_handler(httpd_req_t *req) {
+    return send_json_response(req, wifi_list_snapshot());
+}
+
 static esp_err_t api_wifi_add_post_handler(httpd_req_t *req) {
     cJSON *payload = NULL;
     esp_err_t err = read_json_body(req, &payload);
@@ -538,9 +541,9 @@ static esp_err_t api_keypad_user_post_handler(httpd_req_t *req) {
     const char *name = cJSON_IsString(name_item) ? name_item->valuestring : NULL;
     const char *pin = cJSON_IsString(pin_item) ? pin_item->valuestring : NULL;
 
-    if (!name || !pin || strlen(pin) < 4 || strlen(pin) > 6) {
+    if (!name || !pin || strlen(pin) < 4 || strlen(pin) > 8) {
         cJSON_Delete(payload);
-        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Name and PIN (4-6 digits) required");
+        return httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Name and PIN (4-8 digits) required");
     }
 
     char uuid[33];
@@ -853,6 +856,20 @@ void register_api_routes(httpd_handle_t server) {
     };
     httpd_register_uri_handler(server, &keypad_user_post);
 
+    httpd_uri_t keypad_users_get = {
+        .uri = "/api/keypad/users",
+        .method = HTTP_GET,
+        .handler = api_keypad_users_get_handler,
+    };
+    httpd_register_uri_handler(server, &keypad_users_get);
+
+    httpd_uri_t logs_get = {
+        .uri = "/api/logs",
+        .method = HTTP_GET,
+        .handler = api_logs_get_handler,
+    };
+    httpd_register_uri_handler(server, &logs_get);
+
     httpd_uri_t keypad_user_delete = {
         .uri = "/api/keypad/user",
         .method = HTTP_DELETE,
@@ -908,6 +925,13 @@ void register_api_routes(httpd_handle_t server) {
         .handler = api_wifi_get_handler,
     };
     httpd_register_uri_handler(server, &wifi_get);
+
+    httpd_uri_t wifi_list_get = {
+        .uri = "/api/wifi/list",
+        .method = HTTP_GET,
+        .handler = api_wifi_list_get_handler,
+    };
+    httpd_register_uri_handler(server, &wifi_list_get);
 
     httpd_uri_t wifi_add = {
         .uri = "/api/wifi/add",
