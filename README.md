@@ -15,6 +15,7 @@ feed the same authorization and lock-control services.
 | [Controller mini](code/controller_mini/README.md) | Alternate experimental firmware |
 | `circuits/controller`, `circuits/strike` | KiCad designs and manufacturing artifacts |
 | `model`, `images` | Enclosures, mechanical sources and board views |
+| [Bench photos](docs/hardware-bench-2026-07-24.md) | Recovered controller and keypad wiring views |
 | [Consolidation audit](docs/WORKSPACE_CLEANUP.md) | Branch disposition, recovery and current verification |
 
 ```mermaid
