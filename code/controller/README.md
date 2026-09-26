@@ -1,69 +1,51 @@
-# Ethernet Example
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+# ESP32-S3 Access Controller Firmware
 
-## Overview
+This is the active two-channel controller application. Its local HTTP server
+embeds the Device Manager web assets and can also be reached through the tunnel
+service. [Project documentation](../../docs/README.md).
 
-This example demonstrates basic usage of `Ethernet driver` together with `tcpip_adapter`. The work flow of the example could be as follows:
+## Source map
 
-1. Install Ethernet driver
-2. Send DHCP requests and wait for a DHCP lease
-3. If get IP address successfully, then you will be able to ping the device
+| Path | Responsibility |
+|---|---|
+| `main/main.c` | Startup, device identity and network recovery |
+| `main/services/` | Lock/input services, authorization, storage, APIs and tunnel |
+| `main/public/` | Embedded HTML, JavaScript, CSS and matching gzip assets |
+| `tests/` | Native/source checks and browser/device suites |
+| `CMakeLists.txt` | ESP-IDF project and local WebSocket component location |
 
-If you have a new Ethernet application to go (for example, connect to IoT cloud via Ethernet), try this as a basic template, then add your own code.
-
-## How to use example
-
-### Hardware Required
-
-To run this example, it's recommended that you have an official ESP32 Ethernet development board - [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/hw-reference/get-started-ethernet-kit.html). This example should also work for 3rd party ESP32 board as long as it's integrated with a supported Ethernet PHY chip. Up until now, ESP-IDF supports up to four Ethernet PHY: `LAN8720`, `IP101`, `DP83848` and `RTL8201`, additional PHY drivers should be implemented by users themselves.
-
-Besides that, `esp_eth` component can drive third-party Ethernet module which integrates MAC and PHY and provides common communication interface (e.g. SPI, USB, etc). This example will take the **DM9051** as an example, illustrating how to install the Ethernet driver in the same manner.
-
-#### Pin Assignment
-
-See common pin assignments for Ethernet examples from [upper level](../README.md#common-pin-assignments).
-
-### Configure the project
-
-```
-idf.py menuconfig
+```mermaid
+flowchart LR
+    Startup["Startup and restored settings"] --> Inputs["Input services"]
+    Inputs --> Rules["Authorization / automation"]
+    Rules --> Output["Lock outputs and alerts"]
+    UI["Embedded web UI"] <--> API["HTTP state and commands"]
+    API <--> Rules
 ```
 
-See common configurations for Ethernet examples from [upper level](../README.md#common-configurations).
+## Reproduce the build
 
-### Build, Flash, and Run
+From the repository root:
 
-Build the project and flash it to the board, then run monitor tool to view serial output:
-
-```
-idf.py -p PORT build flash monitor
-```
-
-(Replace PORT with the name of the serial port to use.)
-
-(To exit the serial monitor, type ``Ctrl-]``.)
-
-See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
-
-## Example Output
-
-```bash
-I (394) eth_example: Ethernet Started
-I (3934) eth_example: Ethernet Link Up
-I (3934) eth_example: Ethernet HW Addr 30:ae:a4:c6:87:5b
-I (5864) tcpip_adapter: eth ip: 192.168.2.151, mask: 255.255.255.0, gw: 192.168.2.2
-I (5864) eth_example: Ethernet Got IP Address
-I (5864) eth_example: ~~~~~~~~~~~
-I (5864) eth_example: ETHIP:192.168.2.151
-I (5874) eth_example: ETHMASK:255.255.255.0
-I (5874) eth_example: ETHGW:192.168.2.2
-I (5884) eth_example: ~~~~~~~~~~~
+```sh
+source ~/esp/esp-idf/export.sh
+idf.py -C code/controller build
 ```
 
-Now you can ping your ESP32 in the terminal by entering `ping 192.168.2.151` (it depends on the actual IP address you get).
+The configured target is ESP32-S3 with 16 MB flash. The WebSocket component
+path is currently machine-specific; check `CMakeLists.txt` when using another
+checkout. Keep each `.gz` asset synchronized with its plain source.
 
-## Troubleshooting
+## Choose the verification scope
 
-See common troubleshooting for Ethernet examples from [upper level](../README.md#common-troubleshooting).
+| Scope | Command from `tests/` | Effect |
+|---|---|---|
+| Native Wiegand decoder | `npm run test:wiegand-format` | Host-only C test |
+| Startup and quiet-mode contracts | `npm run test:boot-audio` | Source checks |
+| Wi-Fi/IP-link UI | `npm run test:ui-network` | Intercepted browser fixtures only |
+| Device/API/UI suite | `npm test` | Connects to a controller and changes its state |
+| Physical walkthrough | `npm run test:physical` | Attached-hardware interaction |
 
-(For any technical queries, please open an [issue](https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you as soon as possible.)
+See [test setup](tests/README.md) and the [deployment runbook](../../docs/CONTROLLER_DEPLOY_AND_TEST.md)
+for device operations. The consolidation verification used host checks and
+browser fixtures; no lock was operated or firmware flashed.

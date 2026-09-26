@@ -15,6 +15,7 @@ const App = {
   headerClockBaseMs: 0,
   headerClockUtcOffsetSeconds: 0,
   headerClockResolved: false,
+  networkHandoffTimer: null,
   rfAutoSavedIds: new Set(),
   rfAutoSavingIds: new Set(),
   credentialAutoSaveTimers: new Map(),
@@ -404,6 +405,32 @@ const onPageActivated = (targetId) => {
   }
 };
 
+const applyHeaderIpLink = (linkId, valueId, label, value) => {
+  const link = document.getElementById(linkId);
+  const valueEl = document.getElementById(valueId);
+  const ip = String(value || '').trim();
+
+  if (valueEl) valueEl.textContent = ip || '—';
+  if (!link) return;
+
+  if (!ip) {
+    link.removeAttribute('href');
+    link.setAttribute('aria-disabled', 'true');
+    link.setAttribute('aria-label', `${label} interface unavailable`);
+    link.setAttribute('title', `${label} interface is not available yet`);
+    link.classList.add('is-disabled');
+    return;
+  }
+
+  const host = ip.includes(':') && !ip.startsWith('[') ? `[${ip}]` : ip;
+  const url = `http://${host}/`;
+  link.setAttribute('href', url);
+  link.removeAttribute('aria-disabled');
+  link.setAttribute('aria-label', `Open ${label} interface at ${ip}`);
+  link.setAttribute('title', `Open ${url}`);
+  link.classList.remove('is-disabled');
+};
+
 const applyDeviceInfo = (device = {}) => {
   const uuidEl = document.getElementById('uuid');
   if (uuidEl) {
@@ -422,8 +449,8 @@ const applyDeviceInfo = (device = {}) => {
   setText('wifiStaMac', network.wifi_sta_mac);
   setText('wifiApMac', network.wifi_ap_mac);
   setText('ethMac', network.eth_mac);
-  setText('headerStaIp', network.wifi_sta_ip);
-  setText('headerApIp', network.wifi_ap_ip);
+  applyHeaderIpLink('headerStaLink', 'headerStaIp', 'STA', network.wifi_sta_ip);
+  applyHeaderIpLink('headerApLink', 'headerApIp', 'AP', network.wifi_ap_ip);
 };
 
 const applyServerInfo = (server = {}) => {
@@ -1915,12 +1942,13 @@ const applyWifiListSnapshot = (networks = wifiNetworksCache || [], scanned = wif
   renderWifiFromCache();
 };
 
-const loadState = async () => {
+const loadState = async (options = {}) => {
+  const { suppressErrorToast = false, timeoutMs = 8000 } = options;
   if (stateInFlight) return stateInFlight;
 
   stateInFlight = (async () => {
   try {
-    const data = await fetchJSON(`api/state?t=${Date.now()}`);
+    const data = await fetchJSON(`api/state?t=${Date.now()}`, { timeoutMs });
     App.data = mergeStateCredentialDetails(App.data || {}, data);
     consecutiveStateFailures = 0;
     nextStateToastAt = 0;
@@ -1937,22 +1965,60 @@ const loadState = async () => {
       App.elements.toast.hidden = true;
       App.elements.toast.classList.remove('show');
     }
+    return true;
   } catch (error) {
     consecutiveStateFailures++;
     const now = Date.now();
     const shouldToast =
       consecutiveStateFailures === 1 || (nextStateToastAt > 0 && now >= nextStateToastAt);
-    if (shouldToast && now - lastDeviceStateErrorToast >= DEVICE_STATE_ERROR_THROTTLE_MS) {
+    if (!suppressErrorToast && shouldToast && now - lastDeviceStateErrorToast >= DEVICE_STATE_ERROR_THROTTLE_MS) {
       lastDeviceStateErrorToast = now;
       nextStateToastAt = now + DEVICE_STATE_TOAST_BACKOFF_MS;
       handleError(error, 'Unable to load device state');
     }
+    return false;
   }
   })().finally(() => {
     stateInFlight = null;
   });
 
   return stateInFlight;
+};
+
+const stopNetworkHandoffPolling = () => {
+  if (!App.networkHandoffTimer) return;
+  clearTimeout(App.networkHandoffTimer);
+  App.networkHandoffTimer = null;
+};
+
+const startNetworkHandoffPolling = () => {
+  stopNetworkHandoffPolling();
+  const deadline = Date.now() + 90000;
+
+  // Do not let a pre-reboot STA address look like the result of this handoff.
+  // The next successful state request will restore the live value.
+  if (App.data?.device?.network) {
+    App.data.device.network.wifi_sta_ip = null;
+    App.data.device.network.wifi_sta_connected = false;
+  }
+  applyHeaderIpLink('headerStaLink', 'headerStaIp', 'STA', null);
+
+  const poll = async () => {
+    App.networkHandoffTimer = null;
+    const loaded = await loadState({ suppressErrorToast: true, timeoutMs: 2500 });
+    const staIp = loaded ? String(App.data?.device?.network?.wifi_sta_ip || '').trim() : '';
+    if (staIp) {
+      showToast(`STA ready at ${staIp}. Click the STA badge to switch.`);
+      return;
+    }
+    if (Date.now() < deadline) {
+      App.networkHandoffTimer = setTimeout(poll, 1500);
+    }
+  };
+
+  // The controller schedules its reboot one second after saving Wi-Fi. Start
+  // after that boundary so an old pre-reboot STA address cannot end the watcher.
+  App.networkHandoffTimer = setTimeout(poll, 2000);
 };
 
 const pollSignals = async () => {
@@ -2693,7 +2759,8 @@ const setupForms = () => {
             method: 'POST',
             body: JSON.stringify({ ssid: wifiName, password: wifiPassword }),
           });
-          showToast('Wi‑Fi saved. Device will reboot to connect.');
+          showToast('Wi‑Fi saved. Waiting for the STA link...');
+          startNetworkHandoffPolling();
           wifiNetworksCache = null;
           wifiScanCache = null;
           wifiListLoaded = false;
@@ -2716,7 +2783,8 @@ const setupForms = () => {
             method: 'POST',
             body: JSON.stringify({ ssid }),
           });
-          showToast('Connecting... device will reboot.');
+          showToast('Connecting... waiting for the STA link.');
+          startNetworkHandoffPolling();
           wifiNetworksCache = null;
           wifiScanCache = null;
           wifiListLoaded = false;

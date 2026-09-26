@@ -14,3 +14,7 @@ node_modules/
 .deepseek/
 circuits/controller/.history/
 code/controller/tests/test-report.html
+
+# Generated editor indexes and local UI evidence
+.cache/
+code/controller/tests/artifacts/

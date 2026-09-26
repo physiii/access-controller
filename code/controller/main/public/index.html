@@ -13,7 +13,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=42">
+  <link rel="stylesheet" href="style.css?v=43">
 </head>
 <body>
   <header class="app-bar">
@@ -23,8 +23,8 @@
     </div>
     <div class="header-status">
       <span class="header-chip" id="headerClockChip" title="Device local time"><strong id="headerClock">—</strong></span>
-      <span class="header-chip">AP <strong id="headerApIp">—</strong></span>
-      <span class="header-chip">STA <strong id="headerStaIp">—</strong></span>
+      <a class="header-chip header-ip-link is-disabled" id="headerApLink" aria-disabled="true">AP <strong id="headerApIp">—</strong></a>
+      <a class="header-chip header-ip-link is-disabled" id="headerStaLink" aria-disabled="true">STA <strong id="headerStaIp">—</strong></a>
       <span class="header-chip">Server <strong id="headerServerUrl">https://open-automation.org/devices</strong></span>
     </div>
   </header>
@@ -607,6 +607,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="script.js?v=42"></script>
+  <script src="script.js?v=43"></script>
 </body>
 </html>

@@ -72,30 +72,17 @@ stateDiagram-v2
     StationMode --> [*]
 ```
 
-During recovery, the controller uses AP+STA mode for the probe so a user can
-stay connected to the setup AP while the device tests the saved network. The
-server punch is performed in the recovery task itself to avoid allocating an
-extra TLS task while the AP UI and device services are already running. If the
-probe passes, the controller switches to station-only mode and starts the tunnel
-task. If the probe fails, it returns to AP-only mode and waits for the next
-interval.
+During recovery, the controller uses AP+STA mode for the probe so a user can stay connected to the setup AP while the device tests the saved network. The server punch is performed in the recovery task itself to avoid allocating an extra TLS task while the AP UI and device services are already running.
 
-Wi-Fi runtime configuration uses `WIFI_STORAGE_RAM` for both AP and station
-setup. This keeps ESP-IDF Wi-Fi mode/config changes from writing to the small
-NVS partition during boot or AP recovery. If NVS is nearly full, AP startup must
-log and return on Wi-Fi configuration errors instead of crashing the device in a
-reset loop. The expected recovery behavior is: boot, start AP if station/server
-policy fails, keep the local UI/API reachable, and retry saved station
-credentials when the saved network becomes available again.
+If the probe passes, the controller switches to station-only mode and starts the tunnel task. If the probe fails, it returns to AP-only mode and waits for the next interval.
 
-The provisioning UI must remain useful while the controller is in AP-only or
-AP+STA mode. Wi-Fi scans are run on demand from `/api/wifi/scan`; when the
-device is AP-only the firmware temporarily enables AP+STA for the scan and then
-restores AP mode. The UI keeps the last scan results through normal state
-polling so transient scan delays do not clear the available-network list.
-Legacy active credentials are merged into `/api/wifi/list` snapshots so an
-older board cannot show a configured SSID while saying there are no saved
-networks.
+Wi-Fi runtime configuration uses `WIFI_STORAGE_RAM` for both AP and station setup. This keeps ESP-IDF Wi-Fi mode/config changes from writing to the small NVS partition during boot or AP recovery. If NVS is nearly full, AP startup must log and return on Wi-Fi configuration errors instead of crashing the device in a reset loop.
+
+The expected recovery behavior is: boot, start AP if station/server policy fails, keep the local UI/API reachable, and retry saved station credentials when the saved network becomes available again.
+
+The provisioning UI must remain useful while the controller is in AP-only or AP+STA mode. Wi-Fi scans are run on demand from `/api/wifi/scan`; when the device is AP-only the firmware temporarily enables AP+STA for the scan and then restores AP mode. The UI keeps the last scan results through normal state polling so transient scan delays do not clear the available-network list.
+
+Legacy active credentials are merged into `/api/wifi/list` snapshots so an older board cannot show a configured SSID while saying there are no saved networks.
 
 ## Settings Flow
 

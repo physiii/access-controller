@@ -18,7 +18,8 @@
     "test:stress": "node runner.mjs --stress",
     "test:soak": "node runner.mjs --soak",
     "test:bulk-remove": "node runner.mjs --bulk-remove",
-    "test:server-route": "node runner.mjs --server-route-only"
+    "test:server-route": "node runner.mjs --server-route-only",
+    "test:ui-network": "node unit/ui-network-handoff.mjs"
   },
   "dependencies": {
     "playwright": "^1.45.0"

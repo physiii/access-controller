@@ -334,14 +334,9 @@ curl -X POST https://open-automation.org/devices \
 
 ## How the Access Controller connects
 
-The Access Controller firmware punches into Device Manager with an HTTPS POST.
-Device Manager controls the controller over the LAN-reachable STA IP when both
-are on the same network, or — when the controller is on a NAT'd / remote network
-(e.g. `ec3409`) where its STA IP is not routable — through the reverse **device
-control tunnel and HTTP proxy** documented above (`esp32-tunnel`). The tunnel path
-is the robust default for off-LAN control; on `ec3409` the direct "punch" fails
-(`ESP_ERR_HTTP_CONNECT`) and the firmware correctly stays on Wi-Fi/LAN while the
-tunnel carries all control traffic.
+The Access Controller firmware punches into Device Manager with an HTTPS POST. Device Manager controls the controller over the LAN-reachable STA IP when both are on the same network, or — when the controller is on a NAT'd / remote network (e.g. `ec3409`) where its STA IP is not routable — through the reverse **device control tunnel and HTTP proxy** documented above (`esp32-tunnel`).
+
+The tunnel path is the robust default for off-LAN control; on `ec3409` the direct "punch" fails (`ESP_ERR_HTTP_CONNECT`) and the firmware correctly stays on Wi-Fi/LAN while the tunnel carries all control traffic.
 
 ### Firmware punch behavior
 

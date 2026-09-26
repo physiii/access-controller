@@ -1,75 +1,57 @@
-### Objective
+# Access Controller
 
-Commercial access controller for strike and magnetic locks. Supports Weigand protocols for RFID Keypad, fingerprint scanners, and other end devices.
+ESP32-S3 firmware, web controls and hardware for a two-channel strike/magnetic
+lock controller. Wiegand readers, keypads, exit buttons, fobs and motion inputs
+feed the same authorization and lock-control services.
 
-Includes firmware, schematics, layout, and 3D models.
+## Project map
 
-![Alt text](/images/controller-schematic.png?raw=true "PCB")
+| Area | Purpose |
+|---|---|
+| [Active firmware](code/controller/README.md) | ESP32-S3 controller and embedded Device Manager UI |
+| [Documentation](docs/README.md) | Architecture, hardware, provisioning and operating workflows |
+| [Tests](code/controller/tests/README.md) | Offline checks and separately invoked device tests |
+| [Tunnel server](code/tunnel/README.md) | Optional remote access to the device UI |
+| [Controller mini](code/controller_mini/README.md) | Alternate experimental firmware |
+| `circuits/controller`, `circuits/strike` | KiCad designs and manufacturing artifacts |
+| `model`, `images` | Enclosures, mechanical sources and board views |
+| [Consolidation audit](docs/WORKSPACE_CLEANUP.md) | Branch disposition, recovery and current verification |
 
-![Alt text](/images/controller.png?raw=true "PCB")
-
-![Alt text](/images/controller-3d.png?raw=true "PCB")
-
-## Install [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html)
-
-```
-sudo apt install -y \
-  libncurses5 gcc git wget make libncurses-dev flex bison gperf python python-pip genromfs \
-  python-setuptools python-serial python-cryptography python-future python-pyparsing
-echo 'export PATH="$PATH:/usr/local/src/esp/xtensa-esp32-elf/bin"' >> ~/.bashrc
-echo 'export IDF_PATH="/usr/local/src/esp/esp-idf"' >> ~/.bashrc
-source ~/.bashrc
-
-sudo chmod 777 /usr/local/src
-cd /usr/local/src
-```
-*download esp.zip or:*
-```
-mkdir esp
-cd esp
-git clone --recursive https://github.com/espressif/esp-idf.git
-wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
-tar -zxvf xtensa-esp32*
-
-python2.7 -m pip install --user -r $IDF_PATH/requirements.txt
+```mermaid
+flowchart LR
+    Inputs["Wiegand / keypad / exit / fob / motion"] --> Rules["Authorization and automation"]
+    Rules --> Locks["Two lock channels"]
+    Web["Device Manager UI"] --> API["Local HTTP API"]
+    API --> Rules
+    API <--> Store["Stored credentials and configuration"]
+    Gateway["Optional tunnel gateway"] <--> API
 ```
 
+## Build and check
 
-## Install [lws-factory](https://github.com/warmcat/lws-esp32-factory)
-```
-git clone https://github.com/warmcat/lws-esp32-factory
-cd lws-esp32-factory
-export ESPPORT=/dev/ttyUSB0
-```
-Put device in program mode.  
-```
-make erase_flash
-```
-Put device in program mode.  
-```
-make all flash monitor
-```
-Press *reboot* button  
-Should see lws-factory load in terminal  
-Connect ESP device on wifi  
-Go to https://192.168.4.1  
-Set wifi name/password  
-Wait for IP address  
+Use the configured ESP-IDF checkout and `esp_websocket_client` component.
+The current firmware targets **ESP32-S3**; building does not flash a controller.
 
-## Get NFC Lock code
+```sh
+source ~/esp/esp-idf/export.sh
+idf.py -C code/controller build
+cd code/controller/tests
+npm ci
+npm run test:wiegand-format
+npm run test:boot-audio
+CHROMIUM_PATH=/usr/bin/google-chrome npm run test:ui-network
 ```
-git clone https://github.com/physiii/nfc-lock
-cd nfc-lock/code
-make -j16 all
-```
-Goto https://192.168.4.1 - or you can go to new IP address  
-Upload binary from code/build folder  
-After binary uploads, you can use `make all lws_flash_ota monitor` in the future
 
-#### Program Mode
-Program mode makes device ready to be flashed.  
-Hold down *prog* button and press/release *reboot* button.  
+The browser check uses intercepted fixtures and cannot operate a real lock.
+It covers desktop/mobile navigation, AP/STA links and recovery after saving
+Wi-Fi settings. Omit `CHROMIUM_PATH` to use Playwright's installed Chromium.
 
-#### Factory Mode
-Factory mode boots from lws-factory to upload new binaries or set AP info.  
-Hold down *fact* button then press/release *reboot* button.  
+| Next task | Guide |
+|---|---|
+| Provision AP, LAN or tunnel access | [Network provisioning](docs/NETWORK_PROVISIONING.md) |
+| Flash or run attached-device tests | [Deploy and test runbook](docs/CONTROLLER_DEPLOY_AND_TEST.md) |
+| Change firmware or hardware | [Workflows](docs/WORKFLOWS.md) |
+
+The repository retains its established **`master`** default branch. Legacy
+Python 2/lws-factory setup instructions are available in Git history; use the
+current ESP-IDF workflow above for this firmware.

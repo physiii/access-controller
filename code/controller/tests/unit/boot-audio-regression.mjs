@@ -7,7 +7,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const services = join(here, '..', '..', 'main', 'services');
 
 const inputs = [
-  { file: 'exit.c', collection: 'exits', count: 'NUM_OF_EXITS', read: 'get_io' },
+  { file: 'exit.c', collection: 'exits', count: 'NUM_OF_EXITS', read: 'get_io', invertible: true },
   { file: 'motion.c', collection: 'motions', count: 'NUM_OF_MOTIONS', read: 'get_mcp_io' },
   { file: 'keypad.c', collection: 'keypads', count: 'NUM_OF_KEYPADS', read: 'get_io' },
   { file: 'fob.c', collection: 'fobs', count: 'NUM_OF_FOBS', read: 'get_mcp_io' },
@@ -24,9 +24,12 @@ for (const input of inputs) {
     new RegExp(`for \\(int i = 0; i < ${input.count}; i\\+\\+\\)[\\s\\S]*?${input.collection}\\[i\\]\\.expired = true;[\\s\\S]*?${input.collection}\\[i\\]\\.count = 0;`),
     `${input.file}: every re-arm timer must start expired with a zero count`,
   );
+  const sample = input.invertible
+    ? `${input.collection}\\[i\\]\\.invert \\? ${input.read}\\(${input.collection}\\[i\\]\\.pin\\) : !${input.read}\\(${input.collection}\\[i\\]\\.pin\\)`
+    : `!${input.read}\\(${input.collection}\\[i\\]\\.pin\\)`;
   assert.match(
     initialization,
-    new RegExp(`${input.collection}\\[i\\]\\.isPressed = !${input.read}\\(${input.collection}\\[i\\]\\.pin\\);[\\s\\S]*?${input.collection}\\[i\\]\\.prevPress = ${input.collection}\\[i\\]\\.isPressed;`),
+    new RegExp(`${input.collection}\\[i\\]\\.isPressed = ${sample};[\\s\\S]*?${input.collection}\\[i\\]\\.prevPress = ${input.collection}\\[i\\]\\.isPressed;`),
     `${input.file}: hardware state must be sampled before tasks start`,
   );
   assert.equal(
