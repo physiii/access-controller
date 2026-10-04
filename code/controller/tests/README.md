@@ -10,7 +10,23 @@ npm install
 npx playwright install chromium
 ```
 
-## Usage
+## Offline verification
+
+These commands do not contact a device:
+
+| Command | Checks |
+|---|---|
+| `npm run test:wiegand-format` | Native Wiegand format handling |
+| `npm run test:boot-audio` | Startup sampling, timers and quiet mode |
+| `npm run test:ui-network` | Desktop/mobile navigation, IP badges and simulated reboot recovery |
+
+Set `CHROMIUM_PATH=/usr/bin/google-chrome` to use installed Chrome.
+UI screenshots go to `artifacts/network-ui/` or `$ARTIFACT_DIR`.
+
+## Attached-device usage
+
+The commands below contact a controller and may change lock/input settings.
+
 
 ```bash
 npm test              # Full automated suite (API + stress + UI)

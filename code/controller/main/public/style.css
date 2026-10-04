@@ -1085,6 +1085,30 @@ body {
   text-overflow: ellipsis;
 }
 
+.header-ip-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+}
+
+.header-ip-link:hover,
+.header-ip-link:focus-visible {
+  border-color: rgba(53, 240, 194, 0.62);
+  background: rgba(53, 240, 194, 0.12);
+  color: var(--color-primary);
+  outline: none;
+}
+
+.header-ip-link:focus-visible {
+  box-shadow: 0 0 0 3px rgba(53, 240, 194, 0.2);
+}
+
+.header-ip-link.is-disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.62;
+}
+
 .nav-tabs {
   position: sticky;
   top: 65px;

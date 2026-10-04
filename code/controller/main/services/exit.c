@@ -18,6 +18,7 @@ struct exitButton
 	bool enable;
 	bool latch;
 	bool toggleState;
+	bool invert;
 	int delay;
 	int channel;
 	int channel_mask;
@@ -166,7 +167,7 @@ int storeExitSettings()
 		strcpy(type, exits[i].type);
 		sprintf(exits[i].settings,
 			"{\"eventType\":\"%s\", "
-			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"alert_target\": \"%s\", \"channel_mask\": %d, \"delay\": %d, \"latch\": %s, \"mode\": \"%s\"}}",
+			"\"payload\":{\"channel\":%d, \"enable\": %s, \"alert\": %s, \"alert_target\": \"%s\", \"channel_mask\": %d, \"delay\": %d, \"latch\": %s, \"invert\": %s, \"mode\": \"%s\"}}",
 			type,
 			i+1,
 			(exits[i].enable) ? "true" : "false",
@@ -175,6 +176,7 @@ int storeExitSettings()
 			exits[i].channel_mask,
 			exits[i].delay,
 			(exits[i].latch) ? "true" : "false",
+			(exits[i].invert) ? "true" : "false",
 			exit_current_mode(&exits[i]));
 
 		sprintf(exits[i].key, "%s%d", type, i);
@@ -225,6 +227,7 @@ cJSON *exit_state_snapshot(void) {
         cJSON_AddNumberToObject(entry, "channel_mask", exits[i].channel_mask);
         cJSON_AddNumberToObject(entry, "delay", exits[i].delay);
         cJSON_AddBoolToObject(entry, "latch", exits[i].latch);
+        cJSON_AddBoolToObject(entry, "invert", exits[i].invert);
         cJSON_AddStringToObject(entry, "mode", exit_current_mode(&exits[i]));
         cJSON_AddBoolToObject(entry, "signal", exits[i].isPressed);
         cJSON_AddItemToArray(array, entry);
@@ -287,6 +290,12 @@ void latchExit (int ch, bool val)
 		if (exits[i].channel == ch) exit_set_mode(&exits[i], exit_mode_from_latch(val));
 }
 
+void setExitInvert (int ch, bool val)
+{
+	for (int i=0; i < NUM_OF_EXITS; i++)
+		if (exits[i].channel == ch) exits[i].invert = val;
+}
+
 void modeExit (int ch, const char *mode)
 {
 	for (int i=0; i < NUM_OF_EXITS; i++)
@@ -315,7 +324,10 @@ static void test_exit_signal(struct exitButton *ext)
 
 void check_exit (struct exitButton *ext)
 {
-	ext->isPressed = !get_io(ext->pin);
+	// NO (normally-open, default): idle HIGH, press pulls LOW -> pressed = !level.
+	// NC (normally-closed, invert=true): idle LOW, press opens to HIGH -> pressed = level.
+	// Either way the same press edge (isPressed low->high) drives momentary/toggle.
+	ext->isPressed = ext->invert ? get_io(ext->pin) : !get_io(ext->pin);
 	if (!ext->enable) {
 		ext->prevPress = ext->isPressed;
 		return;
@@ -392,6 +404,11 @@ void handle_exit_message(cJSON * payload)
 			latchExit(ch, tmp);
 		}
 
+		if (cJSON_GetObjectItem(payload,"invert")) {
+			tmp = exit_json_bool(cJSON_GetObjectItem(payload,"invert"));
+			setExitInvert(ch, tmp);
+		}
+
 		cJSON *mode = cJSON_GetObjectItem(payload, "mode");
 		if (cJSON_IsString(mode) && mode->valuestring) {
 			modeExit(ch, mode->valuestring);
@@ -428,6 +445,7 @@ void exit_main()
 	exits[0].enable = false;
 	exits[0].latch = false;
 	exits[0].toggleState = false;
+	exits[0].invert = false;
 	exit_set_mode(&exits[0], "momentary");
 	strcpy(exits[0].type, "exit");
 
@@ -440,6 +458,7 @@ void exit_main()
 	exits[1].alert_target = ALERT_TARGET_BOTH;
 	exits[1].latch = false;
 	exits[1].toggleState = false;
+	exits[1].invert = false;
 	exit_set_mode(&exits[1], "momentary");
 	strcpy(exits[1].type, "exit");
 
@@ -459,7 +478,7 @@ void exit_main()
 	for (int i = 0; i < NUM_OF_EXITS; i++) {
 		exits[i].expired = true;
 		exits[i].count = 0;
-		exits[i].isPressed = !get_io(exits[i].pin);
+		exits[i].isPressed = exits[i].invert ? get_io(exits[i].pin) : !get_io(exits[i].pin);
 		exits[i].prevPress = exits[i].isPressed;
 	}
 

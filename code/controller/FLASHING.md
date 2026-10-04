@@ -169,7 +169,36 @@ idf.py build
 ```
 
 `install.sh esp32s3` pulls only the ESP32-S3 toolchain. `1.6 T`-ish free is plenty; the toolchain
-is ~8 GB installed under `~/.espressif`.
+is ~8 GB installed under `~/.espressif`. (Alternative: rsync a working machine's `~/esp/esp-idf`
++ `~/.espressif` — the Python venv relocates cleanly if both machines use the same `$HOME` path.)
+
+### Gotchas hit on a real bring-up
+
+The clean flow above hides three things that bit a from-scratch build on the asus field laptop:
+
+- **`cmake` / `ninja` missing and `apt` can't install them** (the laptop runs an EOL Ubuntu whose
+  repos are gone → `Package 'cmake' has no installation candidate`). Install them into the ESP-IDF
+  Python env instead — `export.sh` puts it on `PATH`:
+  ```bash
+  source ~/esp/esp-idf/export.sh && pip install cmake ninja
+  ```
+- **`EXTRA_COMPONENT_DIRS doesn't exist: .../esp-protocols/...`** — `CMakeLists.txt` references
+  `~/esp/esp-protocols/components/esp_websocket_client` by absolute path, so that repo must exist at
+  `~/esp/esp-protocols` (`git clone https://github.com/espressif/esp-protocols.git ~/esp/esp-protocols`,
+  or rsync it for an exact version match).
+- **`httpd_ws_frame_t undeclared`** — needs `CONFIG_HTTPD_WS_SUPPORT=y` (in `sdkconfig.defaults` as of
+  `eba517a`). If a stale generated `sdkconfig` predates that: `rm sdkconfig && idf.py build`.
+
+### Driving the AP-OTA over SSH (single-NIC laptop)
+
+Running the OTA *on* the laptop interactively is just §2c. Driving it *over SSH* from another machine
+is fiddlier — the laptop drops the LAN (and your SSH) the instant it joins the AP, and a detached SSH
+session lacks the polkit auth to create a Wi-Fi connection (`Not authorized to control networking`).
+The `ap_ota.sh` staged on asus handles it end to end: run it **detached** and it (a) `nmcli device
+disconnect`s first to free the single radio for a clean 2.4 GHz scan (the controller's AP beacons are
+sparse in AP+STA mode, so a radio camped on 5 GHz LAN won't see them), (b) uses **`sudo nmcli`** to
+authorize the join, (c) OTAs, then (d) restores the LAN (240 s watchdog as backstop). Verify from a
+third machine or after the laptop reconnects. Validated 2026-07-25: `7be4c43-dirty`/app0 → `eba517a`/app1.
 
 ---
 

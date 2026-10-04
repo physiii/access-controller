@@ -60,6 +60,20 @@ The embedded UI source lives in:
 code/controller/main/public/
 ```
 
+## Offline checks before device testing
+
+```mermaid
+flowchart LR
+    Edit["Edit source"] --> Build["Build firmware"]
+    Build --> Host["Host and source checks"]
+    Host --> UI["Browser fixtures"]
+    UI --> Device["Separate attached-device validation"]
+```
+
+From `code/controller/tests`, run `npm run test:wiegand-format`,
+`npm run test:boot-audio` and `npm run test:ui-network`. The last command
+uses mocked HTTP responses; it does not send controller commands.
+
 ## Run Controller Tests
 
 Install once:

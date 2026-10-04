@@ -13,7 +13,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=41">
+  <link rel="stylesheet" href="style.css?v=43">
 </head>
 <body>
   <header class="app-bar">
@@ -23,8 +23,8 @@
     </div>
     <div class="header-status">
       <span class="header-chip" id="headerClockChip" title="Device local time"><strong id="headerClock">—</strong></span>
-      <span class="header-chip">AP <strong id="headerApIp">—</strong></span>
-      <span class="header-chip">STA <strong id="headerStaIp">—</strong></span>
+      <a class="header-chip header-ip-link is-disabled" id="headerApLink" aria-disabled="true">AP <strong id="headerApIp">—</strong></a>
+      <a class="header-chip header-ip-link is-disabled" id="headerStaLink" aria-disabled="true">STA <strong id="headerStaIp">—</strong></a>
       <span class="header-chip">Server <strong id="headerServerUrl">https://open-automation.org/devices</strong></span>
     </div>
   </header>
@@ -138,6 +138,10 @@
                   <input type="checkbox" id="latchExit_1">
                   <span>Latch</span>
                 </label>
+                <label class="form-switch" title="Turn ON only for a Normally-Closed (NC) exit button. Leave OFF for the usual Normally-Open (NO) wiring. Inverts the idle level so the press edge fires the same either way.">
+                  <input type="checkbox" id="invertExit_1">
+                  <span>Invert (NC)</span>
+                </label>
                 <div class="input-row">
                   <label for="armDelay_1">Re-arm delay (seconds)</label>
                   <div class="input-group">
@@ -241,6 +245,10 @@
                 <label class="form-switch">
                   <input type="checkbox" id="latchExit_2">
                   <span>Latch</span>
+                </label>
+                <label class="form-switch" title="Turn ON only for a Normally-Closed (NC) exit button. Leave OFF for the usual Normally-Open (NO) wiring. Inverts the idle level so the press edge fires the same either way.">
+                  <input type="checkbox" id="invertExit_2">
+                  <span>Invert (NC)</span>
                 </label>
                 <div class="input-row">
                   <label for="armDelay_2">Re-arm delay (seconds)</label>
@@ -599,6 +607,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="script.js?v=41"></script>
+  <script src="script.js?v=43"></script>
 </body>
 </html>

@@ -36,13 +36,9 @@ receive and react to an inbound event within 1 second.
 
 ### Why not deep sleep
 
-Deep sleep fully de-associates from the AP. Waking on a fixed short interval
-(e.g. every ~900ms) to reconnect, check for work, and sleep again is **worse**
-than staying associated: reconnect (scan/auth/assoc, ~150–300ms+ at ~150mA+)
-paid every cycle costs far more than briefly waking to check a TIM bit while
-still associated. Rough estimate: deep-sleep-and-reconnect every 900ms lands
-around 30+ mA average — roughly 15–30x worse than the modem-sleep approach
-below. **Stay associated; don't deep-sleep-and-reconnect.**
+Deep sleep fully de-associates from the AP. Waking on a fixed short interval (e.g. every ~900ms) to reconnect, check for work, and sleep again is **worse** than staying associated: reconnect (scan/auth/assoc, ~150–300ms+ at ~150mA+) paid every cycle costs far more than briefly waking to check a TIM bit while still associated.
+
+Rough estimate: deep-sleep-and-reconnect every 900ms lands around 30+ mA average — roughly 15–30x worse than the modem-sleep approach below. **Stay associated; don't deep-sleep-and-reconnect.**
 
 ### Listen interval math
 

@@ -8,7 +8,11 @@ export default async function run(api, report) {
   let page;
 
   try {
-    browser = await chromium.launch({ headless: true });
+    const executablePath = process.env.CHROMIUM_PATH?.trim();
+    browser = await chromium.launch({
+      headless: true,
+      ...(executablePath ? { executablePath } : {}),
+    });
     page = await browser.newPage();
     page.setDefaultTimeout(10000);
   } catch (err) {
@@ -232,6 +236,92 @@ export default async function run(api, report) {
       report.pass('Page title: "Access Controller"', title, Date.now() - t0);
     } else {
       report.fail('Page title', `Got: "${title}"`, Date.now() - t0);
+    }
+  }
+
+  // 1b. Header IP links update from live network state and navigate in-place.
+  {
+    const t0 = Date.now();
+    try {
+      const applyNetwork = async (wifiApIp, wifiStaIp) => {
+        await page.evaluate(({ wifiApIp, wifiStaIp }) => {
+          applyDeviceInfo({
+            network: {
+              wifi_ap_ip: wifiApIp,
+              wifi_sta_ip: wifiStaIp,
+            },
+          });
+        }, { wifiApIp, wifiStaIp });
+      };
+      const readLinks = async () => page.evaluate(() => {
+        const snapshot = (linkId, valueId) => {
+          const link = document.getElementById(linkId);
+          return {
+            tag: link?.tagName,
+            text: document.getElementById(valueId)?.textContent,
+            href: link?.getAttribute('href'),
+            disabled: link?.getAttribute('aria-disabled'),
+          };
+        };
+        return {
+          ap: snapshot('headerApLink', 'headerApIp'),
+          sta: snapshot('headerStaLink', 'headerStaIp'),
+        };
+      });
+      const clickAndCaptureDestination = async (selector, targetUrl) => {
+        const routeHandler = async (route) => route.fulfill({
+          status: 200,
+          contentType: 'text/html',
+          body: '<!doctype html><title>IP badge destination</title>',
+        });
+        await page.route(targetUrl, routeHandler);
+        try {
+          await Promise.all([
+            page.waitForURL(targetUrl, { waitUntil: 'domcontentloaded', timeout: 10000 }),
+            page.click(selector),
+          ]);
+          return page.url();
+        } finally {
+          await page.unroute(targetUrl, routeHandler);
+        }
+      };
+
+      await applyNetwork('192.168.4.1', null);
+      const apOnly = await readLinks();
+      await applyNetwork('192.168.4.1', '192.168.1.131');
+      const apAndSta = await readLinks();
+      const staDestination = await clickAndCaptureDestination('#headerStaLink', 'http://192.168.1.131/');
+
+      await navigateToDevice();
+      await applyNetwork('192.168.4.1', '192.168.1.131');
+      const apDestination = await clickAndCaptureDestination('#headerApLink', 'http://192.168.4.1/');
+      await navigateToDevice();
+
+      const passed =
+        apOnly.ap.tag === 'A' &&
+        apOnly.ap.text === '192.168.4.1' &&
+        apOnly.ap.href === 'http://192.168.4.1/' &&
+        apOnly.sta.href === null &&
+        apOnly.sta.disabled === 'true' &&
+        apAndSta.sta.tag === 'A' &&
+        apAndSta.sta.text === '192.168.1.131' &&
+        apAndSta.sta.href === 'http://192.168.1.131/' &&
+        apAndSta.sta.disabled === null &&
+        staDestination === 'http://192.168.1.131/' &&
+        apDestination === 'http://192.168.4.1/';
+
+      if (passed) {
+        report.pass('UI: AP and STA badges update and navigate', '', Date.now() - t0);
+      } else {
+        report.fail(
+          'UI: AP and STA badges',
+          JSON.stringify({ apOnly, apAndSta, staDestination, apDestination }),
+          Date.now() - t0
+        );
+      }
+    } catch (err) {
+      report.fail('UI: AP and STA badges', err.message, Date.now() - t0);
+      await navigateToDevice();
     }
   }
 
